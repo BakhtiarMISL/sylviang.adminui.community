@@ -1,0 +1,101 @@
+/*
+ *  Sets up base styles for the application like body background, font family, etc.
+ */
+
+// font import
+
+/*
+ * Baloo 2 Font Family
+ * A perfect, friendly, rounded display font
+ */
+
+@font-face {
+  font-family: "Baloo 2";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/Baloo2-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Baloo 2";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("/fonts/Baloo2-Medium.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Baloo 2";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/Baloo2-SemiBold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Baloo 2";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/Baloo2-Bold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Baloo 2";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/fonts/Baloo2-ExtraBold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Kalpurush";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/kalpurush.ttf") format("truetype");
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  font-family: "Baloo 2", "Kalpurush", sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--surface-1);
+}
+
+*::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 18px;
+  height: 18px;
+}
+
+*::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  background-color: #f2f2f2;
+  border-radius: 20px;
+  border: 6px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background-color: #cfd0d1;
+  border-radius: 20px;
+  border: 6px solid transparent;
+  background-clip: content-box;
+}
+
+*[routerLink] {
+  cursor: pointer !important;
+}
+
+*:focus-visible {
+  outline: 1px solid var(--deep-slate-gray);
+}

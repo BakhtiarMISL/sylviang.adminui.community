@@ -1,0 +1,616 @@
+<form [formGroup]="shiftForm" (ngSubmit)="onSubmit()" class="page-container">
+  <!-- Basic Information Section -->
+  <section class="form-container">
+    <h3 class="form-section-header">Basic Information</h3>
+
+    <!-- Shift Code -->
+    <div>
+      <p-floatlabel variant="in">
+        <input
+          pInputText
+          inputId="shiftCode"
+          formControlName="shiftCode"
+          maxlength="20"
+          class="w-full"
+          [readonly]="isEditMode"
+          [class.ng-invalid]="hasError('shiftCode')"
+          [class.ng-dirty]="hasError('shiftCode')"
+          (blur)="f['shiftCode'].markAsTouched()"
+        />
+        <label for="shiftCode">Shift Code *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('shiftCode')" class="invalid">
+        {{ getErrorMessage('shiftCode') }}
+      </div>
+    </div>
+
+    <!-- Shift Name -->
+    <div>
+      <p-floatlabel variant="in">
+        <input
+          pInputText
+          inputId="shiftName"
+          formControlName="shiftName"
+          maxlength="100"
+          class="w-full"
+          [class.ng-invalid]="hasError('shiftName')"
+          [class.ng-dirty]="hasError('shiftName')"
+          (blur)="f['shiftName'].markAsTouched()"
+        />
+        <label for="shiftName">Shift Name *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('shiftName')" class="invalid">
+        {{ getErrorMessage('shiftName') }}
+      </div>
+    </div>
+
+    <!-- Friendly Name -->
+    <div>
+      <p-floatlabel variant="in">
+        <input
+          pInputText
+          inputId="friendlyName"
+          formControlName="friendlyName"
+          maxlength="100"
+          class="w-full"
+          [class.ng-invalid]="hasError('friendlyName')"
+          [class.ng-dirty]="hasError('friendlyName')"
+          (blur)="f['friendlyName'].markAsTouched()"
+        />
+        <label for="friendlyName">Friendly Name</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('friendlyName')" class="invalid">
+        {{ getErrorMessage('friendlyName') }}
+      </div>
+    </div>
+
+    <!-- Login Time -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-datepicker
+          styleClass="w-full"
+          [timeOnly]="true"
+          [stepMinute]="1"
+          [stepHour]="1"
+          [showOnFocus]="true"
+          [touchUI]="false"
+          inputId="loginTime"
+          formControlName="loginTime"
+          [class.ng-invalid]="hasError('loginTime')"
+          [class.ng-dirty]="hasError('loginTime')"
+          (onBlur)="f['loginTime'].markAsTouched()"
+          (onFocus)="onTimeFieldFocus('loginTime')"
+          (keydown)="onTimeFieldKeydown($event, 'loginTime')"
+          (wheel)="onTimeFieldWheel($event, 'loginTime')"
+        />
+        <label for="loginTime">Login Time *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('loginTime')" class="invalid">
+        {{ getErrorMessage('loginTime') }}
+      </div>
+    </div>
+
+    <!-- Logout Time -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-datepicker
+          styleClass="w-full"
+          [timeOnly]="true"
+          [stepMinute]="1"
+          [stepHour]="1"
+          [showOnFocus]="true"
+          [touchUI]="false"
+          inputId="logoutTime"
+          formControlName="logoutTime"
+          [class.ng-invalid]="hasError('logoutTime')"
+          [class.ng-dirty]="hasError('logoutTime')"
+          (onBlur)="f['logoutTime'].markAsTouched()"
+          (onFocus)="onTimeFieldFocus('logoutTime')"
+          (keydown)="onTimeFieldKeydown($event, 'logoutTime')"
+          (wheel)="onTimeFieldWheel($event, 'logoutTime')"
+        />
+        <label for="logoutTime">Logout Time *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('logoutTime')" class="invalid">
+        {{ getErrorMessage('logoutTime') }}
+      </div>
+      <ng-container *ngIf="hasFormError()">
+        <div *ngIf="shiftForm.errors['crossDateRequired']" class="invalid">
+          {{ getFormErrorMessage() }}
+        </div>
+        <div *ngIf="shiftForm.errors['timeRangeInvalid']" class="invalid">
+          {{ getFormErrorMessage() }}
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Login Limit Time -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-datepicker
+          styleClass="w-full"
+          [timeOnly]="true"
+          [stepMinute]="1"
+          [stepHour]="1"
+          [showOnFocus]="true"
+          [touchUI]="false"
+          inputId="loginLimitTime"
+          formControlName="loginLimitTime"
+          [class.ng-invalid]="hasError('loginLimitTime')"
+          [class.ng-dirty]="hasError('loginLimitTime')"
+          (onBlur)="f['loginLimitTime'].markAsTouched()"
+          (onFocus)="onTimeFieldFocus('loginLimitTime')"
+          (keydown)="onTimeFieldKeydown($event, 'loginLimitTime')"
+          (wheel)="onTimeFieldWheel($event, 'loginLimitTime')"
+        />
+        <label for="loginLimitTime">Login Limit Time *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('loginLimitTime')" class="invalid">
+        {{ getErrorMessage('loginLimitTime') }}
+      </div>
+    </div>
+
+    <!-- Logout Limit Time -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-datepicker
+          styleClass="w-full"
+          [timeOnly]="true"
+          [stepMinute]="1"
+          [stepHour]="1"
+          [showOnFocus]="true"
+          [touchUI]="false"
+          inputId="logoutLimitTime"
+          formControlName="logoutLimitTime"
+          [class.ng-invalid]="hasError('logoutLimitTime')"
+          [class.ng-dirty]="hasError('logoutLimitTime')"
+          (onBlur)="f['logoutLimitTime'].markAsTouched()"
+          (onFocus)="onTimeFieldFocus('logoutLimitTime')"
+          (keydown)="onTimeFieldKeydown($event, 'logoutLimitTime')"
+          (wheel)="onTimeFieldWheel($event, 'logoutLimitTime')"
+        />
+        <label for="logoutLimitTime">Logout Limit Time *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('logoutLimitTime')" class="invalid">
+        {{ getErrorMessage('logoutLimitTime') }}
+      </div>
+      <div *ngIf="hasFormError() && shiftForm && shiftForm.errors && shiftForm.errors['logoutLimitOutOfRange']" class="invalid">
+        {{ getFormErrorMessage() }}
+      </div>
+    </div>
+
+    <!-- Grace In Minutes -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-inputnumber
+          inputId="graceInMinutes"
+          formControlName="graceInMinutes"
+          class="w-full"
+          [min]="-1"
+          suffix=" min"
+          [class.ng-invalid]="hasError('graceInMinutes')"
+          [class.ng-dirty]="hasError('graceInMinutes')"
+          (onBlur)="f['graceInMinutes'].markAsTouched()"
+        ></p-inputnumber>
+        <label for="graceInMinutes">Grace Period *</label>
+        <div class="field-info" *ngIf="!hasError('graceInMinutes')">
+          <i class="fas fa-info-circle" pTooltip="Type -1 to assign unlimited grace time" tooltipPosition="left" appendTo="body"></i>
+        </div>
+      </p-floatlabel>
+      <div *ngIf="hasError('graceInMinutes')" class="invalid">
+        {{ getErrorMessage('graceInMinutes') }}
+      </div>
+    </div>
+
+    <!-- Break In Minutes -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-inputnumber
+          inputId="breakInMinutes"
+          formControlName="breakInMinutes"
+          class="w-full"
+          [min]="0"
+          suffix=" min"
+          [class.ng-invalid]="hasError('breakInMinutes')"
+          [class.ng-dirty]="hasError('breakInMinutes')"
+          (onBlur)="f['breakInMinutes'].markAsTouched()"
+        ></p-inputnumber>
+        <label for="breakInMinutes">Break Time *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('breakInMinutes')" class="invalid">
+        {{ getErrorMessage('breakInMinutes') }}
+      </div>
+    </div>
+
+    <!-- Considerable In Minutes -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-inputnumber
+          inputId="considerableInMinutes"
+          formControlName="considerableInMinutes"
+          class="w-full"
+          [min]="-1"
+          suffix=" min"
+          [class.ng-invalid]="hasError('considerableInMinutes')"
+          [class.ng-dirty]="hasError('considerableInMinutes')"
+          (onBlur)="f['considerableInMinutes'].markAsTouched()"
+        ></p-inputnumber>
+        <label for="considerableInMinutes">Considerable Minutes *</label>
+        <div class="field-info" *ngIf="!hasError('considerableInMinutes')">
+          <i class="fas fa-info-circle" pTooltip="Type -1 to assign unlimited considerable time"></i>
+        </div>
+      </p-floatlabel>
+      <div *ngIf="hasError('considerableInMinutes')" class="invalid">
+        {{ getErrorMessage('considerableInMinutes') }}
+      </div>
+    </div>
+
+    <!-- Working Time In Minutes -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-inputnumber
+          inputId="workingTimeInMinutes"
+          formControlName="workingTimeInMinutes"
+          class="w-full"
+          [min]="0"
+          suffix=" min"
+          [readonly]="true"
+          [class.ng-invalid]="hasError('workingTimeInMinutes')"
+          [class.ng-dirty]="hasError('workingTimeInMinutes')"
+        ></p-inputnumber>
+        <label for="workingTimeInMinutes">Working Time (Auto-calculated) *</label>
+        <div class="field-info">
+          <i class="fas fa-info-circle" pTooltip="Auto Calculation based on login time, logout time, and break time"></i>
+        </div>
+      </p-floatlabel>
+      <div *ngIf="hasError('workingTimeInMinutes')" class="invalid">
+        {{ getErrorMessage('workingTimeInMinutes') }}
+      </div>
+    </div>
+
+    <!-- Minimum Working Time In Minutes -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-inputnumber
+          inputId="minimumWorkingTimeInMinutes"
+          formControlName="minimumWorkingTimeInMinutes"
+          class="w-full"
+          [min]="-1"
+          suffix=" min"
+          [class.ng-invalid]="hasError('minimumWorkingTimeInMinutes')"
+          [class.ng-dirty]="hasError('minimumWorkingTimeInMinutes')"
+          (onBlur)="f['minimumWorkingTimeInMinutes'].markAsTouched()"
+        ></p-inputnumber>
+        <label for="minimumWorkingTimeInMinutes">Minimum Working Time *</label>
+        <div class="field-info" *ngIf="!hasError('minimumWorkingTimeInMinutes')">
+          <i class="fas fa-info-circle" pTooltip="Type -1 to assign unlimited minimum working time" tooltipPosition="left" appendTo="body"></i>
+        </div>
+      </p-floatlabel>
+      <div *ngIf="hasError('minimumWorkingTimeInMinutes')" class="invalid">
+        {{ getErrorMessage('minimumWorkingTimeInMinutes') }}
+      </div>
+    </div>
+
+    <!-- Minimum Overtime Minutes -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-inputnumber
+          inputId="minimumOvertimeMinutes"
+          formControlName="minimumOvertimeMinutes"
+          class="w-full"
+          suffix=" min"
+          [class.ng-invalid]="hasError('minimumOvertimeMinutes')"
+          [class.ng-dirty]="hasError('minimumOvertimeMinutes')"
+          (onBlur)="f['minimumOvertimeMinutes'].markAsTouched()"
+        ></p-inputnumber>
+        <label for="minimumOvertimeMinutes">Minimum Overtime</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('minimumOvertimeMinutes')" class="invalid">
+        {{ getErrorMessage('minimumOvertimeMinutes') }}
+      </div>
+    </div>
+
+    <!-- Maximum Overtime Minutes -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-inputnumber
+          inputId="maximumOvertimeMinutes"
+          formControlName="maximumOvertimeMinutes"
+          class="w-full"
+          [min]="-1"
+          suffix=" min"
+          [class.ng-invalid]="hasError('maximumOvertimeMinutes')"
+          [class.ng-dirty]="hasError('maximumOvertimeMinutes')"
+          (onBlur)="f['maximumOvertimeMinutes'].markAsTouched()"
+        ></p-inputnumber>
+        <label for="maximumOvertimeMinutes">Maximum Overtime *</label>
+        <div class="field-info" *ngIf="!hasError('maximumOvertimeMinutes')">
+          <i class="fas fa-info-circle" pTooltip="Type -1 to assign unlimited maximum overtime" tooltipPosition="left" appendTo="body"></i>
+        </div>
+      </p-floatlabel>
+      <div *ngIf="hasError('maximumOvertimeMinutes')" class="invalid">
+        {{ getErrorMessage('maximumOvertimeMinutes') }}
+      </div>
+      <div *ngIf="hasFormError() && shiftForm && shiftForm.errors && shiftForm.errors['overtimeRangeInvalid']" class="invalid">
+        {{ getFormErrorMessage() }}
+      </div>
+    </div>
+
+    <!-- Overtime Rounding Mode -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-select
+          inputId="overtimeRoundingMode"
+          [options]="overtimeRoundingModeOptions"
+          [showClear]="false"
+          [appendTo]="'body'"
+          [autoDisplayFirst]="false"
+          optionLabel="label"
+          optionValue="value"
+          formControlName="overtimeRoundingMode"
+          class="w-full"
+          [class.ng-invalid]="hasError('overtimeRoundingMode')"
+          [class.ng-dirty]="hasError('overtimeRoundingMode')"
+          (onBlur)="f['overtimeRoundingMode'].markAsTouched()"
+          (onChange)="f['overtimeRoundingMode'].markAsTouched()"
+        ></p-select>
+        <label for="overtimeRoundingMode">Overtime Rounding Mode</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('overtimeRoundingMode')" class="invalid">
+        {{ getErrorMessage('overtimeRoundingMode') }}
+      </div>
+    </div>
+
+    <!-- Overtime Rounding Interval -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-inputnumber
+          inputId="overtimeRoundingInterval"
+          formControlName="overtimeRoundingInterval"
+          class="w-full"
+          [min]="0"
+          suffix=" min"
+          [class.ng-invalid]="hasError('overtimeRoundingInterval')"
+          [class.ng-dirty]="hasError('overtimeRoundingInterval')"
+          (onBlur)="f['overtimeRoundingInterval'].markAsTouched()"
+        ></p-inputnumber>
+        <label for="overtimeRoundingInterval">Overtime Rounding Interval</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('overtimeRoundingInterval')" class="invalid">
+        {{ getErrorMessage('overtimeRoundingInterval') }}
+      </div>
+    </div>
+
+    <div class="checkbox-container">
+      <p-checkbox inputId="isActive" formControlName="isActive" [binary]="true"></p-checkbox>
+      <label for="isActive">Active</label>
+    </div>
+
+    <div class="checkbox-container">
+      <p-checkbox inputId="isCrossDateShift" formControlName="isCrossDateShift" [binary]="true"></p-checkbox>
+      <label for="isCrossDateShift">Cross Date Shift</label>
+    </div>
+
+    <div class="checkbox-container">
+      <p-checkbox inputId="defaultSelection" formControlName="defaultSelection" [binary]="true"></p-checkbox>
+      <label for="defaultSelection">Default Selection</label>
+    </div>
+  </section>
+
+  <!-- First Half Settings Section -->
+  <section class="form-container">
+    <h3 class="form-section-header">First Half Settings</h3>
+
+    <!-- First Half Start Time -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-datepicker
+          styleClass="w-full"
+          [timeOnly]="true"
+          [stepMinute]="1"
+          [stepHour]="1"
+          [showOnFocus]="true"
+          [touchUI]="false"
+          inputId="firstHalfStartTime"
+          formControlName="firstHalfStartTime"
+          [class.ng-invalid]="hasError('firstHalfStartTime')"
+          [class.ng-dirty]="hasError('firstHalfStartTime')"
+          (onBlur)="f['firstHalfStartTime'].markAsTouched()"
+          (onFocus)="onTimeFieldFocus('firstHalfStartTime')"
+          (keydown)="onTimeFieldKeydown($event, 'firstHalfStartTime')"
+          (wheel)="onTimeFieldWheel($event, 'firstHalfStartTime')"
+        />
+        <label for="firstHalfStartTime">Start Time</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('firstHalfStartTime')" class="invalid">
+        {{ getErrorMessage('firstHalfStartTime') }}
+      </div>
+    </div>
+
+    <!-- First Half End Time -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-datepicker
+          styleClass="w-full"
+          [timeOnly]="true"
+          [stepMinute]="1"
+          [stepHour]="1"
+          [showOnFocus]="true"
+          [touchUI]="false"
+          inputId="firstHalfEndTime"
+          formControlName="firstHalfEndTime"
+          [class.ng-invalid]="hasError('firstHalfEndTime')"
+          [class.ng-dirty]="hasError('firstHalfEndTime')"
+          (onBlur)="f['firstHalfEndTime'].markAsTouched()"
+          (onFocus)="onTimeFieldFocus('firstHalfEndTime')"
+          (keydown)="onTimeFieldKeydown($event, 'firstHalfEndTime')"
+          (wheel)="onTimeFieldWheel($event, 'firstHalfEndTime')"
+        />
+        <label for="firstHalfEndTime">End Time</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('firstHalfEndTime')" class="invalid">
+        {{ getErrorMessage('firstHalfEndTime') }}
+      </div>
+    </div>
+
+    <!-- First Half Login Limit Time -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-datepicker
+          styleClass="w-full"
+          [timeOnly]="true"
+          [stepMinute]="1"
+          [stepHour]="1"
+          [showOnFocus]="true"
+          [touchUI]="false"
+          inputId="firstHalfLoginLimitTime"
+          formControlName="firstHalfLoginLimitTime"
+          [class.ng-invalid]="hasError('firstHalfLoginLimitTime')"
+          [class.ng-dirty]="hasError('firstHalfLoginLimitTime')"
+          (onBlur)="f['firstHalfLoginLimitTime'].markAsTouched()"
+          (onFocus)="onTimeFieldFocus('firstHalfLoginLimitTime')"
+          (keydown)="onTimeFieldKeydown($event, 'firstHalfLoginLimitTime')"
+          (wheel)="onTimeFieldWheel($event, 'firstHalfLoginLimitTime')"
+        />
+        <label for="firstHalfLoginLimitTime">Login Limit</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('firstHalfLoginLimitTime')" class="invalid">
+        {{ getErrorMessage('firstHalfLoginLimitTime') }}
+      </div>
+    </div>
+
+    <!-- First Half Minimum Working Minutes -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-inputnumber
+          inputId="firstHalfMinimumWorkingMinutes"
+          formControlName="firstHalfMinimumWorkingMinutes"
+          class="w-full"
+          [min]="0"
+          suffix=" min"
+          [class.ng-invalid]="hasError('firstHalfMinimumWorkingMinutes')"
+          [class.ng-dirty]="hasError('firstHalfMinimumWorkingMinutes')"
+          (onBlur)="f['firstHalfMinimumWorkingMinutes'].markAsTouched()"
+        ></p-inputnumber>
+        <label for="firstHalfMinimumWorkingMinutes">Min Working Time</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('firstHalfMinimumWorkingMinutes')" class="invalid">
+        {{ getErrorMessage('firstHalfMinimumWorkingMinutes') }}
+      </div>
+    </div>
+  </section>
+
+  <!-- Second Half Settings Section -->
+  <section class="form-container">
+    <h3 class="form-section-header">Second Half Settings</h3>
+
+    <!-- Second Half Start Time -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-datepicker
+          styleClass="w-full"
+          [timeOnly]="true"
+          [stepMinute]="1"
+          [stepHour]="1"
+          [showOnFocus]="true"
+          [touchUI]="false"
+          inputId="secondHalfStartTime"
+          formControlName="secondHalfStartTime"
+          [class.ng-invalid]="hasError('secondHalfStartTime')"
+          [class.ng-dirty]="hasError('secondHalfStartTime')"
+          (onBlur)="f['secondHalfStartTime'].markAsTouched()"
+          (onFocus)="onTimeFieldFocus('secondHalfStartTime')"
+          (keydown)="onTimeFieldKeydown($event, 'secondHalfStartTime')"
+          (wheel)="onTimeFieldWheel($event, 'secondHalfStartTime')"
+        />
+        <label for="secondHalfStartTime">Start Time</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('secondHalfStartTime')" class="invalid">
+        {{ getErrorMessage('secondHalfStartTime') }}
+      </div>
+    </div>
+
+    <!-- Second Half End Time -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-datepicker
+          styleClass="w-full"
+          [timeOnly]="true"
+          [stepMinute]="1"
+          [stepHour]="1"
+          [showOnFocus]="true"
+          [touchUI]="false"
+          inputId="secondHalfEndTime"
+          formControlName="secondHalfEndTime"
+          [class.ng-invalid]="hasError('secondHalfEndTime')"
+          [class.ng-dirty]="hasError('secondHalfEndTime')"
+          (onBlur)="f['secondHalfEndTime'].markAsTouched()"
+          (onFocus)="onTimeFieldFocus('secondHalfEndTime')"
+          (keydown)="onTimeFieldKeydown($event, 'secondHalfEndTime')"
+          (wheel)="onTimeFieldWheel($event, 'secondHalfEndTime')"
+        />
+        <label for="secondHalfEndTime">End Time</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('secondHalfEndTime')" class="invalid">
+        {{ getErrorMessage('secondHalfEndTime') }}
+      </div>
+    </div>
+
+    <!-- Second Half Login Limit Time -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-datepicker
+          styleClass="w-full"
+          [timeOnly]="true"
+          [stepMinute]="1"
+          [stepHour]="1"
+          [showOnFocus]="true"
+          [touchUI]="false"
+          inputId="secondHalfLoginLimitTime"
+          formControlName="secondHalfLoginLimitTime"
+          [class.ng-invalid]="hasError('secondHalfLoginLimitTime')"
+          [class.ng-dirty]="hasError('secondHalfLoginLimitTime')"
+          (onBlur)="f['secondHalfLoginLimitTime'].markAsTouched()"
+          (onFocus)="onTimeFieldFocus('secondHalfLoginLimitTime')"
+          (keydown)="onTimeFieldKeydown($event, 'secondHalfLoginLimitTime')"
+          (wheel)="onTimeFieldWheel($event, 'secondHalfLoginLimitTime')"
+        />
+        <label for="secondHalfLoginLimitTime">Login Limit</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('secondHalfLoginLimitTime')" class="invalid">
+        {{ getErrorMessage('secondHalfLoginLimitTime') }}
+      </div>
+    </div>
+
+    <!-- Second Half Minimum Working Minutes -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-inputnumber
+          inputId="secondHalfMinimumWorkingMinutes"
+          formControlName="secondHalfMinimumWorkingMinutes"
+          class="w-full"
+          [min]="0"
+          suffix=" min"
+          [class.ng-invalid]="hasError('secondHalfMinimumWorkingMinutes')"
+          [class.ng-dirty]="hasError('secondHalfMinimumWorkingMinutes')"
+          (onBlur)="f['secondHalfMinimumWorkingMinutes'].markAsTouched()"
+        ></p-inputnumber>
+        <label for="secondHalfMinimumWorkingMinutes">Min Working Time</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('secondHalfMinimumWorkingMinutes')" class="invalid">
+        {{ getErrorMessage('secondHalfMinimumWorkingMinutes') }}
+      </div>
+    </div>
+  </section>
+
+  <div class="sm:col-span-2 flex items-center justify-between gap-3">
+    <button pButton severity="secondary" type="button" [routerLink]="['/attendance/shift-list']">
+      <i class="fas fa-arrow-left z-10"></i>
+      <span>Back</span>
+    </button>
+    <button pButton type="submit">
+      <i class="fas fa-save"></i>
+      <span>Save</span>
+    </button>
+  </div>
+</form>

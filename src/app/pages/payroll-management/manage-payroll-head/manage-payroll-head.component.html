@@ -1,0 +1,162 @@
+<form [formGroup]="payrollHeadForm" (ngSubmit)="onSubmit()" class="page-container">
+  <section class="form-container">
+    <h3 class="form-section-header">{{ isEditMode ? 'Update Payroll Head' : 'Add Payroll Head' }}</h3>
+
+    <!-- Head Code -->
+    <div>
+      <p-floatlabel variant="in">
+        <input
+          pInputText
+          inputId="headCode"
+          formControlName="headCode"
+          maxlength="20"
+          class="w-full"
+          [readonly]="isEditMode"
+          [class.ng-invalid]="hasError('headCode')"
+          [class.ng-dirty]="hasError('headCode')"
+          (blur)="f['headCode'].markAsTouched()"
+        />
+        <label for="headCode">Head Code *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('headCode')" class="invalid">{{ getErrorMessage('headCode') }}</div>
+    </div>
+
+    <!-- Head Name -->
+    <div>
+      <p-floatlabel variant="in">
+        <input
+          pInputText
+          inputId="headName"
+          formControlName="headName"
+          maxlength="100"
+          class="w-full"
+          [class.ng-invalid]="hasError('headName')"
+          [class.ng-dirty]="hasError('headName')"
+          (blur)="f['headName'].markAsTouched()"
+        />
+        <label for="headName">Head Name *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('headName')" class="invalid">{{ getErrorMessage('headName') }}</div>
+    </div>
+
+    <!-- Head Type -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-select
+          inputId="headType"
+          [options]="headTypeOptions"
+          [appendTo]="'body'"
+          [autoDisplayFirst]="false"
+          optionLabel="label"
+          optionValue="value"
+          formControlName="headType"
+          class="w-full"
+          [class.ng-invalid]="hasError('headType')"
+          [class.ng-dirty]="hasError('headType')"
+          (onBlur)="f['headType'].markAsTouched()"
+          (onChange)="f['headType'].markAsTouched()"
+        ></p-select>
+        <label for="headType">Head Type *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('headType')" class="invalid">{{ getErrorMessage('headType') }}</div>
+    </div>
+
+    <!-- Calculation Type -->
+    <div>
+      <p-floatlabel variant="in">
+        <p-select
+          inputId="calculationType"
+          [options]="calculationTypeOptions"
+          [appendTo]="'body'"
+          [autoDisplayFirst]="false"
+          optionLabel="label"
+          optionValue="value"
+          formControlName="calculationType"
+          class="w-full"
+          [class.ng-invalid]="hasError('calculationType')"
+          [class.ng-dirty]="hasError('calculationType')"
+          (onBlur)="f['calculationType'].markAsTouched()"
+          (onChange)="f['calculationType'].markAsTouched()"
+        ></p-select>
+        <label for="calculationType">Calculation Type *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('calculationType')" class="invalid">{{ getErrorMessage('calculationType') }}</div>
+    </div>
+
+    <!-- Amount (shown when Fixed) -->
+    <div *ngIf="showAmount">
+      <p-floatlabel variant="in">
+        <p-inputnumber
+          inputId="amount"
+          formControlName="amount"
+          class="w-full"
+          [min]="0"
+          [minFractionDigits]="2"
+          [maxFractionDigits]="2"
+          [class.ng-invalid]="hasError('amount')"
+          [class.ng-dirty]="hasError('amount')"
+          (onBlur)="f['amount'].markAsTouched()"
+        ></p-inputnumber>
+        <label for="amount">Amount</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('amount')" class="invalid">{{ getErrorMessage('amount') }}</div>
+    </div>
+
+    <!-- Percentage (shown when Percentage) -->
+    <div *ngIf="showPercentage">
+      <p-floatlabel variant="in">
+        <p-inputnumber
+          inputId="percentage"
+          formControlName="percentage"
+          class="w-full"
+          [min]="0"
+          [max]="100"
+          [minFractionDigits]="2"
+          [maxFractionDigits]="2"
+          suffix=" %"
+          [class.ng-invalid]="hasError('percentage')"
+          [class.ng-dirty]="hasError('percentage')"
+          (onBlur)="f['percentage'].markAsTouched()"
+        ></p-inputnumber>
+        <label for="percentage">Percentage</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('percentage')" class="invalid">{{ getErrorMessage('percentage') }}</div>
+    </div>
+
+    <!-- Description -->
+    <div class="sm:col-span-2">
+      <p-floatlabel variant="in">
+        <textarea
+          pInputText
+          inputId="description"
+          formControlName="description"
+          class="w-full"
+          rows="3"
+          maxlength="500"
+          [class.ng-invalid]="hasError('description')"
+          [class.ng-dirty]="hasError('description')"
+          (blur)="f['description'].markAsTouched()"
+        ></textarea>
+        <label for="description">Description</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('description')" class="invalid">{{ getErrorMessage('description') }}</div>
+    </div>
+
+    <!-- Is Active -->
+    <div class="checkbox-container">
+      <p-checkbox inputId="isActive" formControlName="isActive" [binary]="true"></p-checkbox>
+      <label for="isActive">Active</label>
+    </div>
+  </section>
+
+  <div class="sm:col-span-2 flex items-center justify-between gap-3">
+    <button pButton severity="secondary" type="button" [routerLink]="['/payroll/payroll-head-list']">
+      <i class="fas fa-arrow-left z-10"></i>
+      <span>Back</span>
+    </button>
+    <button pButton type="submit">
+      <i class="fas fa-save"></i>
+      <span>Save</span>
+    </button>
+  </div>
+</form>

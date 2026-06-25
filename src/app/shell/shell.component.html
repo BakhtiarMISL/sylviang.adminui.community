@@ -1,0 +1,35 @@
+<div class="flex h-screen w-screen overflow-hidden relative">
+  <!-- Global Loading Overlay -->
+  <div *ngIf="showLoadingOverlay" class="loading-overlay">
+    <div class="welcome-message">
+      Welcome, <span class="username">{{ username }}</span>
+    </div>
+    <div class="three-dot-loader">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside class="fixed top-0 left-0 h-screen" [ngClass]="isMobile ? 'z-50' : 'z-10'">
+    <app-sidebar (sidebarToggle)="sidebarToggle($event)" (sidebarExpandedChange)="onSidebarExpandedChange($event)"></app-sidebar>
+  </aside>
+
+  <!-- Main content area -->
+  <main class="flex flex-col flex-1 overflow-hidden transition-[margin-left] duration-300 ease-in-out w-full" [ngStyle]="{ 'margin-left': sidebarMargin }">
+    <header class="relative">
+      <app-header [isSidebarExpanded]="isSidebarExpanded" (sidebarToggle)="onHeaderToggleSidebar()"></app-header>
+    </header>
+    <div class="flex-1 overflow-auto">
+      <router-outlet></router-outlet>
+    </div>
+
+    <!-- Scroll to Top Button -->
+    <button *ngIf="showScrollTop" (click)="scrollToTop()" class="scroll-to-top-btn" aria-label="Scroll to top">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="18 15 12 9 6 15"></polyline>
+      </svg>
+    </button>
+  </main>
+</div>

@@ -1,0 +1,60 @@
+<header class="relative px-4 py-2 flex items-center justify-between transition-colors duration-300">
+  <div class="flex items-center gap-2">
+    <button
+      (click)="toggleSidebar()"
+      class="h-8 flex items-center text-black dark:text-borderLight hover:text-primary dark:hover:text-primary duration-300"
+      [attr.aria-label]="'Toggle sidebar'"
+      title="Toggle sidebar"
+    >
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="flex items-center">
+      <div class="h-6 w-px bg-borderLight dark:bg-neutral mr-3"></div>
+
+      <!-- Dynamic Breadcrumbs -->
+      <nav class="flex items-center space-x-2" aria-label="Breadcrumb">
+        <ng-container *ngFor="let breadcrumb of breadcrumbs; let i = index; let last = last; let first = first">
+          <!-- Non-clickable non-active items (first item or explicitly non-clickable) -->
+          <div
+            *ngIf="!breadcrumb.active && (first || breadcrumb.isClickable === false)"
+            class="text-borderDark dark:text-borderLight"
+            [attr.aria-label]="breadcrumb.title"
+            [pTooltip]="breadcrumb.tooltip || breadcrumb.title"
+            tooltipPosition="bottom"
+          >
+            <i [class]="breadcrumb.icon + ' text-sm'"></i>
+          </div>
+
+          <!-- Clickable non-active items — icon only -->
+          <button
+            *ngIf="!breadcrumb.active && !first && breadcrumb.isClickable !== false"
+            [routerLink]="breadcrumb.href"
+            class="cursor-pointer transition-all duration-300 ease-in-out hover:text-primary dark:hover:text-primary text-borderDark dark:text-borderLight"
+            [attr.aria-label]="'Navigate to ' + breadcrumb.title"
+            [pTooltip]="breadcrumb.tooltip || breadcrumb.title"
+            tooltipPosition="bottom"
+          >
+            <i [class]="breadcrumb.icon + ' text-sm'"></i>
+          </button>
+
+          <!-- Active item — icon + title -->
+          <div *ngIf="breadcrumb.active" class="flex items-center space-x-2 text-dark dark:text-borderLight font-semibold">
+            <i [class]="breadcrumb.icon + ' text-sm'"></i>
+            <span class="text-sm font-medium">{{ breadcrumb.title }}</span>
+          </div>
+
+          <!-- Separator -->
+          <svg *ngIf="!last" class="w-4 h-4 text-neutral flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </ng-container>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Right side controls -->
+  <div class="flex items-center space-x-4">
+    <app-theme-toggle></app-theme-toggle>
+  </div>
+</header>

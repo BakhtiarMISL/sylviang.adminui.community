@@ -1,0 +1,130 @@
+<section class="page-container">
+  <div class="flex justify-between items-center gap-3">
+    <!-- Search Input -->
+    <div class="flex items-end gap-3 mb-4">
+      <p-floatlabel variant="in">
+        <input type="text" pInputText id="searchInput" class="w-full" [(ngModel)]="searchTerm" name="searchInput" (keyup.enter)="applySearch()" />
+        <label for="searchInput">Search payroll heads</label>
+      </p-floatlabel>
+
+      <button pButton (click)="applySearch()">
+        <i class="fa fa-search"></i>
+        <span>Search</span>
+      </button>
+
+      <button *ngIf="searchTerm" severity="secondary" pButton (click)="resetSearch()">
+        <i class="fa fa-times"></i>
+        <span>Reset</span>
+      </button>
+    </div>
+    <button [routerLink]="['/payroll/manage-payroll-head']" pButton>
+      <i class="fa fa-plus"></i>
+      <span>Add</span>
+    </button>
+  </div>
+
+  <!-- Payroll Head Table -->
+  <div class="table-container">
+    <div class="table-title-container">
+      <h3 class="table-title">
+        Payroll Head Table
+        <span class="table-title-info" *ngIf="totalRecords > 0">
+          ({{ totalRecords }} total{{ selectedPayrollHeads.length > 0 ? ', ' + selectedPayrollHeads.length + ' selected' : '' }})
+        </span>
+      </h3>
+    </div>
+
+    <div class="transition-all duration-500 ease-in-out">
+      <p-table
+        #dt
+        [value]="loading ? skeletonItems : payrollHeads"
+        [(selection)]="selectedPayrollHeads"
+        (selectionChange)="onSelectionChange($event)"
+        dataKey="payrollHeadId"
+        (onSort)="onSort($event)"
+        [paginator]="true"
+        [rows]="rows"
+        [first]="(currentPage - 1) * rows"
+        [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+        [totalRecords]="totalRecords"
+        (onPage)="onPageChange($event)"
+        [lazy]="true"
+        [loading]="false"
+        scrollHeight="flex"
+        [responsiveLayout]="'scroll'"
+        selectionMode="multiple"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} payroll heads"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+            @for (col of columns; track col.field) {
+              <th [pSortableColumn]="col.sortable !== false ? col.field : null" [style.width]="col.width" class="group">
+                <div class="flex items-center gap-2">
+                  {{ col.label }}
+                  @if (col.sortable !== false) {
+                    <span
+                      class="transition-opacity duration-150"
+                      [ngClass]="{
+                        'opacity-100': sortedColumn === col.field,
+                        'opacity-0 group-hover:opacity-100': sortedColumn !== col.field,
+                      }"
+                    >
+                      <p-sortIcon [field]="col.field"></p-sortIcon>
+                    </span>
+                  }
+                </div>
+              </th>
+            }
+            <th style="width: 8rem">Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-head>
+          @if (loading) {
+            <tr>
+              <td><p-skeleton width="1rem" height="1rem"></p-skeleton></td>
+              <td><p-skeleton width="100%" height="1rem"></p-skeleton></td>
+              <td><p-skeleton width="100%" height="1rem"></p-skeleton></td>
+              <td><p-skeleton width="100%" height="1rem"></p-skeleton></td>
+              <td><p-skeleton width="100%" height="1rem"></p-skeleton></td>
+              <td><p-skeleton width="100%" height="1rem"></p-skeleton></td>
+              <td><p-skeleton width="3rem" height="1rem"></p-skeleton></td>
+            </tr>
+          } @else {
+            <tr>
+              <td><p-tableCheckbox [value]="head"></p-tableCheckbox></td>
+              <td>{{ head.headCode }}</td>
+              <td>{{ head.headName }}</td>
+              <td>{{ head.headType }}</td>
+              <td>{{ head.calculationType }}</td>
+              <td>
+                <i class="fa text-sm" [class.fa-check]="head.isActive" [class.fa-times]="!head.isActive" [class.text-primary]="head.isActive" [class.text-neutral]="!head.isActive"></i>
+              </td>
+              <td>
+                <button [routerLink]="['/payroll/manage-payroll-head', head.payrollHeadId]" class="text-primary mr-2">
+                  <i class="fa fa-edit"></i>
+                </button>
+                <button class="text-danger" (click)="deletePayrollHead(head, $event)">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="8" class="not-found">
+              <div>
+                <i class="fa fa-magnifying-glass-minus"></i>
+                <p>No payroll heads found</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</section>

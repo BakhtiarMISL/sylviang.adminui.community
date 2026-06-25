@@ -1,0 +1,117 @@
+/*
+ *  Dedicated file for custom utility classes. like margin, padding, display, etc.
+ */
+
+.title {
+  @apply text-[1.2rem] font-semibold;
+}
+
+.form-container {
+  @apply grid gap-x-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 rounded-lg p-4 shadow-md mb-4 border dark:border-borderLight/50 bg-light dark:bg-dark;
+}
+
+.form-section-header {
+  @apply font-medium col-span-2 lg:col-span-3 xl:col-span-4;
+}
+
+.invalid {
+  @apply text-danger text-sm;
+}
+
+.not-found {
+  @apply text-center text-black dark:text-white;
+  div {
+    @apply flex flex-col items-center justify-center py-5 text-neutral dark:text-white/60;
+    i {
+      @apply text-4xl mb-3 opacity-50;
+    }
+    p {
+      @apply text-lg font-medium;
+    }
+  }
+}
+
+.page-container {
+  @apply px-5 pt-2 pb-5;
+}
+
+.table-container {
+  @apply rounded-lg shadow-sm border border-borderLight dark:border-borderDark;
+}
+
+.table-title {
+  @apply text-sm font-semibold;
+}
+
+.table-title-info {
+  @apply ml-2 text-xs text-neutral dark:text-white/60;
+}
+
+.table-title-container {
+  @apply bg-light dark:bg-dark flex items-center justify-between px-4 py-2 border-b border-borderLight dark:border-borderDark rounded-t-lg;
+}
+
+.collapse-button {
+  @apply text-neutral hover:text-black text-xl focus:outline-none transition-transform;
+}
+
+.checkbox-container {
+  @apply flex items-center gap-2 h-10;
+  label {
+    @apply cursor-pointer;
+  }
+}
+
+.field-info {
+  @apply absolute top-1/2 right-3 -translate-y-1/2 text-neutral dark:text-white/70;
+}
+
+.info-container {
+  @apply bg-info-50 dark:bg-info-900/20 border border-info-200 dark:border-info-800 px-3 py-2 rounded-md flex items-center gap-2;
+  i {
+    @apply text-info-600 dark:text-info-400;
+  }
+  p {
+    @apply text-sm text-info-600 dark:text-info-400;
+  }
+}
+
+.error-container {
+  @apply bg-danger-50 dark:bg-danger-900/20 border border-danger-200 dark:border-danger-800 px-3 py-2 rounded-md flex items-center gap-2;
+  i {
+    @apply text-danger-600 dark:text-danger-400;
+  }
+  p {
+    @apply text-sm text-danger-600 dark:text-danger-400;
+  }
+}
+
+// Fixed columns helper classes
+.table-fixed-columns {
+  @apply overflow-x-auto relative;
+}
+
+.fixed-col {
+  @apply sticky z-10;
+}
+
+// Visual feedback for modified records
+.modified-row {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.modified-field {
+  background-color: rgba(59, 130, 246, 0.15);
+}
+
+:host-context(.dark) .modified-row {
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+:host-context(.dark) .modified-field {
+  background-color: rgba(59, 130, 246, 0.3);
+}
+
+.auto-selected-row {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}

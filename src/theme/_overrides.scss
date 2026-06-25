@@ -1,0 +1,524 @@
+// --------------------------------------------Form Components Font Consistency--------------------------------------------
+// Unified font styling for all form inputs to ensure consistency
+.p-inputtext,
+.p-textarea,
+.p-select .p-select-label,
+.p-multiselect .p-multiselect-label,
+.p-select-option,
+.p-multiselect-option,
+.p-datepicker .p-datepicker-input,
+.p-inputnumber .p-inputnumber-input {
+  font-family: "Baloo 2", "Kalpurush", sans-serif !important;
+  font-size: 0.875rem !important; // 14px
+  font-weight: 400 !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.025em !important;
+}
+
+// Consistent placeholder styling
+.p-inputtext::placeholder,
+.p-textarea::placeholder {
+  font-family: "Baloo 2", "Kalpurush", sans-serif !important;
+  font-size: 0.875rem !important; // 14px
+  font-weight: 400 !important;
+  opacity: 0.6 !important;
+  color: inherit !important;
+}
+
+// --------------------------------------------Select, Multiselect Css Override--------------------------------------------
+.p-select,
+.p-multiselect {
+  @apply border-b border-b-neutral hover:border-b-primary focus:border-b-primary border-x-0 border-t-0 rounded-none !important;
+  background: transparent !important;
+  box-shadow: none;
+}
+.p-select .p-select-label {
+  @apply text-black dark:text-white;
+}
+.p-multiselect .p-multiselect-label {
+  @apply text-black dark:text-white py-1;
+}
+.p-select-overlay,
+.p-select-list-container,
+.p-select-list,
+.p-multiselect-overlay,
+.p-multiselect-list-container,
+.p-multiselect-list {
+  @apply bg-light dark:bg-dark w-full border-borderLight dark:border-borderDark rounded z-50 !important;
+  overflow-x: auto !important;
+}
+.p-select-option,
+.p-multiselect-option {
+  background-color: transparent !important;
+  @apply h-8;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  padding: 0.5rem 0.75rem !important;
+  scrollbar-width: none !important;
+}
+.p-select-option:hover,
+.p-select-option-selected,
+.p-multiselect-option:hover,
+.p-multiselect-option-selected {
+  background-color: #4ade80 !important;
+}
+.p-select-header .p-inputtext,
+.p-multiselect-header .p-inputtext {
+  @apply h-8 px-0 !important;
+}
+.p-select-list .p-select-empty-message,
+.p-multiselect-list .p-multiselect-empty-message {
+  @apply h-8 text-black dark:text-white;
+}
+
+// --------------------------------------------Input text, Textarea Css Override--------------------------------------------
+.p-inputtext {
+  @apply border-b border-b-neutral hover:border-b-primary focus:border-b-primary text-black dark:text-white border-x-0 border-t-0 rounded-none !important;
+  background: transparent !important;
+  box-shadow: none;
+}
+.p-textarea {
+  @apply border-b border-b-neutral hover:border-b-primary focus:border-b-primary text-black dark:text-white border-x-0 border-t-0 rounded-none !important;
+  background: transparent !important;
+  box-shadow: none;
+  scrollbar-width: none;
+}
+
+// --------------------------------------------Float Label CSS Override--------------------------------------------
+.p-floatlabel {
+  &:has(.ng-invalid.ng-dirty) label,
+  &:has(.ng-invalid.ng-touched) label {
+    @apply text-danger !important;
+  }
+}
+.p-floatlabel > label {
+  @apply text-black/80 dark:text-white/80 !important;
+}
+
+// --------------------------------------------Input Number Css Override--------------------------------------------
+.p-inputnumber .p-inputnumber-input {
+  @apply w-full !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+// --------------------------------------------Table Css Override--------------------------------------------
+
+.p-datatable {
+  .p-paginator {
+    @apply bg-light dark:bg-dark;
+  }
+  .p-paginator-page.p-paginator-page-selected,
+  .p-paginator-page:not(.p-disabled):not(.p-paginator-page-selected):hover,
+  .p-paginator-first:not(.p-disabled):hover,
+  .p-paginator-prev:not(.p-disabled):hover,
+  .p-paginator-next:not(.p-disabled):hover,
+  .p-paginator-last:not(.p-disabled):hover {
+    @apply bg-primary/10 text-black dark:text-white;
+  }
+  .p-datatable-table-container {
+    overflow-y: hidden !important;
+  }
+  .p-paginator-current {
+    @apply text-black dark:text-white;
+  }
+  .p-paginator .p-select-overlay {
+    top: auto !important;
+    bottom: 0 !important;
+  }
+
+  .p-select-option {
+    @apply text-black dark:text-white;
+    &:hover,
+    &.p-select-option-selected {
+      background-color: #4ade80 !important;
+    }
+  }
+  .p-datatable-thead > tr {
+    @apply text-left text-sm font-semibold text-black dark:text-white !important;
+  }
+  .p-datatable-tbody > tr {
+    @apply text-sm dark:text-white !important;
+    &:nth-child(even) {
+      @apply bg-light dark:bg-dark;
+      &:hover {
+        @apply bg-light dark:bg-dark dark:text-white !important;
+      }
+    }
+    &:nth-child(odd) {
+      @apply bg-borderLight dark:bg-borderDark;
+      &:hover {
+        @apply bg-borderLight dark:bg-borderDark dark:text-white !important;
+      }
+    }
+  }
+  .p-datatable-tbody > tr > td {
+    @apply p-[0.5rem_1rem] border-b text-sm border-b-borderLight dark:border-b-borderDark truncate text-black dark:text-white max-w-[150px] whitespace-nowrap overflow-hidden text-ellipsis hover:whitespace-normal hover:overflow-visible !important;
+  }
+  .p-datatable-thead > tr > th.p-datatable-column-sorted {
+    @apply bg-transparent text-black dark:text-white !important;
+  }
+  .p-datatable-thead > tr > th {
+    @apply bg-light dark:bg-dark text-black dark:text-white border-b border-b-borderLight dark:border-b-borderDark p-[0.75rem_1rem];
+  }
+}
+.p-datatable-sortable-column:not(.p-datatable-column-sorted):hover {
+  @apply bg-borderLight dark:bg-borderDark text-black dark:text-white !important;
+}
+// Table loading state background overlay
+.p-overlay-mask {
+  @apply bg-borderDark/50 text-dark dark:text-white !important;
+}
+
+// --------------------------------------------Datepicker Css Override--------------------------------------------
+.p-datepicker {
+  @apply w-full !important;
+  width: 100% !important;
+}
+.p-datepicker .p-inputwrapper {
+  @apply w-full !important;
+  width: 100% !important;
+}
+.p-datepicker .p-datepicker-input {
+  @apply w-full !important;
+  width: 100% !important;
+}
+.p-datepicker-panel {
+  @apply bg-light dark:bg-dark text-black dark:text-white z-50 !important;
+  min-width: auto !important;
+}
+.p-datepicker .p-datepicker-dropdown
+// .p-datepicker-input-icon-container .p-datepicker-input-icon
+{
+  @apply hidden;
+}
+.p-datepicker-header,
+.p-datepicker-weekday,
+.p-datepicker-select-month,
+.p-datepicker-select-year,
+.p-datepicker-year,
+.p-datepicker-month,
+.p-datepicker-day {
+  @apply dark:bg-transparent text-black dark:text-white text-sm !important;
+  background: transparent !important;
+  color: inherit !important;
+}
+.p-datepicker-day {
+  @apply w-6 h-6 !important;
+}
+
+.p-datepicker .p-datepicker-input,
+.p-datepicker .p-inputtext {
+  @apply h-[54px] !important; // Stupid fix for input height
+}
+
+// --------------------------------------------Menu CSS Override--------------------------------------------
+.p-menu {
+  @apply dark:bg-dark;
+}
+.p-menu-item-link:hover {
+  @apply rounded;
+  background-color: #4ade80 !important;
+}
+
+// --------------------------------------------Button CSS Override--------------------------------------------
+// .p-button {
+//   @apply px-2 !important;
+// }
+
+.p-button {
+  @apply h-[26px] flex items-center gap-2;
+  i,
+  span {
+    @apply text-white text-sm;
+  }
+}
+.p-button:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.5 !important;
+}
+.p-button-text:not(:disabled):hover {
+  @apply bg-borderLight dark:bg-borderDark;
+}
+.p-button-text.p-button-danger:not(:disabled):hover {
+  @apply bg-danger-500 dark:bg-danger-700;
+}
+.p-button-secondary {
+  @apply bg-neutral hover:bg-borderDark border-neutral text-white border-none !important;
+}
+.p-ripple.p-button.p-component.p-button-icon-only.p-button-secondary.p-button-rounded.p-button-text.p-dialog-close-button {
+  @apply bg-transparent hover:bg-danger-100 duration-200 text-danger-500 !important;
+}
+
+// --------------------------------------------Dialog CSS Override--------------------------------------------
+.p-dialog {
+  border: none !important;
+  .p-dialog-header {
+    @apply bg-light dark:bg-dark text-black dark:text-white rounded-t-xl px-5 pt-3 pb-0 z-20;
+  }
+  .p-dialog-content {
+    @apply bg-light dark:bg-dark text-black dark:text-white px-5 py-0;
+    overflow: auto !important;
+  }
+  .p-dialog-footer {
+    @apply bg-light dark:bg-dark text-black dark:text-white rounded-b-xl px-5 py-3 z-20;
+  }
+  .p-confirmdialog-reject-button,
+  .p-confirmdialog-accept-button {
+    @apply w-14 h-6 text-sm rounded text-white hover:text-white !important;
+  }
+}
+
+//--------------------------------------------Toast CSS Override--------------------------------------------
+.p-toast-message-info {
+  @apply bg-info-500/60 !important;
+}
+.p-toast-message-success {
+  @apply bg-success-500/60 !important;
+}
+.p-toast-message-warn {
+  @apply bg-warning-500/60 !important;
+}
+.p-toast-message-error {
+  @apply bg-danger-500/60 !important;
+}
+
+.p-toast-message-info .p-toast-summary,
+.p-toast-message-success .p-toast-summary,
+.p-toast-message-warn .p-toast-summary,
+.p-toast-message-error .p-toast-summary {
+  @apply text-white;
+}
+
+.p-toast-message-info .p-toast-detail {
+  @apply text-info-50;
+}
+
+.p-toast-message-success .p-toast-detail {
+  @apply text-success-50;
+}
+
+.p-toast-message-warn .p-toast-detail {
+  @apply text-amber-50;
+}
+
+.p-toast-message-error .p-toast-detail {
+  @apply text-danger-50;
+}
+
+.p-toast-message-info .p-icon {
+  @apply text-info-100;
+}
+.p-toast-message-success .p-icon {
+  @apply text-success-100;
+}
+.p-toast-message-warn .p-icon {
+  @apply text-amber-100;
+}
+.p-toast-message-error .p-icon {
+  @apply text-danger-100;
+}
+
+.p-toast-message-content .p-toast-close-button {
+  @apply hover:bg-neutral hover:text-white duration-200 !important;
+}
+//--------------------------------------------Skeleton CSS Override--------------------------------------------
+.p-skeleton {
+  @apply bg-borderLight dark:bg-borderDark !important;
+}
+
+// --------------------------------------------Miscellaneous CSS Override--------------------------------------------
+:root {
+  // --p-datatable-body-cell-padding: 0.75rem 1rem;
+  --p-content-border-color: #e5e7eb !important; // Light gray border color
+}
+
+// ---------------------------------------------Checkbox CSS Override--------------------------------------------
+.p-checkbox-box {
+  @apply bg-light dark:bg-dark border-borderLight dark:border-borderDark !important;
+}
+.p-checkbox-checked .p-checkbox-box {
+  @apply bg-primary !important;
+}
+.p-checkbox-checked .p-checkbox-icon {
+  @apply text-white !important;
+}
+.p-checkbox.p-disabled {
+  .p-checkbox-box {
+    @apply bg-[#f3f4f6] dark:bg-[#4b5563]  !important;
+  }
+}
+
+// ---------------------------------------------Radio Button CSS Override--------------------------------------------
+.p-radiobutton-box {
+  @apply bg-transparent !important;
+}
+.p-radiobutton-checked .p-radiobutton-box .p-radiobutton-icon {
+  @apply bg-primary !important;
+}
+
+// ---------------------------------------------Autocomplete CSS Override--------------------------------------------
+.p-autocomplete-overlay {
+  @apply border-borderLight dark:border-borderDark rounded !important;
+}
+.p-autocomplete-list-container {
+  @apply bg-light dark:bg-dark text-dark dark:text-light rounded !important;
+}
+.p-autocomplete-option {
+  @apply py-0 px-1 !important;
+
+  &.p-focus {
+    @apply bg-borderLight dark:bg-borderDark !important;
+  }
+}
+
+/* Alternatively, reset all options when container loses hover */
+.p-autocomplete-overlay:not(:hover) .p-autocomplete-option {
+  @apply bg-transparent !important;
+}
+// ---------------------------------------------Carousel CSS Override---------------------------------------------
+.p-carousel-indicator-list {
+  @apply mt-4 !important;
+}
+
+// ---------------------------------------------Fixed Columns CSS (Central Reusable Logic)--------------------------------------------
+// Central reusable CSS for fixing multiple columns in tables
+.fixed-columns-table {
+  .p-datatable-table-container {
+    @apply relative overflow-x-auto !important;
+  }
+
+  // Base styles for any fixed column
+  .fixed-column {
+    @apply sticky z-10 border-r border-r-borderLight !important;
+  }
+
+  // Dark mode border
+  .dark & .fixed-column {
+    @apply border-r-borderDark !important;
+  }
+
+  // Header fixed columns - sync with default table header
+  .p-datatable-thead > tr > th.fixed-column {
+    @apply bg-light !important;
+  }
+
+  .dark & .p-datatable-thead > tr > th.fixed-column {
+    @apply bg-dark !important;
+  }
+
+  // Body fixed columns - sync with default table row colors
+  .p-datatable-tbody > tr:nth-child(even) > td.fixed-column {
+    @apply bg-light !important;
+  }
+
+  .dark & .p-datatable-tbody > tr:nth-child(even) > td.fixed-column {
+    @apply bg-dark !important;
+  }
+
+  .p-datatable-tbody > tr:nth-child(odd) > td.fixed-column {
+    @apply bg-borderLight !important;
+  }
+
+  .dark & .p-datatable-tbody > tr:nth-child(odd) > td.fixed-column {
+    @apply bg-borderDark !important;
+  }
+
+  // Hover states - sync with default table hover
+  .p-datatable-tbody > tr:nth-child(even):hover > td.fixed-column {
+    @apply bg-light !important;
+  }
+
+  .dark & .p-datatable-tbody > tr:nth-child(even):hover > td.fixed-column {
+    @apply bg-dark !important;
+  }
+
+  .p-datatable-tbody > tr:nth-child(odd):hover > td.fixed-column {
+    @apply bg-borderLight !important;
+  }
+
+  .dark & .p-datatable-tbody > tr:nth-child(odd):hover > td.fixed-column {
+    @apply bg-borderDark !important;
+  }
+
+  .fixed-column-0 {
+    left: 0 !important;
+    width: var(--fixed-col-0-width, 3rem) !important;
+    min-width: var(--fixed-col-0-width, 3rem) !important;
+    max-width: var(--fixed-col-0-width, 3rem) !important;
+  }
+
+  .fixed-column-1 {
+    left: var(--fixed-col-0-width, 3rem) !important;
+    width: var(--fixed-col-1-width, 5rem) !important;
+    min-width: var(--fixed-col-1-width, 5rem) !important;
+    max-width: var(--fixed-col-1-width, 5rem) !important;
+  }
+
+  .fixed-column-2 {
+    left: calc(var(--fixed-col-0-width, 3rem) + var(--fixed-col-1-width, 5rem)) !important;
+    width: var(--fixed-col-2-width, 8rem) !important;
+    min-width: var(--fixed-col-2-width, 8rem) !important;
+    max-width: var(--fixed-col-2-width, 8rem) !important;
+  }
+
+  .fixed-column-3 {
+    left: calc(var(--fixed-col-0-width, 3rem) + var(--fixed-col-1-width, 5rem) + var(--fixed-col-2-width, 8rem)) !important;
+    width: var(--fixed-col-3-width, 6rem) !important;
+    min-width: var(--fixed-col-3-width, 6rem) !important;
+    max-width: var(--fixed-col-3-width, 6rem) !important;
+  }
+
+  .fixed-column-4 {
+    left: calc(var(--fixed-col-0-width, 3rem) + var(--fixed-col-1-width, 5rem) + var(--fixed-col-2-width, 8rem) + var(--fixed-col-3-width, 6rem)) !important;
+    width: var(--fixed-col-4-width, 7rem) !important;
+    min-width: var(--fixed-col-4-width, 7rem) !important;
+    max-width: var(--fixed-col-4-width, 7rem) !important;
+  }
+
+  // Checkbox column specific styling (applies to column 0 by default)
+  .fixed-column-0 {
+    @apply p-0 align-middle !important;
+
+    .p-checkbox,
+    .p-tableHeaderCheckbox,
+    .p-tableCheckbox {
+      @apply flex items-center justify-center h-full w-full p-2 m-0 !important;
+    }
+
+    .p-checkbox-box {
+      @apply m-0 flex-shrink-0 !important;
+    }
+  }
+
+  // Ensure text in fixed columns is properly truncated
+  .fixed-column .table-data {
+    @apply overflow-hidden text-ellipsis whitespace-nowrap max-w-[150px] !important;
+  }
+}
+
+// Legacy support - keep the old class name working
+.fixed-checkbox-table {
+  @extend .fixed-columns-table;
+}
+
+// ---------------------------------------------Browser Autofill Styles Override---------------------------------------------
+.p-inputtext:-webkit-autofill,
+.p-inputtext:-webkit-autofill:hover,
+.p-inputtext:-webkit-autofill:focus,
+.p-inputtext:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px theme("colors.light") inset !important;
+  -webkit-text-fill-color: theme("colors.dark") !important;
+}
+.dark .p-inputtext:-webkit-autofill,
+.dark .p-inputtext:-webkit-autofill:hover,
+.dark .p-inputtext:-webkit-autofill:focus,
+.dark .p-inputtext:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px theme("colors.dark") inset !important;
+  -webkit-text-fill-color: theme("colors.light") !important;
+}
+
+.p-popover-content {
+  @apply p-0 !important;
+}
