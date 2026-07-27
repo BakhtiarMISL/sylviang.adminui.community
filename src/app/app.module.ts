@@ -15,6 +15,7 @@ import { routes } from './app.routes';
 import { ShellModule } from './shell/shell.module';
 import { ApiPrefixInterceptor } from './@core/interceptors/api-prefix.interceptor';
 import { ErrorHandlerInterceptor } from './@core/interceptors/error-handler.interceptor';
+import { CurrentUserInterceptor } from './@core/interceptors/current-user.interceptor';
 import { RouteReuseStrategy, PreloadAllModules } from '@angular/router';
 import { RouteReusableStrategy } from './@core/helpers/route-reusable-strategy';
 
@@ -47,6 +48,11 @@ import { RouteReusableStrategy } from './@core/helpers/route-reusable-strategy';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: ErrorHandlerInterceptor,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: CurrentUserInterceptor,
       multi: true,
     },
     {

@@ -1,0 +1,167 @@
+<section class="page-container">
+  <div class="flex justify-end mb-4">
+    <button [routerLink]="['/employee-directory/manage-employee']" pButton>
+      <i class="fa fa-plus"></i>
+      <span>Add Employee</span>
+    </button>
+  </div>
+
+  <p-panel
+    header="Employee Filters"
+    [toggleable]="true"
+    [toggler]="'header'"
+    [collapsed]="filtersCollapsed"
+    (collapsedChange)="onFiltersCollapsedChange($event)"
+    styleClass="mb-4"
+  >
+    <ng-template #headericons let-collapsed>
+      <i class="fas fa-chevron-down text-xs transition-transform duration-300" [ngClass]="{ 'rotate-180': !collapsed }"></i>
+    </ng-template>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-5">
+      <p-floatlabel variant="in">
+        <input type="text" pInputText id="searchInput" class="w-full" [(ngModel)]="searchTerm" name="searchInput" (keyup.enter)="applySearch()" />
+        <label for="searchInput">Search name, ID, email, skill</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in">
+        <p-select inputId="departmentId" [options]="departmentOptions" optionLabel="label" optionValue="value" [(ngModel)]="departmentId" [appendTo]="'body'" [autoDisplayFirst]="false" styleClass="w-full"></p-select>
+        <label for="departmentId">Department</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in">
+        <p-select inputId="siteId" [options]="branchOptions" optionLabel="label" optionValue="value" [(ngModel)]="siteId" [appendTo]="'body'" [autoDisplayFirst]="false" styleClass="w-full"></p-select>
+        <label for="siteId">Branch</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in">
+        <p-select inputId="designationId" [options]="designationOptions" optionLabel="label" optionValue="value" [(ngModel)]="designationId" [appendTo]="'body'" [autoDisplayFirst]="false" styleClass="w-full"></p-select>
+        <label for="designationId">Designation</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in">
+        <p-select inputId="status" [options]="statusOptions" optionLabel="label" optionValue="value" [(ngModel)]="isActive" [appendTo]="'body'" [autoDisplayFirst]="false" styleClass="w-full"></p-select>
+        <label for="status">Status</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="flex items-center gap-3 mt-6">
+      <button pButton (click)="applySearch()">
+        <i class="fa fa-search"></i>
+        <span>Search</span>
+      </button>
+
+      <button pButton severity="secondary" (click)="resetSearch()">
+        <i class="fa fa-times"></i>
+        <span>Reset</span>
+      </button>
+    </div>
+  </p-panel>
+
+  <p-panel
+    header="Employee Table"
+    [toggleable]="true"
+    [toggler]="'header'"
+    [collapsed]="tableCollapsed"
+    (collapsedChange)="onTableCollapsedChange($event)"
+  >
+    <ng-template #headericons let-collapsed>
+      <i class="fas fa-chevron-down text-xs transition-transform duration-300" [ngClass]="{ 'rotate-180': !collapsed }"></i>
+    </ng-template>
+
+    <div class="table-container">
+      <div class="transition-all duration-500 ease-in-out">
+        <p-table
+        #dt
+        [value]="loading ? skeletonItems : employees"
+        [(selection)]="selectedEmployees"
+        (selectionChange)="onSelectionChange($event)"
+        dataKey="employeeId"
+        (onSort)="onSort($event)"
+        [paginator]="true"
+        [rows]="rows"
+        [first]="(currentPage - 1) * rows"
+        [rowsPerPageOptions]="[10, 20, 50, 100]"
+        [totalRecords]="totalRecords"
+        (onPage)="onPageChange($event)"
+        [lazy]="true"
+        [loading]="false"
+        scrollHeight="flex"
+        [responsiveLayout]="'scroll'"
+        selectionMode="multiple"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} employees"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+            @for (col of columns; track col.field) {
+              <th [pSortableColumn]="col.sortable ? col.field : null" [style.width]="col.width" class="group">
+                <div class="flex items-center gap-2">
+                  {{ col.label }}
+                  @if (col.sortable) {
+                    <span
+                      class="transition-opacity duration-150"
+                      [ngClass]="{
+                        'opacity-100': sortedColumn === col.field,
+                        'opacity-0 group-hover:opacity-100': sortedColumn !== col.field,
+                      }"
+                    >
+                      <p-sortIcon [field]="col.field"></p-sortIcon>
+                    </span>
+                  }
+                </div>
+              </th>
+            }
+            <th style="width: 6rem">Status</th>
+            <th style="width: 10rem">Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-employee>
+          @if (loading) {
+            <tr>
+              <td><p-skeleton width="1rem" height="1rem"></p-skeleton></td>
+              <td *ngFor="let col of columns"><p-skeleton width="100%" height="1rem"></p-skeleton></td>
+              <td><p-skeleton width="3rem" height="1rem"></p-skeleton></td>
+              <td><p-skeleton width="4rem" height="1rem"></p-skeleton></td>
+            </tr>
+          } @else {
+            <tr>
+              <td><p-tableCheckbox [value]="employee"></p-tableCheckbox></td>
+              <td>{{ employee.employeeCode }}</td>
+              <td>{{ employee.employeeName }}</td>
+              <td>{{ employee.email }}</td>
+              <td>{{ employee.designationName || employee.designationId }}</td>
+              <td>{{ employee.departmentName || employee.departmentId }}</td>
+              <td>{{ employee.siteName || employee.siteId }}</td>
+              <td>
+                <span [class]="employee.isActive ? 'status-active' : 'status-inactive'">{{ employee.isActive ? 'Active' : 'Inactive' }}</span>
+              </td>
+              <td>
+                <button [routerLink]="['/employee-directory/profile', employee.employeeId]" class="text-primary mr-2">
+                  <i class="fa fa-eye"></i>
+                </button>
+                <button class="text-danger" *ngIf="employee.isActive" (click)="deactivateEmployee(employee, $event)">
+                  <i class="fa fa-user-slash"></i>
+                </button>
+              </td>
+            </tr>
+          }
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="9" class="not-found">
+              <div>
+                <i class="fa fa-magnifying-glass-minus"></i>
+                <p>No employees found</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+  </p-panel>
+</section>

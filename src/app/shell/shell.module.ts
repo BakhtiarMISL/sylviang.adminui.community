@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { ShellComponent } from './shell.component';
@@ -10,7 +11,6 @@ import { HeaderComponent } from '@app/shell/components/header/header.component';
 import { SidebarComponent } from '@app/shell/components/sidebar/sidebar.component';
 import { SidebarMenuItemComponent } from '@app/shell/components/sidebar/sidebar-menu-item/sidebar-menu-item.component';
 import { ThemeToggleComponent } from '@app/shell/components/theme-toggle/theme-toggle.component';
-import { PagesModule } from '@pages/pages.module';
 
 @NgModule({
   imports: [
@@ -18,9 +18,9 @@ import { PagesModule } from '@pages/pages.module';
     TranslateModule,
     RouterModule,
     FormsModule,
+    SelectModule,
     TooltipModule,
     ThemeToggleComponent,
-    PagesModule,
   ],
   declarations: [ShellComponent, HeaderComponent, SidebarComponent, SidebarMenuItemComponent],
 })

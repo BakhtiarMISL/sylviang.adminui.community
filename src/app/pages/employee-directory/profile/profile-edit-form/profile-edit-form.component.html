@@ -1,0 +1,55 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-container">
+  <h3 class="form-section-header">Edit Profile</h3>
+
+  <div class="sm:col-span-2 lg:col-span-3 xl:col-span-4">
+    <p-floatlabel variant="in">
+      <textarea pTextarea inputId="bio" formControlName="bio" rows="3" class="w-full" [class.ng-invalid]="hasError('bio')"></textarea>
+      <label for="bio">Bio</label>
+    </p-floatlabel>
+    <div *ngIf="hasError('bio')" class="invalid">Bio must not exceed 2000 characters.</div>
+  </div>
+
+  <div>
+    <p-floatlabel variant="in">
+      <input pInputText inputId="skills" formControlName="skills" class="w-full" [class.ng-invalid]="hasError('skills')" />
+      <label for="skills">Skills (comma separated)</label>
+    </p-floatlabel>
+    <div *ngIf="hasError('skills')" class="invalid">Skills must not exceed 1000 characters.</div>
+  </div>
+
+  <div>
+    <p-floatlabel variant="in">
+      <input pInputText inputId="interests" formControlName="interests" class="w-full" [class.ng-invalid]="hasError('interests')" />
+      <label for="interests">Interests (comma separated)</label>
+    </p-floatlabel>
+    <div *ngIf="hasError('interests')" class="invalid">Interests must not exceed 1000 characters.</div>
+  </div>
+
+  <h3 class="form-section-header">Contact Field Privacy</h3>
+
+  <div>
+    <p-floatlabel variant="in">
+      <p-select inputId="phoneVisibility" [options]="visibilityOptions" optionLabel="label" optionValue="value" formControlName="phoneVisibility" class="w-full" [appendTo]="'body'" [autoDisplayFirst]="false"></p-select>
+      <label for="phoneVisibility">Phone Visibility</label>
+    </p-floatlabel>
+  </div>
+
+  <div>
+    <p-floatlabel variant="in">
+      <p-select inputId="emailVisibility" [options]="visibilityOptions" optionLabel="label" optionValue="value" formControlName="emailVisibility" class="w-full" [appendTo]="'body'" [autoDisplayFirst]="false"></p-select>
+      <label for="emailVisibility">Email Visibility</label>
+    </p-floatlabel>
+  </div>
+
+  <div>
+    <p-floatlabel variant="in">
+      <p-select inputId="extensionVisibility" [options]="visibilityOptions" optionLabel="label" optionValue="value" formControlName="extensionVisibility" class="w-full" [appendTo]="'body'" [autoDisplayFirst]="false"></p-select>
+      <label for="extensionVisibility">Extension Visibility</label>
+    </p-floatlabel>
+  </div>
+
+  <div class="sm:col-span-2 lg:col-span-3 xl:col-span-4 flex justify-end gap-3 mt-2">
+    <button type="button" pButton severity="secondary" (click)="onCancel()">Cancel</button>
+    <button type="submit" pButton [disabled]="saving">{{ saving ? 'Saving...' : 'Save Changes' }}</button>
+  </div>
+</form>

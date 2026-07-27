@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+.status-active {
+  @apply text-xs px-2 py-0.5 rounded-full bg-success-50 text-success dark:bg-success-900/20;
+}
+
+.status-inactive {
+  @apply text-xs px-2 py-0.5 rounded-full bg-neutral/10 text-neutral;
+}

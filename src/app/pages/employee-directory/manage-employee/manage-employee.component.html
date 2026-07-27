@@ -1,0 +1,108 @@
+<form [formGroup]="employeeForm" (ngSubmit)="onSubmit()" class="page-container">
+  <section class="form-container">
+    <h3 class="form-section-header">Add Employee</h3>
+
+    <div>
+      <p-floatlabel variant="in">
+        <input
+          pInputText
+          inputId="employeeName"
+          formControlName="employeeName"
+          maxlength="200"
+          class="w-full"
+          [class.ng-invalid]="hasError('employeeName')"
+          (blur)="f['employeeName'].markAsTouched()"
+        />
+        <label for="employeeName">Name *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('employeeName')" class="invalid">{{ getErrorMessage('employeeName') }}</div>
+    </div>
+
+    <div>
+      <p-floatlabel variant="in">
+        <input
+          pInputText
+          inputId="email"
+          formControlName="email"
+          maxlength="200"
+          class="w-full"
+          [class.ng-invalid]="hasError('email')"
+          (blur)="f['email'].markAsTouched()"
+        />
+        <label for="email">Email *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('email')" class="invalid">{{ getErrorMessage('email') }}</div>
+    </div>
+
+    <div>
+      <p-floatlabel variant="in">
+        <p-select
+          inputId="designationId"
+          [options]="designationOptions"
+          optionLabel="label"
+          optionValue="value"
+          formControlName="designationId"
+          class="w-full"
+          [appendTo]="'body'"
+          [autoDisplayFirst]="false"
+          [class.ng-invalid]="hasError('designationId')"
+          [class.ng-dirty]="hasError('designationId')"
+          (onBlur)="f['designationId'].markAsTouched()"
+          (onChange)="f['designationId'].markAsTouched()"
+        ></p-select>
+        <label for="designationId">Designation *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('designationId')" class="invalid">{{ getErrorMessage('designationId') }}</div>
+    </div>
+
+    <div>
+      <p-floatlabel variant="in">
+        <p-select
+          inputId="departmentId"
+          [options]="departmentOptions"
+          optionLabel="label"
+          optionValue="value"
+          formControlName="departmentId"
+          class="w-full"
+          [appendTo]="'body'"
+          [autoDisplayFirst]="false"
+          [class.ng-invalid]="hasError('departmentId')"
+          [class.ng-dirty]="hasError('departmentId')"
+          (onBlur)="f['departmentId'].markAsTouched()"
+          (onChange)="f['departmentId'].markAsTouched()"
+        ></p-select>
+        <label for="departmentId">Department *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('departmentId')" class="invalid">{{ getErrorMessage('departmentId') }}</div>
+    </div>
+
+    <div>
+      <p-floatlabel variant="in">
+        <p-select
+          inputId="siteId"
+          [options]="branchOptions"
+          optionLabel="label"
+          optionValue="value"
+          formControlName="siteId"
+          class="w-full"
+          [appendTo]="'body'"
+          [autoDisplayFirst]="false"
+          [class.ng-invalid]="hasError('siteId')"
+          [class.ng-dirty]="hasError('siteId')"
+          (onBlur)="f['siteId'].markAsTouched()"
+          (onChange)="f['siteId'].markAsTouched()"
+        ></p-select>
+        <label for="siteId">Branch *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('siteId')" class="invalid">{{ getErrorMessage('siteId') }}</div>
+    </div>
+  </section>
+
+  <div class="flex justify-end gap-3">
+    <button type="button" pButton severity="secondary" routerLink="/employee-directory/user-management">Back</button>
+    <button type="submit" pButton [disabled]="saving">
+      <i class="fa fa-plus"></i>
+      <span>{{ saving ? 'Saving...' : 'Add Employee' }}</span>
+    </button>
+  </div>
+</form>

@@ -1,10 +1,12 @@
 import { Component, OnInit, Output, EventEmitter, OnDestroy, Input, HostListener } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { combineLatest } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { NavMode, ShellService } from '@app/shell/services/shell.service';
 import { Theme, ThemeService } from '@app/shell/services/theme.service';
 import { MenuService } from '@app/@core/services/menu.service';
+import { CurrentUserService } from '@app/@core/services/current-user.service';
 import type { IMenuItem } from '@app/@core/interfaces/menuResponse.interface';
 
 interface MenuItemClickEvent {
@@ -48,6 +50,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     public shellService: ShellService,
     private themeService: ThemeService,
     private menuService: MenuService,
+    private currentUserService: CurrentUserService,
   ) {
     this.sidebarItems = [];
   }
@@ -64,12 +67,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.isLoadingMenu = loading;
     });
 
-    this.menuService.menu$.pipe(untilDestroyed(this)).subscribe((menuItems) => {
-      if (menuItems && menuItems.length > 0) {
-        this.sidebarItems = menuItems;
-        this.shellService.activeNavTab(this.sidebarItems, this.sidebarExtendedItem);
-      }
-    });
+    combineLatest([this.menuService.menu$, this.currentUserService.currentUser$])
+      .pipe(untilDestroyed(this))
+      .subscribe(([menuItems]) => {
+        if (menuItems && menuItems.length > 0) {
+          this.sidebarItems = this.filterHrOnlyItems(menuItems);
+          this.shellService.activeNavTab(this.sidebarItems, this.sidebarExtendedItem);
+        }
+      });
 
     this._router.events
       .pipe(untilDestroyed(this))
@@ -238,6 +243,16 @@ export class SidebarComponent implements OnInit, OnDestroy {
         current = current[index].subItems || [];
       }
     }
+  }
+
+  private filterHrOnlyItems(items: IMenuItem[]): IMenuItem[] {
+    const isHrOrAdmin = this.currentUserService.isHrOrAdmin();
+    return items
+      .filter((item) => !item.hrOnly || isHrOrAdmin)
+      .map((item) => ({
+        ...item,
+        subItems: item.subItems ? this.filterHrOnlyItems(item.subItems) : undefined,
+      }));
   }
 
   private collapseAll(): void {
