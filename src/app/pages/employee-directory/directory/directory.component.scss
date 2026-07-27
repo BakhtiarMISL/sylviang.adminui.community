@@ -1,0 +1,11 @@
+:host {
+  display: block;
+}
+
+.employee-skills {
+  @apply flex flex-wrap gap-1;
+}
+
+.employee-skill-chip {
+  @apply text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary;
+}

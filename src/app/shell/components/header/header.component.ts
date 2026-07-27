@@ -1,5 +1,7 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
+import { Router } from '@angular/router';
 import { BreadcrumbItem, BreadcrumbService } from '@core/services/breadcrumb.service';
+import { AuthService } from '@core/services/auth.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
 @UntilDestroy()
@@ -19,12 +21,19 @@ export class HeaderComponent implements OnInit {
   constructor(
     private readonly _eRef: ElementRef,
     private breadcrumbService: BreadcrumbService,
+    private authService: AuthService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
     this.breadcrumbService.breadcrumbs$.pipe(untilDestroyed(this)).subscribe((breadcrumbs) => {
       this.breadcrumbs = breadcrumbs;
     });
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigateByUrl('/login');
   }
 
   toggleSidebar(): void {

@@ -18,6 +18,10 @@ const routes: Routes = [
       path: 'payroll',
       loadChildren: () => import('./payroll-management/payroll-management.module').then((m) => m.PayrollManagementModule),
     },
+    {
+      path: 'employee-directory',
+      loadChildren: () => import('./employee-directory/employee-directory.module').then((m) => m.EmployeeDirectoryModule),
+    },
   ]),
 ];
 

@@ -33,4 +33,37 @@ export const webSidebarMenuItems: IMenuItem[] = [
       },
     ],
   },
+  {
+    title: 'Employee Directory',
+    active: false,
+    icon: 'fa-solid fa-id-badge',
+    subItems: [
+      {
+        href: '/employee-directory/directory',
+        title: 'Directory',
+        active: false,
+        icon: 'fa-solid fa-address-book',
+      },
+      {
+        href: '/employee-directory/profile/me',
+        title: 'My Profile',
+        active: false,
+        icon: 'fa-solid fa-user',
+      },
+      {
+        href: '/employee-directory/user-management',
+        title: 'User Management',
+        active: false,
+        icon: 'fa-solid fa-users-gear',
+        hrOnly: true,
+      },
+      {
+        href: '/employee-directory/manage-employee',
+        title: 'Add Employee',
+        active: false,
+        icon: 'fa-solid fa-user-plus',
+        hrOnly: true,
+      },
+    ],
+  },
 ];

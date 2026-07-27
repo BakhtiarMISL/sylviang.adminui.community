@@ -86,6 +86,7 @@ export class BreadcrumbService {
       dashboard: 'fas fa-chart-line',
       attendance: 'fas fa-clock',
       payroll: 'fas fa-money-bill-wave',
+      'employee-directory': 'fas fa-id-badge',
     };
 
     const crumbs: BreadcrumbItem[] = [];
