@@ -1,0 +1,89 @@
+<div class="comment-thread">
+  <div class="comment-list" *ngIf="!loading; else loadingTpl">
+    <ng-container *ngFor="let comment of comments">
+      <ng-container *ngTemplateOutlet="commentTpl; context: { $implicit: comment, depth: 0 }"></ng-container>
+    </ng-container>
+
+    <p class="empty" *ngIf="comments.length === 0">No comments yet.</p>
+  </div>
+
+  <ng-template #loadingTpl>
+    <p-skeleton width="100%" height="2.5rem" styleClass="mb-2"></p-skeleton>
+    <p-skeleton width="80%" height="2.5rem"></p-skeleton>
+  </ng-template>
+
+  <ng-template #commentTpl let-comment let-depth="depth">
+    <div class="comment-row" [style.margin-left.px]="depth * 28">
+      <div class="comment-bubble">
+        <div class="comment-header">
+          <span class="author">{{ authorName(comment.employeeId) }}</span>
+          <span class="time">{{ comment.createdAt | date: 'short' }}</span>
+        </div>
+
+        <div
+          *ngIf="editingCommentId !== comment.commentId"
+          class="comment-content"
+          [innerHTML]="renderedCommentContent(comment)"
+          (click)="onContentClick($event)"
+        ></div>
+
+        <div *ngIf="editingCommentId === comment.commentId" class="comment-edit-form">
+          <app-mention-textarea
+            [rows]="2"
+            [value]="editContent"
+            (valueChange)="editContent = $event"
+            [mentions]="editTags"
+            (mentionsChange)="editTags = $event"
+          ></app-mention-textarea>
+          <div class="edit-actions">
+            <button pButton size="small" (click)="saveEdit(comment.commentId)">Save</button>
+            <button pButton size="small" severity="secondary" (click)="cancelEdit()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="comment-actions" *ngIf="editingCommentId !== comment.commentId">
+        <app-reaction-bar targetType="Comment" [targetId]="comment.commentId"></app-reaction-bar>
+
+        <button type="button" class="link-action" *ngIf="!postLocked" (click)="startReply(comment)">Reply</button>
+        <button type="button" class="link-action" *ngIf="canEdit(comment)" (click)="startEdit(comment)">Edit</button>
+        <button type="button" class="link-action danger" *ngIf="canEdit(comment)" (click)="deleteComment(comment.commentId)">Delete</button>
+      </div>
+
+      <div class="reply-form" *ngIf="replyingToId === comment.commentId">
+        <app-mention-textarea
+          [rows]="2"
+          placeholder="Write a reply... (type @ to mention someone)"
+          [value]="replyContent"
+          (valueChange)="replyContent = $event"
+          [mentions]="replyTags"
+          (mentionsChange)="replyTags = $event"
+        ></app-mention-textarea>
+        <div class="edit-actions">
+          <button pButton size="small" [disabled]="!replyContent.trim()" (click)="submitReply(comment.commentId)">Reply</button>
+          <button pButton size="small" severity="secondary" (click)="cancelReply()">Cancel</button>
+        </div>
+      </div>
+
+      <ng-container *ngFor="let reply of comment.replies">
+        <ng-container *ngTemplateOutlet="commentTpl; context: { $implicit: reply, depth: depth + 1 }"></ng-container>
+      </ng-container>
+    </div>
+  </ng-template>
+
+  <div class="new-comment-form" *ngIf="!postLocked; else lockedTpl">
+    <app-mention-textarea
+      [rows]="2"
+      placeholder="Write a comment... (type @ to mention someone)"
+      [value]="newCommentContent"
+      (valueChange)="newCommentContent = $event"
+      [mentions]="newCommentTags"
+      (mentionsChange)="newCommentTags = $event"
+    ></app-mention-textarea>
+    <button pButton size="small" class="mt-2" [disabled]="!newCommentContent.trim() || submitting" (click)="submitTopLevelComment()">Comment</button>
+  </div>
+
+  <ng-template #lockedTpl>
+    <p class="locked-message"><i class="fa-solid fa-lock"></i> Comments are locked for this post.</p>
+  </ng-template>
+</div>

@@ -1,0 +1,97 @@
+.composer {
+  background: var(--surface-elevated);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1rem;
+}
+
+.composer-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.announcement-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.post-kind-tabs {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+
+  app-attachment-upload {
+    flex: 1 1 auto;
+    min-width: 12rem;
+  }
+}
+
+.kind-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid var(--border-primary);
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  cursor: pointer;
+
+  i {
+    color: inherit;
+  }
+
+  &.active {
+    background: var(--p-primary-color, #6366f1);
+    color: #fff;
+    border-color: transparent;
+  }
+}
+
+.poll-builder {
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background: var(--surface-secondary);
+}
+
+.poll-option-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.icon-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0.35rem;
+  border-radius: 0.375rem;
+  opacity: 0.6;
+  color: var(--text-primary);
+
+  &:hover {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.05);
+  }
+}
+
+.link-action {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--p-primary-color, #6366f1);
+  padding: 0;
+}

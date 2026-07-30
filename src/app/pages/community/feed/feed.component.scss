@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+.feed-page {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.feed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+}
+
+.skeleton-list {
+  margin-top: 1rem;
+}

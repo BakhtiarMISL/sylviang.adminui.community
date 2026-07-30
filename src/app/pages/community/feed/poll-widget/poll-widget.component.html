@@ -1,0 +1,20 @@
+<div class="poll-widget" *ngIf="poll">
+  <div class="poll-option" *ngFor="let option of poll.options" (click)="vote(option.pollOptionId)" [class.disabled]="voting || isExpired()" [class.mine]="myVotedOptionId === option.pollOptionId">
+    <div class="poll-option-header">
+      <span class="option-text">{{ option.optionText }}</span>
+      <span class="option-meta">{{ option.voteCount }} {{ option.voteCount === 1 ? 'vote' : 'votes' }} &middot; {{ percentageFor(option.voteCount) }}%</span>
+    </div>
+    <p-progressBar
+      [value]="percentageFor(option.voteCount)"
+      [showValue]="false"
+      [styleClass]="'poll-progress-bar'"
+    ></p-progressBar>
+  </div>
+
+  <div class="poll-footer">
+    <span class="poll-total">{{ totalVotes() }} total {{ totalVotes() === 1 ? 'vote' : 'votes' }}</span>
+    <span class="poll-expired" *ngIf="isExpired()">This poll has ended</span>
+  </div>
+</div>
+
+<div class="poll-widget-loading" *ngIf="loading && !poll">Loading poll...</div>

@@ -1,0 +1,37 @@
+<div class="attachment-upload">
+  <p-fileUpload
+    #fileUpload
+    mode="basic"
+    [customUpload]="true"
+    (uploadHandler)="onUpload($event)"
+    [multiple]="multiple"
+    [accept]="accept"
+    [maxFileSize]="maxFileSize"
+    [auto]="true"
+    chooseLabel="Add Photos/Videos"
+    chooseIcon="fa-solid fa-paperclip"
+  ></p-fileUpload>
+
+  <div class="attachment-list" *ngIf="items.length > 0">
+    <div class="attachment-item" *ngFor="let item of items" [class.error]="item.status === 'error'">
+      <div class="attachment-thumb">
+        <img *ngIf="item.isImage" [src]="item.status === 'uploaded' && item.uploadResponse ? servedUrl(item.uploadResponse.storagePath) : item.previewUrl" [alt]="item.file.name" />
+        <i *ngIf="!item.isImage && isVideo(item.file.name)" class="fa-solid fa-file-video file-icon"></i>
+        <i *ngIf="!item.isImage && !isVideo(item.file.name)" class="fa-solid fa-file file-icon"></i>
+      </div>
+
+      <div class="attachment-info">
+        <span class="attachment-name">{{ item.file.name }}</span>
+
+        <span class="attachment-status" *ngIf="item.status === 'uploading'"><i class="fa-solid fa-spinner fa-spin"></i> Uploading...</span>
+        <span class="attachment-status uploaded" *ngIf="item.status === 'uploaded'"><i class="fa-solid fa-check"></i> Uploaded</span>
+        <span class="attachment-status error" *ngIf="item.status === 'error'">{{ item.errorMessage || 'Upload failed.' }}</span>
+      </div>
+
+      <div class="attachment-actions">
+        <button type="button" class="link-action" *ngIf="item.status === 'error'" (click)="retry(item)">Retry</button>
+        <button type="button" class="link-action danger" (click)="removeItem(item)"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+    </div>
+  </div>
+</div>

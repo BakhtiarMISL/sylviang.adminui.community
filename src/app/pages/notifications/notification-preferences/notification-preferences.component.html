@@ -1,0 +1,72 @@
+<section class="page-container">
+  <p-panel header="Notification Preferences">
+    <ng-template #icons>
+      <button
+        [routerLink]="['/notifications']"
+        pButton
+        severity="secondary"
+        text
+        [pTooltip]="'Back to notifications'"
+        tooltipPosition="bottom"
+      >
+        <i class="fa fa-arrow-left"></i>
+        <span>Back</span>
+      </button>
+    </ng-template>
+
+    <p class="text-sm text-borderDark dark:text-neutral mb-5">
+      Choose how you want to be notified for each category. Changes are saved immediately.
+    </p>
+
+    <div class="table-container">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-borderLight dark:border-borderDark">
+            <th class="text-left py-3 px-4 font-semibold text-dark dark:text-borderLight">Category</th>
+            <th class="text-center py-3 px-4 w-32 font-semibold text-dark dark:text-borderLight">In-App</th>
+            <th class="text-center py-3 px-4 w-32 font-semibold text-dark dark:text-borderLight">Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading) {
+            @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+              <tr class="border-b border-borderLight dark:border-borderDark">
+                <td class="py-3 px-4"><p-skeleton width="60%" height="1rem"></p-skeleton></td>
+                <td class="py-3 px-4"><p-skeleton width="2.5rem" height="1.25rem" styleClass="mx-auto"></p-skeleton></td>
+                <td class="py-3 px-4"><p-skeleton width="2.5rem" height="1.25rem" styleClass="mx-auto"></p-skeleton></td>
+              </tr>
+            }
+          } @else if (rows.length === 0) {
+            <tr>
+              <td colspan="3" class="not-found">
+                <div>
+                  <i class="fa fa-bell-slash"></i>
+                  <p>No categories found</p>
+                </div>
+              </td>
+            </tr>
+          } @else {
+            @for (row of rows; track row.value) {
+              <tr class="border-b border-borderLight dark:border-borderDark last:border-0">
+                <td class="py-3 px-4">
+                  <div class="flex items-center gap-3">
+                    <div class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 text-primary shrink-0">
+                      <i [class]="row.icon + ' text-sm'"></i>
+                    </div>
+                    <span class="text-dark dark:text-borderLight">{{ row.label }}</span>
+                  </div>
+                </td>
+                <td class="py-3 px-4 text-center">
+                  <p-toggleswitch [(ngModel)]="row.inAppEnabled" [disabled]="row.saving" (onChange)="onInAppChange(row)"></p-toggleswitch>
+                </td>
+                <td class="py-3 px-4 text-center">
+                  <p-toggleswitch [(ngModel)]="row.emailEnabled" [disabled]="row.saving" (onChange)="onEmailChange(row)"></p-toggleswitch>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </p-panel>
+</section>

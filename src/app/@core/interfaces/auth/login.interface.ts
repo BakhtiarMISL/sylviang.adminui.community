@@ -11,3 +11,9 @@ export interface ILoginResponse {
   role: string;
   employeeId: number | null;
 }
+
+export interface IChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}

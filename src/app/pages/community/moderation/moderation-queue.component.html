@@ -1,0 +1,86 @@
+<section class="page-container">
+  <p-panel header="Moderation Queue">
+    <div class="table-container">
+      <p-table
+        [value]="loading ? skeletonItems : reports"
+        dataKey="reportId"
+        [paginator]="true"
+        [rows]="rows"
+        [first]="(currentPage - 1) * rows"
+        [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+        [totalRecords]="totalRecords"
+        (onPage)="onPageChange($event)"
+        [lazy]="true"
+        [loading]="false"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} reports"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Content</th>
+            <th>Author</th>
+            <th>Reported By</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-report>
+          @if (loading) {
+            <tr>
+              <td colspan="6" class="p-4"><p-skeleton width="100%" height="2.5rem"></p-skeleton></td>
+            </tr>
+          } @else {
+            <tr>
+              <td class="content-cell">
+                <span class="post-type-badge">{{ report.postType }}</span>
+                <p class="content-preview">{{ report.postContentPreview }}</p>
+                <span class="state-badges">
+                  <span *ngIf="report.isPostHidden" class="badge hidden-badge"><i class="fa-solid fa-eye-slash"></i> Hidden</span>
+                  <span *ngIf="report.isPostLocked" class="badge locked-badge"><i class="fa-solid fa-lock"></i> Locked</span>
+                </span>
+              </td>
+              <td>{{ report.postAuthorName }}</td>
+              <td>{{ report.reporterName }}</td>
+              <td>{{ report.reason }}</td>
+              <td>
+                <span class="badge status-badge" [ngClass]="'status-' + report.status.toLowerCase()">{{ report.status }}</span>
+              </td>
+              <td>
+                <div class="row-actions">
+                  <button pButton size="small" severity="secondary" [pTooltip]="report.isPostLocked ? 'Unlock comments' : 'Lock comments'" (click)="toggleLocked(report)">
+                    <i class="fa-solid" [ngClass]="report.isPostLocked ? 'fa-unlock' : 'fa-lock'"></i>
+                  </button>
+                  <button pButton size="small" severity="secondary" [pTooltip]="report.isPostHidden ? 'Unhide' : 'Hide'" (click)="toggleHidden(report)">
+                    <i class="fa-solid" [ngClass]="report.isPostHidden ? 'fa-eye' : 'fa-eye-slash'"></i>
+                  </button>
+                  <button pButton size="small" severity="danger" pTooltip="Remove post" (click)="removePost(report)">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                  <button pButton size="small" severity="success" *ngIf="report.status === 'Pending'" pTooltip="Resolve" (click)="resolveReport(report, 'Resolved')">
+                    <i class="fa-solid fa-check"></i>
+                  </button>
+                  <button pButton size="small" severity="secondary" *ngIf="report.status === 'Pending'" pTooltip="Dismiss" (click)="resolveReport(report, 'Dismissed')">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="not-found">
+              <div>
+                <i class="fa fa-shield-halved"></i>
+                <p>No reported content - the queue is clear.</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </p-panel>
+</section>
