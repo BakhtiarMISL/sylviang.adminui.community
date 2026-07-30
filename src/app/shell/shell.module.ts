@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { BadgeModule } from 'primeng/badge';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 
@@ -20,6 +21,7 @@ import { ThemeToggleComponent } from '@app/shell/components/theme-toggle/theme-t
     FormsModule,
     SelectModule,
     TooltipModule,
+    BadgeModule,
     ThemeToggleComponent,
   ],
   declarations: [ShellComponent, HeaderComponent, SidebarComponent, SidebarMenuItemComponent],

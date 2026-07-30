@@ -1,0 +1,42 @@
+<div class="reaction-bar">
+  <div class="reaction-picker-wrapper">
+    <button
+      type="button"
+      class="reaction-trigger"
+      [class.active]="!!myReaction()"
+      [style.color]="myReaction() ? colorFor(myReaction()?.reactionType) : null"
+      (click)="togglePicker()"
+    >
+      <i [class]="iconFor(myReaction()?.reactionType)"></i>
+      <span>{{ myReaction()?.reactionType || 'React' }}</span>
+      <span *ngIf="totalCount() > 0" class="count">({{ totalCount() }})</span>
+    </button>
+
+    <div class="reaction-picker" *ngIf="pickerOpen">
+      <button
+        type="button"
+        *ngFor="let option of reactionTypes"
+        class="reaction-option"
+        [style.color]="option.color"
+        [pTooltip]="option.label"
+        tooltipPosition="top"
+        (click)="react(option.value)"
+      >
+        <i [class]="option.icon"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="reaction-summary" *ngIf="summary.length > 0">
+    <span
+      *ngFor="let s of summary"
+      class="summary-chip"
+      [class.mine]="s.reactedByMe"
+      [style.color]="colorFor(s.reactionType)"
+      [style.background]="colorFor(s.reactionType) + '1f'"
+    >
+      <i [class]="iconFor(s.reactionType)"></i>
+      {{ s.count }}
+    </span>
+  </div>
+</div>

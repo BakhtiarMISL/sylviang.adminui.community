@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { BadgeModule } from 'primeng/badge';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DatePickerModule } from 'primeng/datepicker';
@@ -32,6 +33,7 @@ import { TooltipModule } from 'primeng/tooltip';
     SkeletonModule,
     TableModule,
     TooltipModule,
+    BadgeModule,
   ],
   exports: [
     CommonModule,
@@ -49,6 +51,7 @@ import { TooltipModule } from 'primeng/tooltip';
     SkeletonModule,
     TableModule,
     TooltipModule,
+    BadgeModule,
   ],
 })
 export class SharedModule {}

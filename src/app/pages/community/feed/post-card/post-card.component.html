@@ -1,0 +1,81 @@
+<div class="post-card">
+  <div class="post-header">
+    <div class="avatar"><i class="fa-solid fa-user"></i></div>
+    <div class="header-text">
+      <div class="author-line">
+        <span class="author-name">{{ authorName }}</span>
+        <span class="badge announcement-badge" *ngIf="post.isAnnouncement">
+          <i class="fa-solid fa-bullhorn"></i> Announcement
+        </span>
+      </div>
+      <div class="meta-line">
+        <span>{{ post.createdAt | date: 'medium' }}</span>
+        <span class="dot">&middot;</span>
+        <span>{{ post.visibility }}</span>
+        <span *ngIf="post.isLocked" class="dot">&middot;</span>
+        <span *ngIf="post.isLocked"><i class="fa-solid fa-lock"></i> Locked</span>
+      </div>
+    </div>
+
+    <div class="post-actions" *ngIf="!editing">
+      <button type="button" class="icon-btn" *ngIf="isOwnPost" (click)="startEdit()" pTooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+      <button type="button" class="icon-btn" *ngIf="canModerate" (click)="toggleLocked()" [pTooltip]="post.isLocked ? 'Unlock comments' : 'Lock comments'">
+        <i class="fa-solid" [ngClass]="post.isLocked ? 'fa-unlock' : 'fa-lock'"></i>
+      </button>
+      <button type="button" class="icon-btn" *ngIf="canModerate" (click)="toggleHidden()" [pTooltip]="post.isHidden ? 'Unhide post' : 'Hide post'">
+        <i class="fa-solid" [ngClass]="post.isHidden ? 'fa-eye' : 'fa-eye-slash'"></i>
+      </button>
+      <button type="button" class="icon-btn" *ngIf="!isOwnPost" (click)="openReportDialog()" pTooltip="Report">
+        <i class="fa-solid fa-flag"></i>
+      </button>
+      <button type="button" class="icon-btn danger" *ngIf="canEdit" (click)="delete()" pTooltip="Delete">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="post-body" *ngIf="!editing" [innerHTML]="renderedContent()" (click)="onContentClick($event)"></div>
+
+  <div class="attachment-gallery" *ngIf="!editing && attachments.length > 0">
+    <div class="attachment-tile" *ngFor="let attachment of attachments">
+      <img *ngIf="!isVideoAttachment(attachment)" [src]="servedUrl(attachment.filePath)" [alt]="attachment.fileName" />
+      <video *ngIf="isVideoAttachment(attachment)" [src]="servedUrl(attachment.filePath)" controls></video>
+    </div>
+  </div>
+
+  <app-poll-widget *ngIf="!editing && post.isPoll" [postId]="post.postId"></app-poll-widget>
+
+  <div class="post-edit-form" *ngIf="editing">
+    <app-mention-textarea
+      [rows]="3"
+      [value]="editContent"
+      (valueChange)="editContent = $event"
+      [mentions]="editTags"
+      (mentionsChange)="editTags = $event"
+    ></app-mention-textarea>
+    <p-select
+      [options]="visibilityOptions"
+      optionLabel="label"
+      optionValue="value"
+      [(ngModel)]="editVisibility"
+      [appendTo]="'body'"
+      styleClass="w-44 mt-2"
+    ></p-select>
+    <div class="edit-actions">
+      <button pButton size="small" [disabled]="!editContent.trim()" (click)="saveEdit()">Save</button>
+      <button pButton size="small" severity="secondary" (click)="cancelEdit()">Cancel</button>
+    </div>
+  </div>
+
+  <div class="post-footer">
+    <app-reaction-bar targetType="Post" [targetId]="post.postId"></app-reaction-bar>
+    <button type="button" class="link-action" (click)="toggleComments()">
+      <i class="fa-regular fa-comment"></i>
+      {{ showComments ? 'Hide comments' : 'Comments' }}
+    </button>
+  </div>
+
+  <app-comment-thread *ngIf="showComments" [postId]="post.postId" [postLocked]="post.isLocked"></app-comment-thread>
+
+  <app-report-content-dialog [postId]="post.postId" [(visible)]="showReportDialog"></app-report-content-dialog>
+</div>

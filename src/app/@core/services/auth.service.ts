@@ -2,8 +2,9 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { ApiResponse } from '@core/interfaces/ApiResponse';
-import { ILoginRequest, ILoginResponse } from '@core/interfaces/auth/login.interface';
+import { IChangePasswordRequest, ILoginRequest, ILoginResponse } from '@core/interfaces/auth/login.interface';
 import { CurrentUserService } from '@core/services/current-user.service';
+import { NotificationHubService } from '@core/services/notifications/notification-hub.service';
 import { UserRoleEnum } from '@core/enums/employee.enum';
 import { BASE_URL_Auth } from '@env/environment';
 
@@ -23,6 +24,7 @@ export class AuthService {
   constructor(
     private httpClient: HttpClient,
     private currentUserService: CurrentUserService,
+    private notificationHubService: NotificationHubService,
   ) {}
 
   login(username: string, password: string): Observable<ApiResponse<ILoginResponse>> {
@@ -38,13 +40,20 @@ export class AuthService {
           employeeName: result.displayName,
           role: result.role as UserRoleEnum,
         });
+
+        this.notificationHubService.start();
       }),
     );
+  }
+
+  changePassword(request: IChangePasswordRequest): Observable<ApiResponse<void>> {
+    return this.httpClient.put<ApiResponse<void>>(`${BASE_URL_Auth}/change-password`, request);
   }
 
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(TOKEN_EXPIRY_KEY);
+    this.notificationHubService.stop();
   }
 
   getToken(): string | null {

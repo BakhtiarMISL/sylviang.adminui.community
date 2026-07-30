@@ -1,0 +1,90 @@
+.comment-thread {
+  margin-top: 0.75rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding-top: 0.75rem;
+}
+
+.comment-row {
+  margin-bottom: 0.75rem;
+}
+
+.comment-bubble {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+
+  .author {
+    font-weight: 600;
+  }
+
+  .time {
+    opacity: 0.6;
+  }
+}
+
+.comment-content {
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  margin-top: 0.15rem;
+  color: #1f2937;
+
+  ::ng-deep .mention-link {
+    color: var(--p-primary-color, #6366f1);
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.comment-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+  padding-left: 0.25rem;
+}
+
+.link-action {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--p-primary-color, #6366f1);
+  padding: 0;
+
+  &.danger {
+    color: #dc2626;
+  }
+}
+
+.reply-form,
+.new-comment-form {
+  margin-top: 0.5rem;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.empty {
+  font-size: 0.85rem;
+  opacity: 0.6;
+}
+
+.locked-message {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin-top: 0.5rem;
+}

@@ -1,0 +1,26 @@
+<div class="mention-textarea-wrapper">
+  <textarea
+    #textareaRef
+    pInputTextarea
+    class="w-full"
+    [rows]="rows"
+    [value]="value"
+    [placeholder]="placeholder"
+    (input)="onInput()"
+    (keydown)="onKeydown($event)"
+    (blur)="showDropdown = false"
+  ></textarea>
+
+  <div class="mention-dropdown" *ngIf="showDropdown">
+    <button
+      type="button"
+      *ngFor="let suggestion of suggestions; let i = index"
+      class="mention-option"
+      [class.active]="i === activeSuggestionIndex"
+      (mousedown)="$event.preventDefault(); selectSuggestion(suggestion)"
+    >
+      <i class="fa-solid fa-user"></i>
+      {{ suggestion.employeeName }}
+    </button>
+  </div>
+</div>

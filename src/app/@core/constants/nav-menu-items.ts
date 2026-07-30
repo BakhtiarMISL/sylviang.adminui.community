@@ -66,4 +66,24 @@ export const webSidebarMenuItems: IMenuItem[] = [
       },
     ],
   },
+  {
+    title: 'Community',
+    active: false,
+    icon: 'fa-solid fa-people-group',
+    subItems: [
+      {
+        href: '/community/feed',
+        title: 'Feed',
+        active: false,
+        icon: 'fa-solid fa-stream',
+      },
+      {
+        href: '/community/moderation',
+        title: 'Moderation Queue',
+        active: false,
+        icon: 'fa-solid fa-shield-halved',
+        hrOnly: true,
+      },
+    ],
+  },
 ];
