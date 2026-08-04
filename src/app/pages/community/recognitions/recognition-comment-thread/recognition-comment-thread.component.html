@@ -1,0 +1,47 @@
+<div class="comment-thread">
+  <div class="comment-list" *ngIf="!loading; else loadingTpl">
+    <ng-container *ngFor="let comment of comments">
+      <ng-container *ngTemplateOutlet="commentTpl; context: { $implicit: comment, depth: 0 }"></ng-container>
+    </ng-container>
+
+    <p class="empty" *ngIf="comments.length === 0">No comments yet.</p>
+  </div>
+
+  <ng-template #loadingTpl>
+    <p-skeleton width="100%" height="2.5rem" styleClass="mb-2"></p-skeleton>
+    <p-skeleton width="80%" height="2.5rem"></p-skeleton>
+  </ng-template>
+
+  <ng-template #commentTpl let-comment let-depth="depth">
+    <div class="comment-row" [style.margin-left.px]="depth * 28">
+      <div class="comment-bubble">
+        <div class="comment-header">
+          <span class="author">{{ authorName(comment.employeeId) }}</span>
+          <span class="time">{{ comment.createdAt | date: 'short' }}</span>
+        </div>
+        <div class="comment-content">{{ comment.comment }}</div>
+      </div>
+
+      <div class="comment-actions">
+        <button type="button" class="link-action" *ngIf="depth === 0" (click)="startReply(comment)">Reply</button>
+      </div>
+
+      <div class="reply-form" *ngIf="replyingToId === comment.commentId">
+        <textarea pInputTextarea rows="2" placeholder="Write a reply..." [(ngModel)]="replyContent"></textarea>
+        <div class="edit-actions">
+          <button pButton size="small" [disabled]="!replyContent.trim()" (click)="submitReply(comment.commentId)">Reply</button>
+          <button pButton size="small" severity="secondary" (click)="cancelReply()">Cancel</button>
+        </div>
+      </div>
+
+      <ng-container *ngFor="let reply of comment.replies">
+        <ng-container *ngTemplateOutlet="commentTpl; context: { $implicit: reply, depth: depth + 1 }"></ng-container>
+      </ng-container>
+    </div>
+  </ng-template>
+
+  <div class="new-comment-form">
+    <textarea pInputTextarea rows="2" placeholder="Write a comment..." [(ngModel)]="newCommentContent"></textarea>
+    <button pButton size="small" class="mt-2" [disabled]="!newCommentContent.trim() || submitting" (click)="submitTopLevelComment()">Comment</button>
+  </div>
+</div>

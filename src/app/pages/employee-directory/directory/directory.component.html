@@ -1,4 +1,9 @@
 <section class="page-container">
+  <div class="directory-header">
+    <h1>Employee Directory</h1>
+    <app-colleague-search></app-colleague-search>
+  </div>
+
   <p-panel
     header="Employee Filters"
     [toggleable]="true"
@@ -133,7 +138,7 @@
                 </div>
               </td>
               <td>
-                <a [routerLink]="['/employee-directory/profile', employee.employeeId]" class="text-primary">
+                <a [routerLink]="['/community/profile', employee.employeeId]" class="text-primary">
                   <i class="fa fa-eye"></i>
                 </a>
               </td>

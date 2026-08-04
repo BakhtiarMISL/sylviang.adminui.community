@@ -1,0 +1,59 @@
+<div class="relative">
+  <button
+    (click)="toggle()"
+    class="relative h-8 flex items-center text-black dark:text-borderLight hover:text-primary dark:hover:text-primary duration-300"
+    [attr.aria-label]="'Notifications'"
+    [attr.aria-expanded]="open"
+    [pTooltip]="'Notifications'"
+    tooltipPosition="bottom"
+  >
+    <i class="fas fa-bell"></i>
+    <p-badge
+      *ngIf="(unreadCount$ | async) as unreadCount"
+      [value]="displayUnreadCount(unreadCount)"
+      severity="danger"
+      [style]="{ position: 'absolute', top: '-6px', right: '-10px' }"
+    ></p-badge>
+  </button>
+
+  <div
+    *ngIf="open"
+    class="absolute right-0 top-full mt-2 w-80 rounded-xl border border-borderLight dark:border-borderDark bg-light dark:bg-dark shadow-xl overflow-hidden z-20"
+  >
+    <div class="px-4 py-3 border-b border-borderLight dark:border-borderDark font-semibold text-dark dark:text-borderLight">Notifications</div>
+
+    <div class="max-h-96 overflow-y-auto">
+      <div *ngIf="loading" class="px-4 py-6 text-center text-sm text-neutral">Loading...</div>
+
+      <ng-container *ngIf="!loading">
+        <button
+          *ngFor="let notification of notifications"
+          type="button"
+          (click)="onItemClick(notification)"
+          class="w-full flex items-start gap-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-white/5 duration-150 border-b border-borderLight dark:border-borderDark last:border-b-0"
+          [ngClass]="{ 'bg-primary/5': !notification.isRead }"
+        >
+          <span class="w-8 h-8 rounded-full flex items-center justify-center bg-primary/10 text-primary shrink-0">
+            <i [class]="getCategoryIcon(notification.category)"></i>
+          </span>
+          <span class="flex-1 min-w-0">
+            <span class="block text-sm text-dark dark:text-borderLight" [class.font-semibold]="!notification.isRead">{{ notification.title }}</span>
+            <span class="block text-xs text-neutral truncate" *ngIf="notification.message">{{ notification.message }}</span>
+            <span class="block text-xs text-neutral mt-0.5">{{ notification.createdAt | date: 'short' }}</span>
+          </span>
+          <span *ngIf="!notification.isRead" class="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0"></span>
+        </button>
+
+        <div *ngIf="notifications.length === 0" class="px-4 py-6 text-center text-sm text-neutral">No notifications yet.</div>
+      </ng-container>
+    </div>
+
+    <button
+      type="button"
+      (click)="goToNotificationCenter()"
+      class="w-full px-4 py-3 text-sm text-center font-medium text-primary hover:bg-gray-50 dark:hover:bg-white/5 duration-150 border-t border-borderLight dark:border-borderDark"
+    >
+      See previous notifications
+    </button>
+  </div>
+</div>

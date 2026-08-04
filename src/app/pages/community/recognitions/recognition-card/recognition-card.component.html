@@ -1,0 +1,42 @@
+<div class="recognition-card" [class.hr-issued]="recognition.isHrIssued">
+  <div class="recognition-header">
+    <div class="avatar"><i class="fa-solid fa-user"></i></div>
+    <div class="header-text">
+      <div class="author-line">
+        <span class="sender-name">{{ senderName }}</span>
+        <i class="fa-solid fa-arrow-right arrow"></i>
+        <span class="recipient-name">{{ recipientName }}</span>
+        <span class="badge award-badge" *ngIf="recognition.isHrIssued">
+          <i class="fa-solid fa-trophy"></i> Formal Award
+        </span>
+      </div>
+      <div class="meta-line">
+        <span>{{ recognition.createdAt | date: 'medium' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="badge-chip" *ngIf="recognition.badgeName" [style.background]="(recognition.badgeColor || '#6366f1') + '1f'" [style.color]="recognition.badgeColor || '#6366f1'">
+    <i [class]="recognition.badgeIcon || 'fa-solid fa-star'"></i>
+    <span>{{ recognition.badgeName }}</span>
+  </div>
+
+  <div class="award-title" *ngIf="recognition.awardTitle">{{ recognition.awardTitle }}</div>
+
+  <div class="recognition-message" *ngIf="recognition.message">{{ recognition.message }}</div>
+
+  <div class="recognition-footer">
+    <app-recognition-reaction-bar [recognitionId]="recognition.recognitionId"></app-recognition-reaction-bar>
+    <button type="button" class="link-action" (click)="toggleComments()">
+      <i class="fa-regular fa-comment"></i>
+      {{ showComments ? 'Hide comments' : 'Comments' }}
+      <span *ngIf="commentCount > 0">({{ commentCount }})</span>
+    </button>
+  </div>
+
+  <app-recognition-comment-thread
+    *ngIf="showComments"
+    [recognitionId]="recognition.recognitionId"
+    (countChanged)="onCommentCountChanged($event)"
+  ></app-recognition-comment-thread>
+</div>

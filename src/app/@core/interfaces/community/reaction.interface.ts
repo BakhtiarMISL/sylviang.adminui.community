@@ -1,4 +1,4 @@
-export type ReactionType = 'Like' | 'Love' | 'Celebrate' | 'Support' | 'Insightful';
+export type ReactionType = 'Like' | 'Love' | 'Care' | 'Haha' | 'Wow' | 'Sad' | 'Angry';
 
 export interface IPostReactionResponse {
   reactionId: number;

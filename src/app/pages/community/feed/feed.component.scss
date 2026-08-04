@@ -2,21 +2,28 @@
   display: block;
 }
 
-.feed-page {
-  max-width: 640px;
-  margin: 0 auto;
-}
-
 .feed-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
   margin-bottom: 1rem;
+}
 
-  h1 {
-    font-size: 1.25rem;
-    font-weight: 600;
-  }
+.feed-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.feed-logo {
+  height: 2.25rem;
+  width: auto;
+  border-radius: 0.375rem;
+  flex-shrink: 0;
 }
 
 .skeleton-list {

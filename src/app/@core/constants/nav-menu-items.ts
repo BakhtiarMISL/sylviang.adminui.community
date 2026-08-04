@@ -78,6 +78,18 @@ export const webSidebarMenuItems: IMenuItem[] = [
         icon: 'fa-solid fa-stream',
       },
       {
+        href: '/community/recognitions',
+        title: 'Recognitions',
+        active: false,
+        icon: 'fa-solid fa-award',
+      },
+      {
+        href: '/community/profile/me',
+        title: 'Profile',
+        active: false,
+        icon: 'fa-solid fa-address-card',
+      },
+      {
         href: '/community/moderation',
         title: 'Moderation Queue',
         active: false,

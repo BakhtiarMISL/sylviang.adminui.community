@@ -49,6 +49,34 @@ export class MenuService {
     this.menuSubject.next(updatedMenuItems);
   }
 
+  /**
+   * Persists an expand/collapse toggle into the canonical menu store. Needed because
+   * SidebarComponent keeps its own filtered copy of the menu and mutates that copy's
+   * `expanded` flags directly for instant UI feedback - without also writing back here,
+   * the next NavigationEnd (see updateActiveMenuItem, called on every route change) would
+   * rebuild the menu from these stale canonical items (expanded: false) and overwrite the
+   * sidebar's local state, collapsing whatever section the user just expanded.
+   */
+  setExpanded(path: number[], expanded: boolean): void {
+    const items = this.getCurrentMenu();
+    this.setExpandedByPath(items, path, expanded);
+    this.menuSubject.next([...items]);
+  }
+
+  private setExpandedByPath(items: IMenuItem[], path: number[], expanded: boolean): void {
+    if (path.length === 0) return;
+    let current = items;
+    for (let i = 0; i < path.length; i++) {
+      const index = path[i];
+      if (!current[index]) return;
+      if (i === path.length - 1) {
+        current[index].expanded = expanded;
+      } else {
+        current = current[index].subItems || [];
+      }
+    }
+  }
+
   private updateMenuItemsActiveState(items: IMenuItem[], currentRoute: string): IMenuItem[] {
     return items.map((item) => {
       const updatedItem: IMenuItem = { ...item };

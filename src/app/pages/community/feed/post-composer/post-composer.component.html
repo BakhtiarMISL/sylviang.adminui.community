@@ -23,7 +23,7 @@
   </div>
 
   <div class="poll-builder" *ngIf="postKind === 'Poll'">
-    <div class="poll-option-row" *ngFor="let option of pollOptions; let i = index">
+    <div class="poll-option-row" *ngFor="let option of pollOptions; let i = index; trackBy: trackByIndex">
       <input pInputText type="text" class="w-full" [(ngModel)]="pollOptions[i]" [placeholder]="'Option ' + (i + 1)" />
       <button type="button" class="icon-btn" *ngIf="pollOptions.length > 2" (click)="removePollOption(i)">
         <i class="fa-solid fa-xmark"></i>

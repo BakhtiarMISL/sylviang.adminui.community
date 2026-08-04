@@ -219,6 +219,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
 
     this.setItemByPath(path, { expanded });
+    this.menuService.setExpanded(path, expanded);
 
     if (path.length === 1) {
       if (expanded) {

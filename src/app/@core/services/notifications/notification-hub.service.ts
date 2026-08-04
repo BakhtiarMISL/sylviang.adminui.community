@@ -33,7 +33,24 @@ export class NotificationHubService {
     private injector: Injector,
     private notificationService: NotificationService,
     private currentUserService: CurrentUserService,
-  ) {}
+  ) {
+    // REST-based baseline, independent of whether the SignalR hub below ever connects (it
+    // can't authenticate at all in dev-persona mode - see start()'s isLoggedIn() gate in
+    // HeaderComponent). currentUser$ is a BehaviorSubject, so subscribing fires immediately
+    // with the current persona, and again on every "acting as" persona switch, keeping the
+    // unread badge correct without relying on a live push connection.
+    //
+    // The subscribe() call itself is deferred via setTimeout rather than run directly here:
+    // AuthService constructor-injects this service, so a *synchronous* subscribe would fire
+    // resyncUnreadCount()'s HTTP call immediately, which routes through CurrentUserInterceptor
+    // - which itself needs AuthService, while AuthService is still mid-construction on the
+    // call stack. That's a circular DI dependency (NG0200), and it broke login entirely.
+    // Queuing this for the next macrotask lets AuthService (and the rest of the DI graph)
+    // finish constructing first.
+    setTimeout(() => {
+      this.currentUserService.currentUser$.subscribe(() => this.resyncUnreadCount());
+    });
+  }
 
   start(): void {
     if (this.connection && this.connection.state === HubConnectionState.Connected) {

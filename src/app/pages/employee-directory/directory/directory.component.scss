@@ -2,6 +2,14 @@
   display: block;
 }
 
+.directory-header {
+  @apply flex items-center justify-between gap-4 flex-wrap mb-4;
+
+  h1 {
+    @apply text-lg font-semibold text-black dark:text-white;
+  }
+}
+
 .employee-skills {
   @apply flex flex-wrap gap-1;
 }

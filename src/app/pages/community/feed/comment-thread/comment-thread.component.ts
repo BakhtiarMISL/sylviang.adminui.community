@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { IPostCommentAddRequest, IPostCommentNode, IPostCommentResponse } from '@core/interfaces/community/post-comment.interface';
@@ -20,6 +20,7 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 export class CommentThreadComponent implements OnInit {
   @Input({ required: true }) postId!: number;
   @Input() postLocked = false;
+  @Output() countChanged = new EventEmitter<number>();
 
   comments: IPostCommentNode[] = [];
   loading = true;
@@ -81,7 +82,7 @@ export class CommentThreadComponent implements OnInit {
     event.preventDefault();
     const employeeId = link.getAttribute('data-employee-id');
     if (employeeId) {
-      this.router.navigate(['/employee-directory/profile', employeeId]);
+      this.router.navigate(['/community/profile', employeeId]);
     }
   }
 
@@ -199,6 +200,7 @@ export class CommentThreadComponent implements OnInit {
           this.resolveAuthorNames(rows);
           this.resolveMentionLinks(rows);
           this.loading = false;
+          this.countChanged.emit(rows.length);
           this.cdr.detectChanges();
         },
         error: () => {

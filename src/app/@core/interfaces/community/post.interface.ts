@@ -40,4 +40,5 @@ export interface IPostFilterParams {
   searchTerm?: string;
   isAnnouncement?: boolean;
   isPoll?: boolean;
+  employeeId?: number;
 }
