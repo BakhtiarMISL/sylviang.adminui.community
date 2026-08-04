@@ -55,21 +55,7 @@
 
   <!-- Right side controls -->
   <div class="flex items-center space-x-4">
-    <button
-      (click)="goToNotifications()"
-      class="relative h-8 flex items-center text-black dark:text-borderLight hover:text-primary dark:hover:text-primary duration-300"
-      [attr.aria-label]="'Notifications'"
-      [pTooltip]="'Notifications'"
-      tooltipPosition="bottom"
-    >
-      <i class="fas fa-bell"></i>
-      <p-badge
-        *ngIf="(unreadCount$ | async) as unreadCount"
-        [value]="displayUnreadCount(unreadCount)"
-        severity="danger"
-        [style]="{ position: 'absolute', top: '-6px', right: '-10px' }"
-      ></p-badge>
-    </button>
+    <app-notification-bell></app-notification-bell>
 
     <app-theme-toggle></app-theme-toggle>
 

@@ -9,11 +9,12 @@ import { FileUpload, FileUploadHandlerEvent } from 'primeng/fileupload';
 const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.webm'];
 
 /**
- * Standalone, reusable "pick and upload a file" widget for Community attachments (Phase 5 /
- * US-3.4, "attach photos/videos to a post"). Deliberately NOT wired into post-composer here -
- * that integration is a follow-up phase. Uses PrimeNG's p-fileUpload in customUpload mode (auto
- * upload on select) so each upload request can carry `module`/`entityId` alongside the file
- * bytes, and so the FileStorage-backed response can bubble up to a parent via `uploaded`.
+ * Standalone, reusable "pick and upload a file" widget, shared across features (Community
+ * post attachments and Employee Directory profile photo/cover-photo). Lives in SharedModule
+ * since it's now used by two unrelated feature modules. Uses PrimeNG's p-fileUpload in
+ * customUpload mode (auto upload on select) so each upload request can carry `module`/`entityId`
+ * alongside the file bytes, and so the FileStorage-backed response can bubble up to a parent
+ * via `uploaded`.
  */
 @Component({
   selector: 'app-attachment-upload',
@@ -22,15 +23,20 @@ const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.webm'];
   styleUrl: './attachment-upload.component.scss',
 })
 export class AttachmentUploadComponent implements OnDestroy {
-  /** Passed straight through to the backend's Module field (e.g. "Post"). */
+  /** Passed straight through to the backend's Module field (e.g. "Post", "employee-photo"). */
   @Input({ required: true }) module!: string;
-  /** Optional owning entity id (e.g. a postId), forwarded to the backend as EntityId. */
+  /** Optional owning entity id (e.g. a postId or employeeId), forwarded to the backend as EntityId. */
   @Input() entityId?: number;
   @Input() multiple = true;
+  /** Label on the browse button. Pass '' along with [compact]="true" for an icon-only button. */
+  @Input() chooseLabel = 'Add Photos/Videos';
+  @Input() chooseIcon = 'fa-solid fa-paperclip';
+  /** Renders the browse button as a small circular icon button instead of the default pill - for overlaying on avatars/banners. */
+  @Input() compact = false;
 
   /** Emitted once per file, right after that file's upload succeeds. */
   @Output() uploaded = new EventEmitter<IUploadedAttachment>();
-  /** Emitted when a pending/uploaded item is removed from this widget's own list (before it's attached to a post elsewhere). */
+  /** Emitted when a pending/uploaded item is removed from this widget's own list (before it's attached elsewhere). */
   @Output() removed = new EventEmitter<IFileUploadResponse | undefined>();
 
   @ViewChild('fileUpload') fileUploadRef?: FileUpload;

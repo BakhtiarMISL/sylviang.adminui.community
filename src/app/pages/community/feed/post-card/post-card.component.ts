@@ -8,6 +8,7 @@ import { IPostAttachmentResponse } from '@core/interfaces/community/attachment.i
 import { CurrentUserService } from '@core/services/current-user.service';
 import { EmployeeLookupService } from '@core/services/community/employee-lookup.service';
 import { MentionRenderService } from '@core/services/community/mention-render.service';
+import { PostCommentService } from '@core/services/community/post-comment.service';
 import { PostService } from '@core/services/community/post.service';
 import { PostAttachmentService } from '@core/services/community/post-attachment.service';
 import { ToastService } from '@core/services/misc/toast.service';
@@ -25,22 +26,28 @@ const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.webm'];
 })
 export class PostCardComponent implements OnInit {
   @Input({ required: true }) post!: IPostResponse;
+  /** True only for the nested instance rendered inside the detail modal - prevents it from opening another modal on click. */
+  @Input() isModalView = false;
   @Output() deleted = new EventEmitter<number>();
 
   authorName = 'Loading...';
+  authorPhotoUrl: string | null = null;
   showComments = false;
+  commentCount = 0;
   editing = false;
   editContent = '';
   editVisibility: PostVisibility = 'Everyone';
   editTags: IMentionTag[] = [];
   attachments: IPostAttachmentResponse[] = [];
   showReportDialog = false;
+  showDetailModal = false;
   private mentionLinks: IMentionTag[] = [];
 
   visibilityOptions: IVisibilityOption[] = VISIBILITY_OPTIONS;
 
   constructor(
     private postService: PostService,
+    private postCommentService: PostCommentService,
     private postAttachmentService: PostAttachmentService,
     private employeeLookupService: EmployeeLookupService,
     private mentionRenderService: MentionRenderService,
@@ -64,11 +71,16 @@ export class PostCardComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    if (this.isModalView) {
+      this.showComments = true;
+    }
+
     this.employeeLookupService
       .getById(this.post.employeeId)
       .pipe(untilDestroyed(this))
       .subscribe((employee) => {
         this.authorName = employee?.employeeName ?? `Employee #${this.post.employeeId}`;
+        this.authorPhotoUrl = employee?.photoUrl ? `${Base_URL}/${employee.photoUrl}` : null;
         this.cdr.detectChanges();
       });
 
@@ -89,10 +101,24 @@ export class PostCardComponent implements OnInit {
         this.mentionLinks = links;
         this.cdr.detectChanges();
       });
+
+    this.postCommentService
+      .getByPostId(this.post.postId)
+      .pipe(untilDestroyed(this))
+      .subscribe((response) => {
+        if (!response.hasError && response.content) {
+          this.commentCount = response.content.length;
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   toggleComments(): void {
     this.showComments = !this.showComments;
+  }
+
+  onCommentCountChanged(count: number): void {
+    this.commentCount = count;
   }
 
   renderedContent(): SafeHtml {
@@ -101,13 +127,26 @@ export class PostCardComponent implements OnInit {
 
   onContentClick(event: MouseEvent): void {
     const link = (event.target as HTMLElement).closest('.mention-link') as HTMLElement | null;
-    if (!link) return;
+    if (!link) {
+      this.openDetailModal();
+      return;
+    }
 
     event.preventDefault();
     const employeeId = link.getAttribute('data-employee-id');
     if (employeeId) {
-      this.router.navigate(['/employee-directory/profile', employeeId]);
+      this.router.navigate(['/community/profile', employeeId]);
     }
+  }
+
+  openDetailModal(): void {
+    if (this.isModalView) return; // the nested instance inside the modal must not open another one
+    this.showDetailModal = true;
+  }
+
+  onModalPostDeleted(postId: number): void {
+    this.showDetailModal = false;
+    this.deleted.emit(postId);
   }
 
   servedUrl(filePath: string): string {

@@ -48,7 +48,7 @@ export class MentionRenderService {
       const pattern = new RegExp(`@${this.escapeRegExp(escapedName)}`, 'g');
       escaped = escaped.replace(
         pattern,
-        `<a class="mention-link" href="/employee-directory/profile/${link.employeeId}" data-employee-id="${link.employeeId}">@${escapedName}</a>`,
+        `<a class="mention-link" href="/community/profile/${link.employeeId}" data-employee-id="${link.employeeId}">@${escapedName}</a>`,
       );
     }
 

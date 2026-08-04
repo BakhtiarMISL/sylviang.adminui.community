@@ -2,6 +2,32 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+
+  // Icon-only circular button, for overlaying on avatars/banners rather than the default
+  // full-width "Add Photos/Videos" pill (which is far too wide for that context).
+  &.compact {
+    display: block;
+
+    ::ng-deep .p-fileupload-choose-button {
+      width: 2rem;
+      height: 2rem;
+      padding: 0;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+
+      .p-button-label {
+        display: none;
+      }
+
+      .p-button-icon {
+        margin: 0;
+        font-size: 0.85rem;
+      }
+    }
+  }
 }
 
 .attachment-list {

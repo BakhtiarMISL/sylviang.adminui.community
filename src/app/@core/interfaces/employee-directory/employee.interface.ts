@@ -12,9 +12,19 @@ export interface IEmployeeUpdateProfileRequest {
   bio: string | null;
   skills: string | null;
   interests: string | null;
+  achievements: string | null;
+  communityContributions: string | null;
   phoneVisibility: ContactVisibilityEnum;
   emailVisibility: ContactVisibilityEnum;
   extensionVisibility: ContactVisibilityEnum;
+}
+
+export interface IEmployeeUpdatePhotoRequest {
+  storagePath: string;
+}
+
+export interface IEmployeeUpdateCoverPhotoRequest {
+  storagePath: string;
 }
 
 export interface IEmployeeDirectoryCardResponse {
@@ -68,6 +78,7 @@ export interface IEmployeeResponse {
   badges: string[];
   recentRecognitions: string[];
   photoUrl: string | null;
+  coverPhotoUrl: string | null;
   isActive: boolean;
 
   phone: string | null;

@@ -7,6 +7,8 @@ import {
   IEmployeeFilterParams,
   IEmployeeManagementRowResponse,
   IEmployeeResponse,
+  IEmployeeUpdateCoverPhotoRequest,
+  IEmployeeUpdatePhotoRequest,
   IEmployeeUpdateProfileRequest,
 } from '@core/interfaces/employee-directory/employee.interface';
 import { PaginatedResponse } from '@core/interfaces/PaginatedResponse';
@@ -42,6 +44,14 @@ export class EmployeeService {
 
   updateMyProfile(employeeId: number, profile: IEmployeeUpdateProfileRequest) {
     return this.httpClient.put<ApiResponse<void>>(`${this.API_URL}/${employeeId}/profile`, profile);
+  }
+
+  updatePhoto(employeeId: number, request: IEmployeeUpdatePhotoRequest) {
+    return this.httpClient.put<ApiResponse<void>>(`${this.API_URL}/${employeeId}/photo`, request);
+  }
+
+  updateCoverPhoto(employeeId: number, request: IEmployeeUpdateCoverPhotoRequest) {
+    return this.httpClient.put<ApiResponse<void>>(`${this.API_URL}/${employeeId}/cover-photo`, request);
   }
 
   deactivateEmployee(employeeId: number) {

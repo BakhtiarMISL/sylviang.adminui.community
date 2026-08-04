@@ -5,6 +5,7 @@ import { AuthService } from '@core/services/auth.service';
 import { CurrentUserService } from '@core/services/current-user.service';
 import { EmployeeService } from '@core/services/employee-directory/employee/employee.service';
 import { NotificationHubService } from '@core/services/notifications/notification-hub.service';
+import { Base_URL } from '@env/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
 @UntilDestroy()
@@ -20,8 +21,6 @@ export class HeaderComponent implements OnInit {
 
   @Input() isSidebarExpanded = true;
   @Output() sidebarToggle = new EventEmitter<void>();
-
-  unreadCount$ = this.notificationHubService.unreadCount$;
 
   profileMenuHidden = true;
   employeeCode: string | null = null;
@@ -57,15 +56,6 @@ export class HeaderComponent implements OnInit {
     this.loadEmployeeCode();
   }
 
-  goToNotifications(): void {
-    this.router.navigateByUrl('/notifications');
-  }
-
-  displayUnreadCount(count: number | null): string {
-    if (!count) return '';
-    return count > 99 ? '99+' : String(count);
-  }
-
   toggleProfileMenu(): void {
     this.profileMenuHidden = !this.profileMenuHidden;
   }
@@ -98,7 +88,7 @@ export class HeaderComponent implements OnInit {
       next: (response) => {
         if (!response.hasError && response.content) {
           this.employeeCode = response.content.employeeCode;
-          this.photoUrl = response.content.photoUrl;
+          this.photoUrl = response.content.photoUrl ? `${Base_URL}/${response.content.photoUrl}` : null;
           this.cdr.detectChanges();
         }
       },

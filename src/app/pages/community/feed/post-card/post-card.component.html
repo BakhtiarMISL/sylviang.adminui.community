@@ -1,9 +1,12 @@
 <div class="post-card">
   <div class="post-header">
-    <div class="avatar"><i class="fa-solid fa-user"></i></div>
+    <div class="avatar">
+      <img *ngIf="authorPhotoUrl" [src]="authorPhotoUrl" alt="" />
+      <i *ngIf="!authorPhotoUrl" class="fa-solid fa-user"></i>
+    </div>
     <div class="header-text">
       <div class="author-line">
-        <span class="author-name">{{ authorName }}</span>
+        <a class="author-name" [routerLink]="['/community/profile', post.employeeId]">{{ authorName }}</a>
         <span class="badge announcement-badge" *ngIf="post.isAnnouncement">
           <i class="fa-solid fa-bullhorn"></i> Announcement
         </span>
@@ -36,7 +39,7 @@
 
   <div class="post-body" *ngIf="!editing" [innerHTML]="renderedContent()" (click)="onContentClick($event)"></div>
 
-  <div class="attachment-gallery" *ngIf="!editing && attachments.length > 0">
+  <div class="attachment-gallery" *ngIf="!editing && attachments.length > 0" (click)="openDetailModal()">
     <div class="attachment-tile" *ngFor="let attachment of attachments">
       <img *ngIf="!isVideoAttachment(attachment)" [src]="servedUrl(attachment.filePath)" [alt]="attachment.fileName" />
       <video *ngIf="isVideoAttachment(attachment)" [src]="servedUrl(attachment.filePath)" controls></video>
@@ -72,10 +75,28 @@
     <button type="button" class="link-action" (click)="toggleComments()">
       <i class="fa-regular fa-comment"></i>
       {{ showComments ? 'Hide comments' : 'Comments' }}
+      <span *ngIf="commentCount > 0">({{ commentCount }})</span>
     </button>
   </div>
 
-  <app-comment-thread *ngIf="showComments" [postId]="post.postId" [postLocked]="post.isLocked"></app-comment-thread>
+  <app-comment-thread
+    *ngIf="showComments"
+    [postId]="post.postId"
+    [postLocked]="post.isLocked"
+    (countChanged)="onCommentCountChanged($event)"
+  ></app-comment-thread>
 
   <app-report-content-dialog [postId]="post.postId" [(visible)]="showReportDialog"></app-report-content-dialog>
+
+  <p-dialog
+    *ngIf="!isModalView"
+    header="Post"
+    [(visible)]="showDetailModal"
+    [modal]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '42rem' }"
+    [contentStyle]="{ 'max-height': '80vh', 'overflow-y': 'auto' }"
+  >
+    <app-post-card *ngIf="showDetailModal" [post]="post" [isModalView]="true" (deleted)="onModalPostDeleted($event)"></app-post-card>
+  </p-dialog>
 </div>

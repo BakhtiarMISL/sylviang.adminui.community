@@ -10,7 +10,9 @@ import { ToastService } from '@core/services/misc/toast.service';
  * Colleague profile view (US-1.3) and My Profile view + inline edit (US-1.4/1.5) - one
  * component for both, since they're the same data/layout with different permissions.
  * Edit is an in-place mode toggle rather than a separate route, matching the story's own
- * framing ("Edit Profile" opens a form and "Save Changes" returns to view mode).
+ * framing ("Edit Profile" opens a form and "Save Changes" returns to view mode). This is
+ * the plain, HRM-wide employee record view - see CommunityProfileComponent for the richer
+ * community-facing profile (photo, cover photo, achievements, contributions, etc.).
  */
 @Component({
   selector: 'app-profile',
@@ -37,8 +39,11 @@ export class ProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
+      // The 'profile/me' route is a literal path segment (no :id token), so params.get('id')
+      // is null on it - Number(null) would be 0, not NaN, so idParam === null is the correct
+      // discriminator here, not idParam === 'me'.
       const idParam = params.get('id');
-      const employeeId = idParam === 'me' ? this.currentUserService.currentUser.employeeId : Number(idParam);
+      const employeeId = idParam === null ? this.currentUserService.currentUser.employeeId : Number(idParam);
 
       if (employeeId === null || employeeId === undefined || Number.isNaN(employeeId)) {
         // Admin persona has no employeeId (Admin is not an Employee record) - nothing to show.
@@ -62,7 +67,6 @@ export class ProfileComponent implements OnInit {
           this.employee = response.content;
           this.notFound = false;
           this.breadcrumbService.setBreadcrumbs([
-            { title: 'Employee Directory', icon: 'fa-solid fa-id-badge', href: '/employee-directory/directory' },
             { title: this.employee.isOwnProfile ? 'My Profile' : this.employee.employeeName || 'Profile', icon: 'fa-solid fa-user', href: this.router.url },
           ]);
         } else {

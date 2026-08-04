@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { RouterModule } from '@angular/router';
+import { NoPreloading, RouteReuseStrategy, RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
@@ -16,7 +16,6 @@ import { ShellModule } from './shell/shell.module';
 import { ApiPrefixInterceptor } from './@core/interceptors/api-prefix.interceptor';
 import { ErrorHandlerInterceptor } from './@core/interceptors/error-handler.interceptor';
 import { CurrentUserInterceptor } from './@core/interceptors/current-user.interceptor';
-import { RouteReuseStrategy, PreloadAllModules } from '@angular/router';
 import { RouteReusableStrategy } from './@core/helpers/route-reusable-strategy';
 
 @NgModule({
@@ -27,7 +26,7 @@ import { RouteReusableStrategy } from './@core/helpers/route-reusable-strategy';
     HttpClientModule,
     TranslateModule.forRoot(),
     RouterModule.forRoot(routes, {
-      preloadingStrategy: PreloadAllModules,
+      preloadingStrategy: NoPreloading,
       onSameUrlNavigation: 'reload',
       paramsInheritanceStrategy: 'always',
       scrollPositionRestoration: 'enabled',

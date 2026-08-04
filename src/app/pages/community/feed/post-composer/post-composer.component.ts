@@ -56,6 +56,10 @@ export class PostComposerComponent {
     return true;
   }
 
+  trackByIndex(index: number): number {
+    return index;
+  }
+
   addPollOption(): void {
     this.pollOptions.push('');
   }

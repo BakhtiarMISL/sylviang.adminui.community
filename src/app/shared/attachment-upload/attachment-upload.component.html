@@ -1,4 +1,4 @@
-<div class="attachment-upload">
+<div class="attachment-upload" [class.compact]="compact">
   <p-fileUpload
     #fileUpload
     mode="basic"
@@ -8,11 +8,11 @@
     [accept]="accept"
     [maxFileSize]="maxFileSize"
     [auto]="true"
-    chooseLabel="Add Photos/Videos"
-    chooseIcon="fa-solid fa-paperclip"
+    [chooseLabel]="chooseLabel"
+    [chooseIcon]="chooseIcon"
   ></p-fileUpload>
 
-  <div class="attachment-list" *ngIf="items.length > 0">
+  <div class="attachment-list" *ngIf="!compact && items.length > 0">
     <div class="attachment-item" *ngFor="let item of items" [class.error]="item.status === 'error'">
       <div class="attachment-thumb">
         <img *ngIf="item.isImage" [src]="item.status === 'uploaded' && item.uploadResponse ? servedUrl(item.uploadResponse.storagePath) : item.previewUrl" [alt]="item.file.name" />

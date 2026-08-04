@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, Input, OnInit } from '@angular/core';
 import { ApiResponse } from '@core/interfaces/ApiResponse';
 import { IReactionTypeOption, REACTION_TYPES } from '@core/constants/community/reaction-types';
 import { IReactionSummary, ReactionType } from '@core/interfaces/community/reaction.interface';
@@ -32,6 +32,7 @@ export class ReactionBarComponent implements OnInit {
     private reactionService: ReactionService,
     private currentUserService: CurrentUserService,
     private cdr: ChangeDetectorRef,
+    private eRef: ElementRef,
   ) {}
 
   private get employeeId(): number | null {
@@ -44,6 +45,14 @@ export class ReactionBarComponent implements OnInit {
 
   togglePicker(): void {
     this.pickerOpen = !this.pickerOpen;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: Event): void {
+    if (this.pickerOpen && !this.eRef.nativeElement.contains(event.target)) {
+      this.pickerOpen = false;
+      this.cdr.detectChanges();
+    }
   }
 
   react(reactionType: ReactionType): void {

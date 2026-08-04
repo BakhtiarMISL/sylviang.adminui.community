@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { FileUploadModule } from 'primeng/fileupload';
+import { RouterModule } from '@angular/router';
 import { PanelModule } from 'primeng/panel';
 import { PaginatorModule } from 'primeng/paginator';
 import { ProgressBarModule } from 'primeng/progressbar';
@@ -14,9 +14,16 @@ import { CommentThreadComponent } from './feed/comment-thread/comment-thread.com
 import { ReactionBarComponent } from './feed/reaction-bar/reaction-bar.component';
 import { MentionTextareaComponent } from './feed/mention-textarea/mention-textarea.component';
 import { PollWidgetComponent } from './feed/poll-widget/poll-widget.component';
-import { AttachmentUploadComponent } from './feed/attachment-upload/attachment-upload.component';
 import { ReportContentDialogComponent } from './feed/report-content-dialog/report-content-dialog.component';
 import { ModerationQueueComponent } from './moderation/moderation-queue.component';
+import { CommunityProfileEditFormComponent } from './profile/profile-edit-form/profile-edit-form.component';
+import { CommunityProfileComponent } from './profile/profile.component';
+import { RecognitionsComponent } from './recognitions/recognitions.component';
+import { RecognitionCardComponent } from './recognitions/recognition-card/recognition-card.component';
+import { RecognitionComposerComponent } from './recognitions/recognition-composer/recognition-composer.component';
+import { RecognitionReactionBarComponent } from './recognitions/recognition-reaction-bar/recognition-reaction-bar.component';
+import { RecognitionCommentThreadComponent } from './recognitions/recognition-comment-thread/recognition-comment-thread.component';
+import { BadgeManagementComponent } from './recognitions/badge-management/badge-management.component';
 
 @NgModule({
   declarations: [
@@ -27,18 +34,25 @@ import { ModerationQueueComponent } from './moderation/moderation-queue.componen
     ReactionBarComponent,
     MentionTextareaComponent,
     PollWidgetComponent,
-    AttachmentUploadComponent,
     ReportContentDialogComponent,
     ModerationQueueComponent,
+    CommunityProfileComponent,
+    CommunityProfileEditFormComponent,
+    RecognitionsComponent,
+    RecognitionCardComponent,
+    RecognitionComposerComponent,
+    RecognitionReactionBarComponent,
+    RecognitionCommentThreadComponent,
+    BadgeManagementComponent,
   ],
   imports: [
     CommonModule,
+    RouterModule,
     SharedModule,
     PanelModule,
     PaginatorModule,
     TextareaModule,
     ProgressBarModule,
-    FileUploadModule,
     CommunityRoutingModule,
   ],
 })
