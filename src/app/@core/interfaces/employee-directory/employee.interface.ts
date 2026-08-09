@@ -8,15 +8,33 @@ export interface IEmployeeCreateRequest {
   siteId: number;
 }
 
+export interface IEmployeeContactLinkRequest {
+  id: number | null;
+  platform: string;
+  url: string;
+  visibility: ContactVisibilityEnum;
+}
+
+export interface IEmployeeContactLink {
+  id: number;
+  platform: string;
+  url: string;
+  visibility: ContactVisibilityEnum;
+}
+
 export interface IEmployeeUpdateProfileRequest {
   bio: string | null;
   skills: string | null;
   interests: string | null;
   achievements: string | null;
   communityContributions: string | null;
+  phone: string | null;
+  email: string | null;
+  extension: string | null;
   phoneVisibility: ContactVisibilityEnum;
   emailVisibility: ContactVisibilityEnum;
   extensionVisibility: ContactVisibilityEnum;
+  contactLinks: IEmployeeContactLinkRequest[];
 }
 
 export interface IEmployeeUpdatePhotoRequest {
@@ -66,8 +84,6 @@ export interface IEmployeeResponse {
   departmentName: string | null;
   siteId: number | null;
   siteName: string | null;
-  gradeId: number | null;
-  gradeName: string | null;
   division: string | null;
 
   bio: string | null;
@@ -87,6 +103,7 @@ export interface IEmployeeResponse {
   phoneVisibility: ContactVisibilityEnum;
   emailVisibility: ContactVisibilityEnum;
   extensionVisibility: ContactVisibilityEnum;
+  contactLinks: IEmployeeContactLink[];
 
   isOwnProfile: boolean;
 }

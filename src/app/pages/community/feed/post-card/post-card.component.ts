@@ -12,6 +12,7 @@ import { PostCommentService } from '@core/services/community/post-comment.servic
 import { PostService } from '@core/services/community/post.service';
 import { PostAttachmentService } from '@core/services/community/post-attachment.service';
 import { ToastService } from '@core/services/misc/toast.service';
+import { TimeTickerService } from '@core/services/misc/time-ticker.service';
 import { Base_URL } from '@env/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
@@ -28,6 +29,8 @@ export class PostCardComponent implements OnInit {
   @Input({ required: true }) post!: IPostResponse;
   /** True only for the nested instance rendered inside the detail modal - prevents it from opening another modal on click. */
   @Input() isModalView = false;
+  /** Set when the viewer is a Creator/GroupAdmin/Contributor of this post's group - grants the same moderation rights as HR/Admin, scoped to this post. */
+  @Input() groupModerator = false;
   @Output() deleted = new EventEmitter<number>();
 
   authorName = 'Loading...';
@@ -56,14 +59,19 @@ export class PostCardComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    public timeTicker: TimeTickerService,
   ) {}
 
   get canEdit(): boolean {
-    return this.currentUserService.isHrOrAdmin() || this.post.employeeId === this.currentUserService.currentUser.employeeId;
+    return (
+      this.currentUserService.isHrOrAdmin() ||
+      this.post.employeeId === this.currentUserService.currentUser.employeeId ||
+      this.groupModerator
+    );
   }
 
   get canModerate(): boolean {
-    return this.currentUserService.isHrOrAdmin();
+    return this.currentUserService.isHrOrAdmin() || this.groupModerator;
   }
 
   get isOwnPost(): boolean {

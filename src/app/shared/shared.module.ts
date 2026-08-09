@@ -18,6 +18,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 
+import { RelativeTimePipe } from '@core/pipes/relative-time.pipe';
 import { AttachmentUploadComponent } from './attachment-upload/attachment-upload.component';
 import { ColleagueSearchComponent } from './colleague-search/colleague-search.component';
 
@@ -42,6 +43,7 @@ import { ColleagueSearchComponent } from './colleague-search/colleague-search.co
     BadgeModule,
     AutoCompleteModule,
     FileUploadModule,
+    RelativeTimePipe,
   ],
   exports: [
     CommonModule,
@@ -64,6 +66,7 @@ import { ColleagueSearchComponent } from './colleague-search/colleague-search.co
     FileUploadModule,
     AttachmentUploadComponent,
     ColleagueSearchComponent,
+    RelativeTimePipe,
   ],
 })
 export class SharedModule {}

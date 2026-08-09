@@ -1,0 +1,58 @@
+<section class="page-container survey-results-page">
+  <div *ngIf="loading" class="skeleton-list">
+    <p-skeleton width="100%" height="4rem" styleClass="mb-3"></p-skeleton>
+    <p-skeleton width="100%" height="8rem"></p-skeleton>
+  </div>
+
+  <ng-container *ngIf="!loading && survey && results">
+    <div class="results-header">
+      <h1>{{ survey.title }} - Results</h1>
+      <span class="badge anon-badge" *ngIf="survey.isAnonymous"><i class="fa-solid fa-user-secret"></i> Anonymous survey - no per-respondent breakdown</span>
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-tile">
+        <span class="tile-value">{{ results.totalResponses }}</span>
+        <span class="tile-label">Total Responses</span>
+      </div>
+      <div class="summary-tile">
+        <span class="tile-value">{{ results.participationRate !== null ? results.participationRate + '%' : 'N/A' }}</span>
+        <span class="tile-label">Participation Rate</span>
+      </div>
+    </div>
+    <p class="rate-note" *ngIf="results.participationRate === null">
+      Participation rate isn't available for Department/Branch-scoped surveys yet - only company-wide surveys can compute it today.
+    </p>
+
+    <div class="question-result" *ngFor="let question of results.questions; let qIndex = index">
+      <div class="question-text">{{ qIndex + 1 }}. {{ question.questionText }}</div>
+
+      <div class="option-result" *ngFor="let option of question.options">
+        <div class="option-row">
+          <span class="option-text">{{ option.optionText }}</span>
+          <span class="option-count">{{ option.count }} ({{ option.percentage }}%)</span>
+        </div>
+        <p-progressBar [value]="option.percentage" [showValue]="false"></p-progressBar>
+      </div>
+
+      <ul class="text-answers" *ngIf="question.textAnswers.length > 0">
+        <li *ngFor="let answer of question.textAnswers">{{ answer }}</li>
+      </ul>
+
+      <div class="not-found" *ngIf="question.options.length === 0 && question.textAnswers.length === 0">
+        <div><p>No answers yet for this question.</p></div>
+      </div>
+    </div>
+
+    <div class="not-found" *ngIf="results.questions.length === 0 && survey.externalUrl">
+      <div>
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        <p>This is an external survey - responses are collected on the external platform; only completion counts are tracked in CES.</p>
+      </div>
+    </div>
+
+    <div class="not-found" *ngIf="results.questions.length === 0 && !survey.externalUrl">
+      <div><i class="fa-solid fa-chart-column"></i><p>No questions to report on.</p></div>
+    </div>
+  </ng-container>
+</section>

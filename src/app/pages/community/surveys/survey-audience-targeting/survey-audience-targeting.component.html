@@ -1,0 +1,68 @@
+<div class="audience-targeting">
+  <div class="readonly-note" *ngIf="readonly">
+    <i class="fa-solid fa-lock"></i>
+    Audience targeting is set and cannot be changed once a survey has one - delete and recreate the survey to retarget it.
+  </div>
+
+  <div class="radio-row">
+    <div class="radio-option">
+      <p-radioButton
+        name="audienceType"
+        value="EntireCompany"
+        [ngModel]="audienceType"
+        [disabled]="readonly"
+        (ngModelChange)="onTypeChange($event)"
+        inputId="audience-entire-company"
+      ></p-radioButton>
+      <label for="audience-entire-company">Entire Company</label>
+    </div>
+    <div class="radio-option">
+      <p-radioButton
+        name="audienceType"
+        value="Department"
+        [ngModel]="audienceType"
+        [disabled]="readonly"
+        (ngModelChange)="onTypeChange($event)"
+        inputId="audience-department"
+      ></p-radioButton>
+      <label for="audience-department">Department</label>
+    </div>
+    <div class="radio-option">
+      <p-radioButton
+        name="audienceType"
+        value="Branch"
+        [ngModel]="audienceType"
+        [disabled]="readonly"
+        (ngModelChange)="onTypeChange($event)"
+        inputId="audience-branch"
+      ></p-radioButton>
+      <label for="audience-branch">Branch</label>
+    </div>
+  </div>
+
+  <p-select
+    *ngIf="audienceType === 'Department'"
+    [options]="departments"
+    optionLabel="name"
+    optionValue="departmentId"
+    [ngModel]="departmentId"
+    [disabled]="readonly"
+    (ngModelChange)="onDepartmentChange($event)"
+    placeholder="Choose a department"
+    [appendTo]="'body'"
+    styleClass="w-full"
+  ></p-select>
+
+  <p-select
+    *ngIf="audienceType === 'Branch'"
+    [options]="branches"
+    optionLabel="name"
+    optionValue="branchId"
+    [ngModel]="branchId"
+    [disabled]="readonly"
+    (ngModelChange)="onBranchChange($event)"
+    placeholder="Choose a branch"
+    [appendTo]="'body'"
+    styleClass="w-full"
+  ></p-select>
+</div>

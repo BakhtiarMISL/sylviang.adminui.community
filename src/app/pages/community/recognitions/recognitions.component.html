@@ -37,14 +37,8 @@
       </div>
     </div>
 
-    <p-paginator
-      *ngIf="totalRecords > rows"
-      [rows]="rows"
-      [totalRecords]="totalRecords"
-      [first]="(currentPage - 1) * rows"
-      [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
-      (onPageChange)="onPageChange($event)"
-    ></p-paginator>
+    <div *ngIf="loadingMore" class="load-more-spinner"><i class="fa-solid fa-spinner fa-spin"></i></div>
+    <div #scrollAnchor class="scroll-anchor"></div>
   </div>
 
   <app-badge-management [(visible)]="showBadgeManagement"></app-badge-management>

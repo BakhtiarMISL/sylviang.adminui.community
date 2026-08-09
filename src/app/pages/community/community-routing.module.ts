@@ -3,9 +3,15 @@ import { RouterModule, Routes } from '@angular/router';
 import { authGuard } from '@core/guards/auth.guard';
 import { hrAdminGuard } from '@core/guards/hr-admin.guard';
 import { FeedComponent } from './feed/feed.component';
+import { GroupsListComponent } from './groups/groups-list/groups-list.component';
+import { GroupDetailComponent } from './groups/group-detail/group-detail.component';
 import { ModerationQueueComponent } from './moderation/moderation-queue.component';
 import { CommunityProfileComponent } from './profile/profile.component';
 import { RecognitionsComponent } from './recognitions/recognitions.component';
+import { SurveysComponent } from './surveys/surveys.component';
+import { SurveyBuilderComponent } from './surveys/survey-builder/survey-builder.component';
+import { SurveyTakeComponent } from './surveys/survey-take/survey-take.component';
+import { SurveyResultsComponent } from './surveys/survey-results/survey-results.component';
 
 const routes: Routes = [
   {
@@ -14,9 +20,44 @@ const routes: Routes = [
     canActivate: [authGuard],
   },
   {
+    path: 'groups',
+    component: GroupsListComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'groups/:id',
+    component: GroupDetailComponent,
+    canActivate: [authGuard],
+  },
+  {
     path: 'recognitions',
     component: RecognitionsComponent,
     canActivate: [authGuard],
+  },
+  {
+    path: 'surveys',
+    component: SurveysComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'surveys/create',
+    component: SurveyBuilderComponent,
+    canActivate: [authGuard, hrAdminGuard],
+  },
+  {
+    path: 'surveys/:id/edit',
+    component: SurveyBuilderComponent,
+    canActivate: [authGuard, hrAdminGuard],
+  },
+  {
+    path: 'surveys/:id/take',
+    component: SurveyTakeComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'surveys/:id/results',
+    component: SurveyResultsComponent,
+    canActivate: [authGuard, hrAdminGuard],
   },
   {
     // Must come before 'profile/:id' - resolves to the current mock user's own profile.

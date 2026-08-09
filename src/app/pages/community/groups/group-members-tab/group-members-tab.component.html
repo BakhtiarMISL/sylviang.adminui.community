@@ -1,0 +1,130 @@
+<div class="members-tab">
+  <div class="members-toolbar" *ngIf="isManager">
+    <button pButton size="small" (click)="openAddMember()"><i class="fa-solid fa-user-plus"></i> Add Member</button>
+  </div>
+
+  <div class="add-member-form" *ngIf="showAddMember">
+    <p-autocomplete
+      [(ngModel)]="addMemberQuery"
+      [suggestions]="addMemberSuggestions"
+      (completeMethod)="searchNewMembers($event)"
+      (onSelect)="onNewMemberSelect($event.value)"
+      optionLabel="employeeName"
+      placeholder="Search colleagues to add..."
+      [minLength]="1"
+      [appendTo]="'body'"
+      styleClass="w-full"
+    >
+      <ng-template let-employee pTemplate="item">
+        <div class="suggestion-item">
+          <i class="fa-solid fa-user"></i>
+          <span>{{ employee.employeeName }}</span>
+          <span class="suggestion-meta">{{ employee.designationName }}</span>
+        </div>
+      </ng-template>
+    </p-autocomplete>
+
+    <div class="form-actions">
+      <button pButton size="small" [disabled]="!selectedNewMember || addingMember" (click)="submitAddMember()">Add</button>
+      <button pButton size="small" severity="secondary" (click)="cancelAddMember()">Cancel</button>
+    </div>
+  </div>
+
+  <div *ngIf="membersLoading" class="skeleton-list">
+    <p-skeleton width="100%" height="2.5rem" styleClass="mb-2"></p-skeleton>
+    <p-skeleton width="100%" height="2.5rem"></p-skeleton>
+  </div>
+
+  <div class="table-container" *ngIf="!membersLoading">
+    <p-table [value]="members" dataKey="groupMemberId">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Member</th>
+          <th>Role</th>
+          <th>Joined</th>
+          <th *ngIf="isManager"></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-member>
+        <tr>
+          <td>
+            {{ nameFor(member.employeeId) }}
+            <span *ngIf="member.employeeId === currentEmployeeId" class="you-tag">(you)</span>
+          </td>
+          <td>
+            <span class="badge role-badge" [ngClass]="'role-' + member.role.toLowerCase()">{{ member.role }}</span>
+          </td>
+          <td>{{ member.joinedDate | date: 'dd-MMM-yyyy' }}</td>
+          <td class="actions-cell" *ngIf="isManager">
+            <button
+              *ngIf="member.role === 'Member'"
+              pButton
+              size="small"
+              severity="secondary"
+              pTooltip="Promote to Contributor"
+              [disabled]="pendingActionEmployeeId === member.employeeId"
+              (click)="promoteToContributor(member)"
+            >
+              <i class="fa-solid fa-pen-nib"></i>
+            </button>
+            <button
+              *ngIf="member.role === 'Member'"
+              pButton
+              size="small"
+              severity="secondary"
+              pTooltip="Promote to Group Admin"
+              [disabled]="pendingActionEmployeeId === member.employeeId"
+              (click)="promoteToAdmin(member)"
+            >
+              <i class="fa-solid fa-arrow-up"></i>
+            </button>
+            <button
+              *ngIf="member.role === 'GroupAdmin' || member.role === 'Contributor'"
+              pButton
+              size="small"
+              severity="secondary"
+              pTooltip="Demote to Member"
+              [disabled]="pendingActionEmployeeId === member.employeeId"
+              (click)="demoteToMember(member)"
+            >
+              <i class="fa-solid fa-arrow-down"></i>
+            </button>
+            <button
+              *ngIf="member.role !== 'Creator' && canTransferOwnership"
+              pButton
+              size="small"
+              severity="secondary"
+              pTooltip="Transfer ownership"
+              [disabled]="pendingActionEmployeeId === member.employeeId"
+              (click)="transferOwnership(member)"
+            >
+              <i class="fa-solid fa-crown"></i>
+            </button>
+            <button
+              *ngIf="member.role !== 'Creator'"
+              pButton
+              size="small"
+              severity="danger"
+              pTooltip="Remove from group"
+              [disabled]="pendingActionEmployeeId === member.employeeId"
+              (click)="removeMember(member)"
+            >
+              <i class="fa-solid fa-user-minus"></i>
+            </button>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4" class="not-found">
+            <div>
+              <p>No members yet.</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

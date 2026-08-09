@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, Input, OnInit } from '@angular/core';
 import { IRecognitionResponse } from '@core/interfaces/community/recognition.interface';
 import { EmployeeLookupService } from '@core/services/community/employee-lookup.service';
 import { RecognitionCommentService } from '@core/services/community/recognition-comment.service';
+import { TimeTickerService } from '@core/services/misc/time-ticker.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
 @UntilDestroy()
@@ -13,19 +14,27 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 })
 export class RecognitionCardComponent implements OnInit {
   @Input({ required: true }) recognition!: IRecognitionResponse;
+  /** True only for the nested instance rendered inside the detail modal - prevents it from opening another modal on click. */
+  @Input() isModalView = false;
 
   senderName = 'Loading...';
   recipientName = 'Loading...';
   showComments = false;
   commentCount = 0;
+  showDetailModal = false;
 
   constructor(
     private employeeLookupService: EmployeeLookupService,
     private recognitionCommentService: RecognitionCommentService,
     private cdr: ChangeDetectorRef,
+    public timeTicker: TimeTickerService,
   ) {}
 
   ngOnInit(): void {
+    if (this.isModalView) {
+      this.showComments = true;
+    }
+
     this.employeeLookupService
       .getById(this.recognition.senderId)
       .pipe(untilDestroyed(this))
@@ -59,5 +68,10 @@ export class RecognitionCardComponent implements OnInit {
 
   onCommentCountChanged(count: number): void {
     this.commentCount = count;
+  }
+
+  openDetailModal(): void {
+    if (this.isModalView) return; // the nested instance inside the modal must not open another one
+    this.showDetailModal = true;
   }
 }

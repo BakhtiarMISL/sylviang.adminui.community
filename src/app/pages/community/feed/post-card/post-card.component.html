@@ -7,13 +7,13 @@
     <div class="header-text">
       <div class="author-line">
         <a class="author-name" [routerLink]="['/community/profile', post.employeeId]">{{ authorName }}</a>
+        <span class="dot">&middot;</span>
+        <span class="time" [title]="post.createdAt | date: 'medium'">{{ post.createdAt | relativeTime : (timeTicker.now$ | async) }}</span>
         <span class="badge announcement-badge" *ngIf="post.isAnnouncement">
           <i class="fa-solid fa-bullhorn"></i> Announcement
         </span>
       </div>
       <div class="meta-line">
-        <span>{{ post.createdAt | date: 'medium' }}</span>
-        <span class="dot">&middot;</span>
         <span>{{ post.visibility }}</span>
         <span *ngIf="post.isLocked" class="dot">&middot;</span>
         <span *ngIf="post.isLocked"><i class="fa-solid fa-lock"></i> Locked</span>

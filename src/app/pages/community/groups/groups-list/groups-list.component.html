@@ -1,0 +1,89 @@
+<section class="page-container">
+  <div class="groups-header">
+    <h1 class="title">Groups</h1>
+    <div class="groups-header-actions">
+      <input pInputText type="text" placeholder="Search groups..." [ngModel]="searchTerm" (ngModelChange)="onSearchInput($event)" />
+      <button pButton (click)="openCreateDialog()"><i class="fa-solid fa-plus"></i> Create Group</button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <p-table
+      [value]="loading ? skeletonItems : groups"
+      dataKey="groupId"
+      [paginator]="true"
+      [rows]="rows"
+      [first]="(currentPage - 1) * rows"
+      [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+      [totalRecords]="totalRecords"
+      (onPage)="onPageChange($event)"
+      [lazy]="true"
+      [loading]="false"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} groups"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Visibility</th>
+          <th>Members</th>
+          <th></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-group>
+        @if (loading) {
+          <tr>
+            <td colspan="5" class="p-4"><p-skeleton width="100%" height="2.5rem"></p-skeleton></td>
+          </tr>
+        } @else {
+          <tr class="group-row" (click)="openGroup(group)">
+            <td class="name-cell">{{ group.name }}</td>
+            <td class="description-cell">{{ group.description }}</td>
+            <td>
+              <span class="badge visibility-badge" [ngClass]="'visibility-' + group.visibility.toLowerCase()">{{ group.visibility }}</span>
+            </td>
+            <td>{{ group.memberCount }}</td>
+            <td class="actions-cell" (click)="$event.stopPropagation()">
+              <span *ngIf="myGroupIds.has(group.groupId)" class="badge joined-badge"><i class="fa-solid fa-check"></i> Member</span>
+              <span *ngIf="!myGroupIds.has(group.groupId) && requestedGroupIds.has(group.groupId)" class="badge requested-badge">Requested</span>
+              <button
+                *ngIf="!myGroupIds.has(group.groupId) && !requestedGroupIds.has(group.groupId) && group.visibility === 'Public'"
+                pButton
+                size="small"
+                [disabled]="pendingActionGroupId === group.groupId"
+                (click)="join(group)"
+              >
+                Join
+              </button>
+              <button
+                *ngIf="!myGroupIds.has(group.groupId) && !requestedGroupIds.has(group.groupId) && group.visibility === 'Private'"
+                pButton
+                size="small"
+                severity="secondary"
+                [disabled]="pendingActionGroupId === group.groupId"
+                (click)="requestToJoin(group)"
+              >
+                Request to Join
+              </button>
+            </td>
+          </tr>
+        }
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="5" class="not-found">
+            <div>
+              <i class="fa-solid fa-people-group"></i>
+              <p>No groups yet. Be the first to create one!</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</section>
+
+<app-group-form-dialog [(visible)]="showCreateDialog" [groupId]="null" (saved)="onGroupCreated()"></app-group-form-dialog>

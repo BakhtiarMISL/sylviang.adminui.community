@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UI_CONFIG } from '@core/constants';
 import { IRecognitionFilterParams, IRecognitionResponse } from '@core/interfaces/community/recognition.interface';
 import { CurrentUserService } from '@core/services/current-user.service';
@@ -17,9 +17,12 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
   templateUrl: './recognitions.component.html',
   styleUrl: './recognitions.component.scss',
 })
-export class RecognitionsComponent implements OnInit {
+export class RecognitionsComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('scrollAnchor') scrollAnchor?: ElementRef<HTMLElement>;
+
   recognitions: IRecognitionResponse[] = [];
   loading = true;
+  loadingMore = false;
   totalRecords = 0;
   rows: number = UI_CONFIG.defaultPageSize;
   currentPage = 1;
@@ -30,6 +33,8 @@ export class RecognitionsComponent implements OnInit {
   // "Recognition Filters" panel currently just hosts the give-recognition composer,
   // collapsible/styled the same way as the Employee Directory's filter box.
   filtersCollapsed = false;
+
+  private observer?: IntersectionObserver;
 
   constructor(
     private recognitionService: RecognitionService,
@@ -42,26 +47,46 @@ export class RecognitionsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadRecognitions();
+    this.loadRecognitions(true);
+  }
+
+  ngAfterViewInit(): void {
+    if (!this.scrollAnchor) return;
+
+    this.observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        this.loadMore();
+      }
+    });
+    this.observer.observe(this.scrollAnchor.nativeElement);
+  }
+
+  ngOnDestroy(): void {
+    this.observer?.disconnect();
   }
 
   onFiltersCollapsedChange(collapsed: boolean): void {
     this.filtersCollapsed = collapsed;
   }
 
-  onPageChange(event: { first: number; rows: number }): void {
-    this.currentPage = Math.floor(event.first / event.rows) + 1;
-    this.rows = event.rows;
-    this.loadRecognitions();
-  }
-
   onRecognitionCreated(): void {
-    this.currentPage = 1;
-    this.loadRecognitions();
+    this.loadRecognitions(true);
   }
 
-  private loadRecognitions(): void {
-    this.loading = true;
+  private loadMore(): void {
+    if (this.loading || this.loadingMore || this.recognitions.length >= this.totalRecords) return;
+    this.currentPage += 1;
+    this.loadRecognitions(false);
+  }
+
+  private loadRecognitions(reset: boolean): void {
+    if (reset) {
+      this.currentPage = 1;
+      this.recognitions = [];
+      this.loading = true;
+    } else {
+      this.loadingMore = true;
+    }
 
     const params: IRecognitionFilterParams = {
       page: this.currentPage,
@@ -75,20 +100,22 @@ export class RecognitionsComponent implements OnInit {
       .pipe(untilDestroyed(this))
       .subscribe({
         next: (response) => {
-          if (!response.hasError && response.content) {
-            this.recognitions = response.content.data || [];
-            this.totalRecords = response.content.totalCount || 0;
-          } else {
+          const data = !response.hasError && response.content ? response.content.data || [] : [];
+          const totalCount = !response.hasError && response.content ? response.content.totalCount || 0 : 0;
+
+          this.recognitions = reset ? data : [...this.recognitions, ...data];
+          this.totalRecords = totalCount;
+          this.loading = false;
+          this.loadingMore = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          if (reset) {
             this.recognitions = [];
             this.totalRecords = 0;
           }
           this.loading = false;
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.recognitions = [];
-          this.totalRecords = 0;
-          this.loading = false;
+          this.loadingMore = false;
           this.cdr.detectChanges();
         },
       });

@@ -39,7 +39,7 @@
           <span class="flex-1 min-w-0">
             <span class="block text-sm text-dark dark:text-borderLight" [class.font-semibold]="!notification.isRead">{{ notification.title }}</span>
             <span class="block text-xs text-neutral truncate" *ngIf="notification.message">{{ notification.message }}</span>
-            <span class="block text-xs text-neutral mt-0.5">{{ notification.createdAt | date: 'short' }}</span>
+            <span class="block text-xs text-neutral mt-0.5">{{ notification.createdAt | relativeTime : (timeTicker.now$ | async) }}</span>
           </span>
           <span *ngIf="!notification.isRead" class="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0"></span>
         </button>

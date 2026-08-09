@@ -3,27 +3,32 @@
 }
 
 .cover-photo-banner {
-  @apply relative w-full h-36 sm:h-44 rounded-lg mb-[-2rem] bg-neutral/10 dark:bg-white/5 bg-cover bg-center border border-borderLight dark:border-borderDark;
+  // No negative bottom margin here - the avatar overlaps this banner via its own negative
+  // top-margin (see .profile-photo-wrapper) so the banner's own box is never overlapped by a
+  // later sibling, and the cover-photo-upload button below can safely sit at its bottom edge.
+  @apply relative w-full h-40 sm:h-52 rounded-t-lg bg-neutral/10 dark:bg-white/5 bg-cover bg-center border border-borderLight dark:border-borderDark;
 }
 
 .cover-photo-upload {
-  // Positioned in the banner's top-right corner rather than the bottom - the banner has a
-  // negative bottom margin (mb-[-2rem]) so .profile-card overlaps its lower edge, and since
-  // .profile-card is a later DOM sibling it paints on top there, hiding anything placed at
-  // the bottom of the banner behind the card underneath.
-  @apply absolute top-3 right-3;
+  @apply absolute bottom-3 right-3;
 }
 
+// Still used by the loading-skeleton state (@if (loading) block) - the real header below has
+// moved to .profile-header-row.
 .profile-card {
   @apply relative flex flex-col items-center text-center rounded-lg p-6 shadow-sm border border-borderLight dark:border-borderDark bg-light dark:bg-dark mb-4;
 }
 
+.profile-header-row {
+  @apply relative flex items-end gap-4 px-4 pb-4 sm:pb-6 border-x border-b rounded-b-lg shadow-sm border-borderLight dark:border-borderDark bg-light dark:bg-dark mb-4;
+}
+
 .profile-photo-wrapper {
-  @apply relative mb-3;
+  @apply relative flex-shrink-0 -mt-12 sm:-mt-16;
 }
 
 .profile-photo {
-  @apply w-24 h-24 rounded-full object-cover;
+  @apply w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover ring-4 ring-light dark:ring-dark;
 }
 
 .profile-photo-placeholder {
@@ -31,7 +36,15 @@
 }
 
 .profile-photo-upload {
-  @apply absolute bottom-0 right-0 rounded-full ring-2 ring-light dark:ring-dark;
+  @apply absolute bottom-1 right-1 rounded-full ring-2 ring-light dark:ring-dark;
+}
+
+.profile-header-info {
+  @apply flex-1 min-w-0 pb-1;
+}
+
+.profile-header-actions {
+  @apply flex-shrink-0 pb-1;
 }
 
 .profile-name {
@@ -81,4 +94,12 @@
 
 .employee-skill-chip {
   @apply text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary;
+}
+
+.contact-link-list {
+  @apply flex flex-col gap-2;
+
+  a {
+    @apply flex items-center gap-2 text-primary hover:underline;
+  }
 }
