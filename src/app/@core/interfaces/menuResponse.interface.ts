@@ -9,4 +9,6 @@ export interface IMenuItem {
   expanded?: boolean;
   order?: number;
   divider?: boolean;
+  /** Only shown when the current user is HR/Admin - see sidebar.component.ts filterHrOnlyItems. */
+  hrOnly?: boolean;
 }

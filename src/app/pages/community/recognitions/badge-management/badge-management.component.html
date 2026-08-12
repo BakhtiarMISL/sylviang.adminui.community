@@ -1,0 +1,87 @@
+<p-dialog header="Manage Badges" [(visible)]="visible" [modal]="true" [style]="{ width: '40rem' }" (onShow)="onDialogShow()" (onHide)="close()">
+  <div class="badge-management">
+    <div class="toolbar">
+      <button pButton size="small" (click)="startCreate()"><i class="fa-solid fa-plus"></i> New Badge</button>
+    </div>
+
+    <div class="badge-form" *ngIf="showForm">
+      <input pInputText type="text" placeholder="Badge name" [(ngModel)]="formName" />
+
+      <p-select
+        [options]="iconOptions"
+        optionLabel="label"
+        optionValue="value"
+        [(ngModel)]="formIcon"
+        [filter]="true"
+        filterBy="label"
+        placeholder="Choose an icon"
+        [appendTo]="'body'"
+        [autoDisplayFirst]="false"
+        [showClear]="true"
+        styleClass="w-full"
+      >
+        <ng-template let-option pTemplate="item">
+          <div class="icon-option">
+            <i [class]="option.value"></i>
+            <span>{{ option.label }}</span>
+          </div>
+        </ng-template>
+        <ng-template let-option pTemplate="selectedItem">
+          <div class="icon-option" *ngIf="option">
+            <i [class]="option.value"></i>
+            <span>{{ option.label }}</span>
+          </div>
+        </ng-template>
+      </p-select>
+
+      <input pInputText type="text" placeholder="Description" [(ngModel)]="formDescription" />
+      <div class="color-row">
+        <label>Color</label>
+        <input type="color" [(ngModel)]="formColor" />
+      </div>
+      <div class="form-actions">
+        <button pButton size="small" [disabled]="!formName.trim() || submitting" (click)="saveForm()">Save</button>
+        <button pButton size="small" severity="secondary" (click)="cancelForm()">Cancel</button>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="skeleton-list">
+      <p-skeleton width="100%" height="2.5rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="100%" height="2.5rem"></p-skeleton>
+    </div>
+
+    <p-table *ngIf="!loading" [value]="badges">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Badge</th>
+          <th>Description</th>
+          <th>Active</th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-badge>
+        <tr>
+          <td>
+            <span class="badge-name" [style.color]="badge.color || null">
+              <i [class]="badge.icon || 'fa-solid fa-star'"></i>
+              {{ badge.name }}
+            </span>
+          </td>
+          <td class="description-cell">{{ badge.description }}</td>
+          <td>
+            <p-checkbox [ngModel]="badge.isActive" [binary]="true" (onChange)="toggleActive(badge)"></p-checkbox>
+          </td>
+          <td class="actions-cell">
+            <button type="button" class="icon-btn" (click)="startEdit(badge)" pTooltip="Edit"><i class="fa-solid fa-pen"></i></button>
+            <button type="button" class="icon-btn danger" (click)="deleteBadge(badge)" pTooltip="Delete"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4" class="empty">No badges yet.</td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</p-dialog>

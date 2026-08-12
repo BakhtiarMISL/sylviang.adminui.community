@@ -1,0 +1,75 @@
+.members-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.75rem;
+}
+
+.add-member-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.suggestion-meta {
+  margin-left: auto;
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.you-tag {
+  opacity: 0.6;
+  font-size: 0.8rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+}
+
+.role-badge {
+  text-transform: uppercase;
+
+  &.role-creator {
+    background: rgba(234, 179, 8, 0.18);
+    color: #a16207;
+  }
+
+  &.role-groupadmin {
+    background: rgba(59, 130, 246, 0.15);
+    color: #1d4ed8;
+  }
+
+  &.role-contributor {
+    background: rgba(168, 85, 247, 0.15);
+    color: #7e22ce;
+  }
+
+  &.role-member {
+    background: rgba(0, 0, 0, 0.06);
+  }
+}
+
+.actions-cell {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}

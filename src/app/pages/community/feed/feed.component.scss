@@ -1,0 +1,64 @@
+:host {
+  display: block;
+}
+
+.feed-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.feed-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.feed-logo {
+  height: 2.25rem;
+  width: auto;
+  border-radius: 0.375rem;
+  flex-shrink: 0;
+}
+
+.feed-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+}
+
+.feed-main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.feed-sidebar {
+  flex: 0 0 280px;
+  position: sticky;
+  top: 1rem;
+
+  @media (max-width: 900px) {
+    display: none;
+  }
+}
+
+.skeleton-list {
+  margin-top: 1rem;
+}
+
+.load-more-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+  opacity: 0.6;
+  font-size: 1.1rem;
+}
+
+.scroll-anchor {
+  height: 1px;
+}

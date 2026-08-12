@@ -1,0 +1,72 @@
+<div class="composer">
+  <label class="field-label">Give recognition to</label>
+  <p-autocomplete
+    [(ngModel)]="recipientQuery"
+    [suggestions]="recipientSuggestions"
+    (completeMethod)="searchRecipients($event)"
+    (onSelect)="onRecipientSelect($event.value)"
+    optionLabel="employeeName"
+    placeholder="Search colleagues..."
+    [minLength]="1"
+    [appendTo]="'body'"
+    styleClass="w-full"
+  >
+    <ng-template let-employee pTemplate="item">
+      <div class="suggestion-item">
+        <i class="fa-solid fa-user"></i>
+        <span>{{ employee.employeeName }}</span>
+        <span class="suggestion-meta">{{ employee.designationName }}</span>
+      </div>
+    </ng-template>
+  </p-autocomplete>
+
+  <div class="selected-recipient" *ngIf="selectedRecipient">
+    <i class="fa-solid fa-circle-check"></i>
+    Recognizing <strong>{{ selectedRecipient.employeeName }}</strong>
+  </div>
+
+  <label class="field-label">Badges (optional)</label>
+  <p-multiSelect
+    [options]="badges"
+    optionLabel="name"
+    [(ngModel)]="selectedBadges"
+    display="chip"
+    placeholder="No badge"
+    [showClear]="true"
+    [appendTo]="'body'"
+    styleClass="w-full"
+  >
+    <ng-template let-badge pTemplate="item">
+      <div class="badge-option">
+        <i [class]="badge.icon || 'fa-solid fa-star'" [style.color]="badge.color || null"></i>
+        <span>{{ badge.name }}</span>
+      </div>
+    </ng-template>
+  </p-multiSelect>
+
+  <label class="field-label">Message (optional)</label>
+  <textarea pInputTextarea rows="3" placeholder="Say what they did well..." [(ngModel)]="message"></textarea>
+
+  <ng-container *ngIf="canGiveFormalAward">
+    <label class="award-toggle">
+      <p-checkbox [(ngModel)]="isHrIssued" [binary]="true"></p-checkbox>
+      <span>Issue as a formal HR/Admin award (e.g. "Employee of the Month")</span>
+    </label>
+
+    <input
+      *ngIf="isHrIssued"
+      pInputText
+      type="text"
+      class="w-full mt-2"
+      placeholder="Award title"
+      [(ngModel)]="awardTitle"
+    />
+  </ng-container>
+
+  <div class="composer-actions">
+    <button pButton class="ml-auto" [disabled]="!canSubmit" (click)="submit()">
+      <i class="fa-solid fa-award"></i>
+      <span>Send Recognition</span>
+    </button>
+  </div>
+</div>

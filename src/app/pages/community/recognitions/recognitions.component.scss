@@ -1,0 +1,71 @@
+:host {
+  display: block;
+}
+
+.recognitions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+}
+
+.skeleton-list {
+  margin-top: 1rem;
+}
+
+.load-more-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+  opacity: 0.6;
+  font-size: 1.1rem;
+}
+
+.scroll-anchor {
+  height: 1px;
+}
+
+// Force the "Recognition Filters" p-panel to match the "Employee Filters" p-panel on the
+// Employee Directory page pixel-for-pixel. Both already get the same rules from the global
+// .p-panel-* overrides in theme/_overrides.scss, but PrimeNG injects each component's own
+// theme CSS into <head> lazily, the first time that component type renders on a given page -
+// so injection order (and therefore which !important rule wins) can end up route-dependent.
+// Re-declaring the same rules here, scoped via ::ng-deep so they can pierce into p-panel's
+// internal DOM, guarantees this page can never drift from Employee Filters regardless of that.
+:host ::ng-deep {
+  .p-panel {
+    @apply rounded-lg shadow-sm border border-borderLight dark:border-borderDark !important;
+    background: transparent !important;
+  }
+
+  .p-panel-header {
+    @apply bg-light dark:bg-dark text-black dark:text-white rounded-t-lg px-4 py-2 border-b border-borderLight dark:border-borderDark !important;
+  }
+
+  .p-panel-title {
+    @apply text-sm font-semibold text-black dark:text-white !important;
+  }
+
+  .p-panel-content {
+    @apply bg-light dark:bg-dark rounded-b-lg !important;
+  }
+
+  .p-panel-header-icon {
+    @apply bg-light dark:bg-dark border border-borderLight dark:border-borderDark text-neutral dark:text-white/70 shadow-sm hover:text-primary hover:border-primary !important;
+    width: 1.75rem !important;
+    height: 1.75rem !important;
+    border-radius: 0.375rem !important;
+
+    i,
+    span {
+      color: inherit !important;
+    }
+  }
+}

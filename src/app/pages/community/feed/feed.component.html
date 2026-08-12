@@ -1,0 +1,52 @@
+<section class="page-container feed-page">
+  <div class="feed-header">
+    <div class="feed-header-left">
+      <img alt="Sylvia" class="feed-logo" src="assets/images/sylvia_logo.png" />
+      <app-colleague-search></app-colleague-search>
+    </div>
+
+    <p-select
+      [options]="[
+        { label: 'All Posts', value: 'all' },
+        { label: 'Announcements', value: 'announcements' },
+        { label: 'Polls', value: 'polls' },
+      ]"
+      optionLabel="label"
+      optionValue="value"
+      [(ngModel)]="typeFilter"
+      [appendTo]="'body'"
+      (onChange)="onTypeFilterChange()"
+      styleClass="w-48"
+    ></p-select>
+  </div>
+
+  <div class="feed-layout">
+    <div class="feed-main">
+      <app-post-composer (posted)="onPostCreated()"></app-post-composer>
+
+      <div *ngIf="loading" class="skeleton-list">
+        <p-skeleton width="100%" height="8rem" styleClass="mb-3"></p-skeleton>
+        <p-skeleton width="100%" height="8rem" styleClass="mb-3"></p-skeleton>
+        <p-skeleton width="100%" height="8rem"></p-skeleton>
+      </div>
+
+      <div *ngIf="!loading">
+        <app-post-card *ngFor="let post of posts" [post]="post" (deleted)="onPostDeleted($event)"></app-post-card>
+
+        <div class="not-found" *ngIf="posts.length === 0">
+          <div>
+            <i class="fa fa-stream"></i>
+            <p>No posts yet. Be the first to share something with the company!</p>
+          </div>
+        </div>
+
+        <div *ngIf="loadingMore" class="load-more-spinner"><i class="fa-solid fa-spinner fa-spin"></i></div>
+        <div #scrollAnchor class="scroll-anchor"></div>
+      </div>
+    </div>
+
+    <aside class="feed-sidebar">
+      <app-groups-sidebar></app-groups-sidebar>
+    </aside>
+  </div>
+</section>

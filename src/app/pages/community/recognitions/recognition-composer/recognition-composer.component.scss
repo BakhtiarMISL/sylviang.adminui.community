@@ -1,0 +1,64 @@
+.composer {
+  background: var(--surface-elevated);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1rem;
+
+  textarea,
+  input {
+    width: 100%;
+  }
+}
+
+.field-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0.75;
+  margin-top: 0.75rem;
+  margin-bottom: 0.3rem;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.selected-recipient {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: #16a34a;
+  margin-top: 0.4rem;
+}
+
+.suggestion-item,
+.badge-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
+}
+
+.suggestion-meta {
+  opacity: 0.6;
+  font-size: 0.75rem;
+}
+
+.award-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  margin-top: 0.9rem;
+}
+
+.composer-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.9rem;
+  flex-wrap: wrap;
+}

@@ -1,0 +1,13 @@
+:host {
+  display: block;
+  width: 100%;
+  max-width: 20rem;
+}
+
+::ng-deep .colleague-search-input {
+  width: 100%;
+}
+
+::ng-deep .colleague-search-field {
+  width: 100%;
+}

@@ -1,0 +1,135 @@
+.recognition-card {
+  background: var(--surface-elevated);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1rem;
+
+  &.hr-issued {
+    box-shadow:
+      0 0 0 1px rgba(245, 158, 11, 0.35),
+      0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.recognition-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.header-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.author-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.sender-name,
+.recipient-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.arrow {
+  color: var(--text-primary);
+  opacity: 0.4;
+  font-size: 0.75rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+}
+
+.award-badge {
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+}
+
+.dot {
+  opacity: 0.5;
+}
+
+.time {
+  font-size: 0.8rem;
+  font-weight: 400;
+  opacity: 0.6;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.badge-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.badge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
+.award-title {
+  font-weight: 600;
+  margin-top: 0.5rem;
+  color: var(--text-primary);
+}
+
+.recognition-message {
+  white-space: pre-wrap;
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.recognition-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-primary);
+}
+
+.link-action {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  opacity: 0.75;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  &:hover {
+    opacity: 1;
+  }
+}

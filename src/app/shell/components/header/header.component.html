@@ -55,6 +55,52 @@
 
   <!-- Right side controls -->
   <div class="flex items-center space-x-4">
+    <app-notification-bell></app-notification-bell>
+
     <app-theme-toggle></app-theme-toggle>
+
+    <div class="relative">
+      <button
+        (click)="toggleProfileMenu()"
+        class="h-8 flex items-center gap-2 pl-1 pr-2 rounded-full border border-transparent hover:border-borderLight dark:hover:border-borderDark duration-300"
+        [attr.aria-label]="'Account menu'"
+        [attr.aria-expanded]="!profileMenuHidden"
+      >
+        <span class="w-7 h-7 rounded-full overflow-hidden border-2 border-primary flex items-center justify-center bg-gray-100 dark:bg-gray-800 shrink-0">
+          <img *ngIf="photoUrl" [src]="photoUrl" alt="" class="w-full h-full object-cover" />
+          <i *ngIf="!photoUrl" class="fas fa-user text-neutral text-xs"></i>
+        </span>
+        <span *ngIf="employeeCode" class="text-sm text-black dark:text-borderLight">{{ employeeCode }}</span>
+        <i class="fas fa-chevron-down text-xs text-neutral transition-transform duration-200" [class.rotate-180]="!profileMenuHidden"></i>
+      </button>
+
+      <div
+        *ngIf="!profileMenuHidden"
+        class="absolute right-0 top-full mt-2 w-48 rounded-xl border border-borderLight dark:border-borderDark bg-light dark:bg-dark shadow-xl overflow-hidden z-20"
+      >
+        <button
+          (click)="goToProfile()"
+          class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-dark dark:text-borderLight hover:bg-gray-50 dark:hover:bg-white/5 duration-150"
+        >
+          <i class="fas fa-user text-neutral w-4"></i>
+          <span>Profile</span>
+        </button>
+        <button
+          (click)="goToChangePassword()"
+          class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-dark dark:text-borderLight hover:bg-gray-50 dark:hover:bg-white/5 duration-150"
+        >
+          <i class="fas fa-key text-neutral w-4"></i>
+          <span>Change Password</span>
+        </button>
+        <div class="border-t border-borderLight dark:border-borderDark"></div>
+        <button
+          (click)="logout()"
+          class="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-danger hover:bg-gray-50 dark:hover:bg-white/5 duration-150"
+        >
+          <i class="fas fa-right-from-bracket w-4"></i>
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
   </div>
 </header>

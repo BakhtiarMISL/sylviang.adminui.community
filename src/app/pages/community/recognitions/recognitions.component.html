@@ -1,0 +1,45 @@
+<section class="page-container recognitions-page">
+  <div class="recognitions-header">
+    <h1>Recognitions</h1>
+
+    <button *ngIf="isHrOrAdmin" pButton severity="secondary" (click)="showBadgeManagement = true">
+      <i class="fa-solid fa-star"></i>
+      Manage Badges
+    </button>
+  </div>
+
+  <p-panel
+    header="Recognition Filters"
+    [toggleable]="true"
+    [toggler]="'header'"
+    [collapsed]="filtersCollapsed"
+    (collapsedChange)="onFiltersCollapsedChange($event)"
+    expandIcon="fas fa-chevron-down"
+    collapseIcon="fas fa-chevron-down"
+    styleClass="mb-4"
+  >
+    <app-recognition-composer (created)="onRecognitionCreated()"></app-recognition-composer>
+  </p-panel>
+
+  <div *ngIf="loading" class="skeleton-list">
+    <p-skeleton width="100%" height="8rem" styleClass="mb-3"></p-skeleton>
+    <p-skeleton width="100%" height="8rem" styleClass="mb-3"></p-skeleton>
+    <p-skeleton width="100%" height="8rem"></p-skeleton>
+  </div>
+
+  <div *ngIf="!loading">
+    <app-recognition-card *ngFor="let recognition of recognitions" [recognition]="recognition"></app-recognition-card>
+
+    <div class="not-found" *ngIf="recognitions.length === 0">
+      <div>
+        <i class="fa-solid fa-award"></i>
+        <p>No recognitions yet. Be the first to give someone kudos!</p>
+      </div>
+    </div>
+
+    <div *ngIf="loadingMore" class="load-more-spinner"><i class="fa-solid fa-spinner fa-spin"></i></div>
+    <div #scrollAnchor class="scroll-anchor"></div>
+  </div>
+
+  <app-badge-management [(visible)]="showBadgeManagement"></app-badge-management>
+</section>

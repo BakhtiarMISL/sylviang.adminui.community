@@ -1,0 +1,43 @@
+.mention-textarea-wrapper {
+  position: relative;
+}
+
+.mention-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 20;
+  margin-top: 0.25rem;
+  min-width: 12rem;
+  max-height: 12rem;
+  overflow-y: auto;
+  background: var(--surface-elevated);
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  padding: 0.25rem;
+}
+
+.mention-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: none;
+  background: transparent;
+  border-radius: 0.375rem;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+
+  i {
+    opacity: 0.5;
+    font-size: 0.75rem;
+  }
+
+  &:hover,
+  &.active {
+    background: rgba(99, 102, 241, 0.1);
+  }
+}

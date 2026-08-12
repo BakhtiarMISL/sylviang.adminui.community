@@ -1,0 +1,163 @@
+<section class="page-container">
+  <div class="directory-header">
+    <h1>Employee Directory</h1>
+    <app-colleague-search></app-colleague-search>
+  </div>
+
+  <p-panel
+    header="Employee Filters"
+    [toggleable]="true"
+    [toggler]="'header'"
+    [collapsed]="filtersCollapsed"
+    (collapsedChange)="onFiltersCollapsedChange($event)"
+    expandIcon="fas fa-chevron-down"
+    collapseIcon="fas fa-chevron-down"
+    styleClass="mb-4"
+  >
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-5">
+      <p-floatlabel variant="in">
+        <input
+          type="text"
+          pInputText
+          id="searchInput"
+          class="w-full"
+          [ngModel]="searchTerm"
+          (ngModelChange)="onSearchInput($event)"
+          name="searchInput"
+        />
+        <label for="searchInput">Search name, ID, email, skill</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in">
+        <p-select inputId="departmentId" [options]="departmentOptions" optionLabel="label" optionValue="value" [(ngModel)]="departmentId" [appendTo]="'body'" [autoDisplayFirst]="false" (onChange)="applyFilters()" styleClass="w-full"></p-select>
+        <label for="departmentId">Department</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in">
+        <p-select inputId="siteId" [options]="branchOptions" optionLabel="label" optionValue="value" [(ngModel)]="siteId" [appendTo]="'body'" [autoDisplayFirst]="false" (onChange)="applyFilters()" styleClass="w-full"></p-select>
+        <label for="siteId">Branch</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in">
+        <p-select inputId="designationId" [options]="designationOptions" optionLabel="label" optionValue="value" [(ngModel)]="designationId" [appendTo]="'body'" [autoDisplayFirst]="false" (onChange)="applyFilters()" styleClass="w-full"></p-select>
+        <label for="designationId">Designation</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="flex items-center gap-3 mt-6" *ngIf="searchTerm || departmentId !== null || siteId !== null || designationId !== null">
+      <button pButton severity="secondary" (click)="resetFilters()">
+        <i class="fa fa-times"></i>
+        <span>Reset</span>
+      </button>
+    </div>
+  </p-panel>
+
+  <p-panel
+    header="Employee Table"
+    [toggleable]="true"
+    [toggler]="'header'"
+    [collapsed]="tableCollapsed"
+    (collapsedChange)="onTableCollapsedChange($event)"
+    expandIcon="fas fa-chevron-down"
+    collapseIcon="fas fa-chevron-down"
+  >
+    <div class="table-container">
+      <div class="transition-all duration-500 ease-in-out">
+        <p-table
+        #dt
+        [value]="loading ? skeletonItems : employees"
+        [(selection)]="selectedEmployees"
+        (selectionChange)="onSelectionChange($event)"
+        dataKey="employeeId"
+        (onSort)="onSort($event)"
+        [paginator]="true"
+        [rows]="rows"
+        [first]="(currentPage - 1) * rows"
+        [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+        [totalRecords]="totalRecords"
+        (onPage)="onPageChange($event)"
+        [lazy]="true"
+        [loading]="false"
+        scrollHeight="flex"
+        [responsiveLayout]="'scroll'"
+        selectionMode="multiple"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} employees"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+            @for (col of columns; track col.field) {
+              <th [pSortableColumn]="col.sortable ? col.field : null" [style.width]="col.width" class="group">
+                <div class="flex items-center gap-2">
+                  {{ col.label }}
+                  @if (col.sortable) {
+                    <span
+                      class="transition-opacity duration-150"
+                      [ngClass]="{
+                        'opacity-100': sortedColumn === col.field,
+                        'opacity-0 group-hover:opacity-100': sortedColumn !== col.field,
+                      }"
+                    >
+                      <p-sortIcon [field]="col.field"></p-sortIcon>
+                    </span>
+                  }
+                </div>
+              </th>
+            }
+            <th style="width: 4rem">Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-employee>
+          @if (loading) {
+            <!-- Skeleton Row -->
+            <tr>
+              <td><p-skeleton width="1rem" height="1rem"></p-skeleton></td>
+              <td><p-skeleton width="100%" height="1rem"></p-skeleton></td>
+              <td><p-skeleton width="100%" height="1rem"></p-skeleton></td>
+              <td><p-skeleton width="100%" height="1rem"></p-skeleton></td>
+              <td><p-skeleton width="100%" height="1rem"></p-skeleton></td>
+              <td><p-skeleton width="100%" height="1rem"></p-skeleton></td>
+              <td><p-skeleton width="100%" height="1rem"></p-skeleton></td>
+              <td><p-skeleton width="2rem" height="1rem"></p-skeleton></td>
+            </tr>
+          } @else {
+            <!-- Actual Data Row -->
+            <tr>
+              <td><p-tableCheckbox [value]="employee"></p-tableCheckbox></td>
+              <td>{{ employee.employeeCode }}</td>
+              <td>{{ employee.employeeName }}</td>
+              <td>{{ employee.designationName || ('Designation #' + employee.designationId) }}</td>
+              <td>{{ employee.departmentName || ('Department #' + employee.departmentId) }}</td>
+              <td>{{ employee.siteName || ('Branch #' + employee.siteId) }}</td>
+              <td>
+                <div class="employee-skills" *ngIf="employee.skills.length > 0">
+                  <span class="employee-skill-chip" *ngFor="let skill of employee.skills.slice(0, 3)">{{ skill }}</span>
+                  <span class="employee-skill-chip" *ngIf="employee.skills.length > 3">+{{ employee.skills.length - 3 }}</span>
+                </div>
+              </td>
+              <td>
+                <a [routerLink]="['/community/profile', employee.employeeId]" class="text-primary">
+                  <i class="fa fa-eye"></i>
+                </a>
+              </td>
+            </tr>
+          }
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td [attr.colspan]="columns.length + 2" class="not-found">
+              <div>
+                <i class="fa fa-magnifying-glass-minus"></i>
+                <p>No employees found</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+  </p-panel>
+</section>

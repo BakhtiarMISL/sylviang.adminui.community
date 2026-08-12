@@ -1,0 +1,105 @@
+<section class="page-container">
+  <p-panel header="Notifications">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-4">
+      <p-tabView [activeIndex]="activeTabIndex" (onChange)="onTabChange($event.index)" styleClass="flex-1">
+        <p-tabPanel header="All"></p-tabPanel>
+        <p-tabPanel [header]="'Unread (' + ((unreadCount$ | async) ?? 0) + ')'"></p-tabPanel>
+      </p-tabView>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <p-select
+          [options]="categories"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="selectedCategory"
+          [showClear]="true"
+          placeholder="All categories"
+          [appendTo]="'body'"
+          (onChange)="onCategoryChange()"
+          styleClass="w-52"
+        ></p-select>
+
+        <button pButton severity="secondary" [disabled]="loading" (click)="markAllRead()">
+          <i class="fa fa-check-double"></i>
+          <span>Mark All Read</span>
+        </button>
+
+        <a
+          [routerLink]="['/notifications/preferences']"
+          class="h-8 flex items-center gap-2 px-3 text-sm text-borderDark dark:text-borderLight hover:text-primary duration-300"
+          [pTooltip]="'Notification preferences'"
+          tooltipPosition="bottom"
+        >
+          <i class="fa fa-gear"></i>
+          <span>Preferences</span>
+        </a>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <p-table
+        [value]="loading ? skeletonItems : notifications"
+        dataKey="notificationId"
+        [paginator]="true"
+        [rows]="rows"
+        [first]="(currentPage - 1) * rows"
+        [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+        [totalRecords]="totalRecords"
+        (onPage)="onPageChange($event)"
+        [lazy]="true"
+        [loading]="false"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} notifications"
+      >
+        <ng-template pTemplate="body" let-notification>
+          @if (loading) {
+            <tr>
+              <td class="p-4">
+                <p-skeleton width="100%" height="3rem"></p-skeleton>
+              </td>
+            </tr>
+          } @else {
+            <tr
+              class="cursor-pointer transition-colors duration-200 hover:bg-gray-50 dark:hover:bg-white/5"
+              [ngClass]="{ 'bg-primary/5 dark:bg-primary/10': !notification.isRead }"
+              (click)="onNotificationClick(notification)"
+            >
+              <td class="p-4">
+                <div class="flex items-start gap-3">
+                  <div class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 text-primary shrink-0">
+                    <i [class]="getCategoryIcon(notification.category) + ' text-sm'"></i>
+                  </div>
+
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-2">
+                      <p class="truncate text-sm text-dark dark:text-borderLight" [ngClass]="{ 'font-semibold': !notification.isRead }">
+                        {{ notification.title }}
+                      </p>
+                      <span class="text-xs text-borderDark dark:text-neutral whitespace-nowrap">{{ notification.createdAt | relativeTime : (timeTicker.now$ | async) }}</span>
+                    </div>
+                    <p *ngIf="notification.message" class="text-sm text-borderDark dark:text-neutral mt-0.5 line-clamp-2">
+                      {{ notification.message }}
+                    </p>
+                  </div>
+
+                  <span *ngIf="!notification.isRead" class="w-2 h-2 mt-2 rounded-full bg-primary shrink-0" [attr.aria-label]="'Unread'"></span>
+                </div>
+              </td>
+            </tr>
+          }
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td class="not-found">
+              <div>
+                <i class="fa fa-bell-slash"></i>
+                <p>No notifications found</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </p-panel>
+</section>

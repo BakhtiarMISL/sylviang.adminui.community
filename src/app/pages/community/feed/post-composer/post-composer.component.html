@@ -1,0 +1,56 @@
+<div class="composer">
+  <app-mention-textarea
+    [rows]="3"
+    placeholder="Share an update with your colleagues... (type @ to mention someone)"
+    [value]="content"
+    (valueChange)="content = $event"
+    [mentions]="mentionedTags"
+    (mentionsChange)="mentionedTags = $event"
+  ></app-mention-textarea>
+
+  <div class="post-kind-tabs">
+    <button type="button" class="kind-tab" [class.active]="postKind === 'Text'" (click)="postKind = 'Text'">
+      <i class="fa-regular fa-comment"></i> Update
+    </button>
+    <button type="button" class="kind-tab" [class.active]="postKind === 'Announcement'" (click)="postKind = 'Announcement'">
+      <i class="fa-solid fa-bullhorn"></i> Announcement
+    </button>
+    <button type="button" class="kind-tab" [class.active]="postKind === 'Poll'" (click)="postKind = 'Poll'">
+      <i class="fa-solid fa-square-poll-vertical"></i> Poll
+    </button>
+
+    <app-attachment-upload module="Post" (uploaded)="onAttachmentUploaded($event)" (removed)="onAttachmentRemoved($event)"></app-attachment-upload>
+  </div>
+
+  <div class="poll-builder" *ngIf="postKind === 'Poll'">
+    <div class="poll-option-row" *ngFor="let option of pollOptions; let i = index; trackBy: trackByIndex">
+      <input pInputText type="text" class="w-full" [(ngModel)]="pollOptions[i]" [placeholder]="'Option ' + (i + 1)" />
+      <button type="button" class="icon-btn" *ngIf="pollOptions.length > 2" (click)="removePollOption(i)">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <button type="button" class="link-action" (click)="addPollOption()"><i class="fa-solid fa-plus"></i> Add option</button>
+
+    <label class="announcement-toggle mt-2">
+      <p-checkbox [(ngModel)]="allowVoteChange" [binary]="true"></p-checkbox>
+      <span>Allow voters to change their vote</span>
+    </label>
+  </div>
+
+  <p-select
+    *ngIf="!groupId"
+    [options]="visibilityOptions"
+    optionLabel="label"
+    optionValue="value"
+    [(ngModel)]="visibility"
+    [appendTo]="'body'"
+    styleClass="w-44 mt-2"
+  ></p-select>
+
+  <div class="composer-actions">
+    <button pButton class="ml-auto" [disabled]="!canSubmit" (click)="submit()">
+      <i class="fa-solid fa-paper-plane"></i>
+      <span>Post</span>
+    </button>
+  </div>
+</div>

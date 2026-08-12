@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+.directory-header {
+  @apply flex items-center justify-between gap-4 flex-wrap mb-4;
+
+  h1 {
+    @apply text-lg font-semibold text-black dark:text-white;
+  }
+}
+
+.employee-skills {
+  @apply flex flex-wrap gap-1;
+}
+
+.employee-skill-chip {
+  @apply text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary;
+}

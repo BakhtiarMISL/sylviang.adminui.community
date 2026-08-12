@@ -1,0 +1,178 @@
+<section class="page-container">
+  <div class="flex justify-end mb-4" *ngIf="!isEditMode">
+    <app-colleague-search></app-colleague-search>
+  </div>
+
+  @if (loading) {
+    <div class="profile-card">
+      <p-skeleton shape="circle" size="6rem" styleClass="mb-3"></p-skeleton>
+      <p-skeleton width="12rem" height="1.2rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="8rem" height="1rem"></p-skeleton>
+    </div>
+  } @else if (notFound || !employee) {
+    <div class="not-found">
+      <div>
+        <i class="fa fa-user-slash"></i>
+        <p>Profile not found</p>
+      </div>
+    </div>
+  } @else if (isEditMode) {
+    <app-community-profile-edit-form [employee]="employee" [saving]="saving" (save)="saveProfile($event)" (cancel)="cancelEdit()"></app-community-profile-edit-form>
+  } @else {
+    <div class="cover-photo-banner" [ngStyle]="employee.coverPhotoUrl ? { 'background-image': 'url(' + coverPhotoUrl(employee.coverPhotoUrl) + ')' } : {}">
+      <div class="cover-photo-upload" *ngIf="employee.isOwnProfile">
+        <app-attachment-upload
+          module="employee-cover"
+          [entityId]="employee.employeeId"
+          [multiple]="false"
+          chooseLabel="Edit Cover Photo"
+          chooseIcon="fa-solid fa-camera"
+          (uploaded)="onCoverPhotoUploaded($event)"
+        ></app-attachment-upload>
+      </div>
+    </div>
+
+    <div class="profile-header-row">
+      <div class="profile-photo-wrapper">
+        <img *ngIf="employee.photoUrl; else avatarPlaceholder" [src]="photoUrl(employee.photoUrl)" class="profile-photo" alt="" />
+        <ng-template #avatarPlaceholder>
+          <div class="profile-photo profile-photo-placeholder"><i class="fa fa-user"></i></div>
+        </ng-template>
+        <div class="profile-photo-upload" *ngIf="employee.isOwnProfile" title="Change photo">
+          <app-attachment-upload
+            module="employee-photo"
+            [entityId]="employee.employeeId"
+            [multiple]="false"
+            [compact]="true"
+            chooseLabel=""
+            chooseIcon="fa-solid fa-camera"
+            (uploaded)="onPhotoUploaded($event)"
+          ></app-attachment-upload>
+        </div>
+      </div>
+
+      <div class="profile-header-info">
+        <h2 class="profile-name">{{ employee.employeeName }}</h2>
+        <div class="profile-meta">{{ employee.designationName || ('Designation #' + employee.designationId) }}</div>
+        <div class="profile-meta">
+          {{ employee.departmentName || ('Department #' + employee.departmentId) }} &middot; {{ employee.siteName || ('Branch #' + employee.siteId) }}
+        </div>
+        <div class="profile-meta">Employee Code: {{ employee.employeeCode }}</div>
+        <div class="profile-meta" *ngIf="!employee.isActive"><span class="inactive-badge">Inactive</span></div>
+      </div>
+
+      <div class="profile-header-actions">
+        <button *ngIf="employee.isOwnProfile" pButton (click)="startEdit()">
+          <i class="fa fa-edit"></i>
+          <span>Edit Profile</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="profile-details">
+      <div class="profile-section">
+        <h3 class="form-section-header">Bio</h3>
+        <p>{{ employee.bio || 'No bio yet.' }}</p>
+      </div>
+
+      <div class="profile-section">
+        <h3 class="form-section-header">Identity</h3>
+        <dl class="profile-fields">
+          <dt>Division</dt>
+          <dd>{{ employee.division || '—' }}</dd>
+          <dt>Phone</dt>
+          <dd>{{ employee.phone || 'Not visible' }}</dd>
+          <dt>Email</dt>
+          <dd>{{ employee.email || 'Not visible' }}</dd>
+          <dt>Extension</dt>
+          <dd>{{ employee.extension || 'Not visible' }}</dd>
+        </dl>
+      </div>
+
+      <div class="profile-section">
+        <h3 class="form-section-header">Contact Links</h3>
+        <ul class="contact-link-list" *ngIf="employee.contactLinks.length > 0; else noContactLinks">
+          <li *ngFor="let link of employee.contactLinks">
+            <a [href]="link.url" target="_blank" rel="noopener noreferrer">
+              <i class="fa-solid fa-link"></i>
+              <span>{{ link.platform }}</span>
+            </a>
+          </li>
+        </ul>
+        <ng-template #noContactLinks><p>No contact links added yet.</p></ng-template>
+      </div>
+
+      <div class="profile-section">
+        <h3 class="form-section-header">Skills</h3>
+        <div class="employee-skills" *ngIf="employee.skills.length > 0; else noSkills">
+          <span class="employee-skill-chip" *ngFor="let skill of employee.skills">{{ skill }}</span>
+        </div>
+        <ng-template #noSkills><p>No skills listed yet.</p></ng-template>
+      </div>
+
+      <div class="profile-section">
+        <h3 class="form-section-header">Interests</h3>
+        <div class="employee-skills" *ngIf="employee.interests.length > 0; else noInterests">
+          <span class="employee-skill-chip" *ngFor="let interest of employee.interests">{{ interest }}</span>
+        </div>
+        <ng-template #noInterests><p>No interests listed yet.</p></ng-template>
+      </div>
+
+      <div class="profile-section">
+        <h3 class="form-section-header">Achievements</h3>
+        <p *ngIf="employee.achievements.length === 0">No achievements yet.</p>
+        <ul *ngIf="employee.achievements.length > 0">
+          <li *ngFor="let item of employee.achievements">{{ item }}</li>
+        </ul>
+      </div>
+
+      <div class="profile-section">
+        <h3 class="form-section-header">Community Contributions</h3>
+        <p *ngIf="employee.communityContributions.length === 0">No community contributions yet.</p>
+        <ul *ngIf="employee.communityContributions.length > 0">
+          <li *ngFor="let item of employee.communityContributions">{{ item }}</li>
+        </ul>
+      </div>
+
+      <div class="profile-section sm:col-span-2">
+        <h3 class="form-section-header">Posts</h3>
+
+        <div *ngIf="postsLoading" class="skeleton-list">
+          <p-skeleton width="100%" height="8rem" styleClass="mb-3"></p-skeleton>
+          <p-skeleton width="100%" height="8rem"></p-skeleton>
+        </div>
+
+        <div *ngIf="!postsLoading">
+          <app-post-card *ngFor="let post of posts" [post]="post" (deleted)="onPostDeleted($event)"></app-post-card>
+
+          <p *ngIf="posts.length === 0">
+            {{ employee.isOwnProfile ? "You haven't posted anything yet." : "This employee hasn't posted anything yet." }}
+          </p>
+
+          <p-paginator
+            *ngIf="postsTotalRecords > postsRows"
+            [rows]="postsRows"
+            [totalRecords]="postsTotalRecords"
+            [first]="(postsCurrentPage - 1) * postsRows"
+            [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+            (onPageChange)="onPostsPageChange($event)"
+          ></p-paginator>
+        </div>
+      </div>
+
+      <!-- Badges/Recent Recognitions have no backing feature yet (Recognition/Gamification
+           aren't built) - shown on the colleague-facing view only, as empty-state placeholders. -->
+      <ng-container *ngIf="!employee.isOwnProfile">
+        <div class="profile-section">
+          <h3 class="form-section-header">Badges</h3>
+          <p>No badges yet.</p>
+        </div>
+
+        <div class="profile-section">
+          <h3 class="form-section-header">Recent Recognitions</h3>
+          <p>No recognitions yet.</p>
+        </div>
+      </ng-container>
+    </div>
+  }
+</section>

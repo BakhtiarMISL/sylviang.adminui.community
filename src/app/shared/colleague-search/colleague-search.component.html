@@ -1,0 +1,21 @@
+<p-autocomplete
+  [(ngModel)]="query"
+  [suggestions]="results"
+  (completeMethod)="search($event)"
+  (onSelect)="onSelect($event.value)"
+  optionLabel="employeeName"
+  placeholder="Search colleagues..."
+  [minLength]="1"
+  [appendTo]="'body'"
+  styleClass="colleague-search-input"
+  inputStyleClass="colleague-search-field"
+>
+  <ng-template let-employee pTemplate="item">
+    <div class="flex items-center gap-2">
+      <img *ngIf="employee.photoUrl" [src]="photoUrl(employee.photoUrl)" class="w-6 h-6 rounded-full object-cover" alt="" />
+      <i *ngIf="!employee.photoUrl" class="fa-solid fa-user text-neutral dark:text-white/60"></i>
+      <span class="text-black dark:text-white">{{ employee.employeeName }}</span>
+      <span class="text-xs text-neutral dark:text-white/60">{{ employee.designationName }}</span>
+    </div>
+  </ng-template>
+</p-autocomplete>

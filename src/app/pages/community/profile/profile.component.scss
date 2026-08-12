@@ -1,0 +1,105 @@
+:host {
+  display: block;
+}
+
+.cover-photo-banner {
+  // No negative bottom margin here - the avatar overlaps this banner via its own negative
+  // top-margin (see .profile-photo-wrapper) so the banner's own box is never overlapped by a
+  // later sibling, and the cover-photo-upload button below can safely sit at its bottom edge.
+  @apply relative w-full h-40 sm:h-52 rounded-t-lg bg-neutral/10 dark:bg-white/5 bg-cover bg-center border border-borderLight dark:border-borderDark;
+}
+
+.cover-photo-upload {
+  @apply absolute bottom-3 right-3;
+}
+
+// Still used by the loading-skeleton state (@if (loading) block) - the real header below has
+// moved to .profile-header-row.
+.profile-card {
+  @apply relative flex flex-col items-center text-center rounded-lg p-6 shadow-sm border border-borderLight dark:border-borderDark bg-light dark:bg-dark mb-4;
+}
+
+.profile-header-row {
+  @apply relative flex items-end gap-4 px-4 pb-4 sm:pb-6 border-x border-b rounded-b-lg shadow-sm border-borderLight dark:border-borderDark bg-light dark:bg-dark mb-4;
+}
+
+.profile-photo-wrapper {
+  @apply relative flex-shrink-0 -mt-12 sm:-mt-16;
+}
+
+.profile-photo {
+  @apply w-28 h-28 sm:w-32 sm:h-32 rounded-full object-cover ring-4 ring-light dark:ring-dark;
+}
+
+.profile-photo-placeholder {
+  @apply flex items-center justify-center bg-neutral/10 text-neutral text-4xl;
+}
+
+.profile-photo-upload {
+  @apply absolute bottom-1 right-1 rounded-full ring-2 ring-light dark:ring-dark;
+}
+
+.profile-header-info {
+  @apply flex-1 min-w-0 pb-1;
+}
+
+.profile-header-actions {
+  @apply flex-shrink-0 pb-1;
+}
+
+.profile-name {
+  @apply text-lg font-semibold;
+}
+
+.profile-meta {
+  @apply text-sm text-neutral dark:text-white/60;
+}
+
+.inactive-badge {
+  @apply text-xs px-2 py-0.5 rounded-full bg-danger-50 text-danger dark:bg-danger-900/20;
+}
+
+.profile-details {
+  @apply grid gap-4 sm:grid-cols-2;
+}
+
+.profile-section {
+  @apply rounded-lg p-4 shadow-sm border border-borderLight dark:border-borderDark bg-light dark:bg-dark;
+
+  h3 {
+    @apply mb-2;
+  }
+
+  p,
+  li {
+    @apply text-sm text-neutral dark:text-white/70;
+  }
+}
+
+.profile-fields {
+  @apply grid grid-cols-2 gap-x-2 gap-y-1 text-sm;
+
+  dt {
+    @apply text-neutral dark:text-white/60;
+  }
+
+  dd {
+    @apply text-black dark:text-white;
+  }
+}
+
+.employee-skills {
+  @apply flex flex-wrap gap-1;
+}
+
+.employee-skill-chip {
+  @apply text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary;
+}
+
+.contact-link-list {
+  @apply flex flex-col gap-2;
+
+  a {
+    @apply flex items-center gap-2 text-primary hover:underline;
+  }
+}

@@ -1,0 +1,55 @@
+<div class="recognition-card" [class.hr-issued]="recognition.isHrIssued">
+  <div class="recognition-header" (click)="openDetailModal()">
+    <div class="avatar"><i class="fa-solid fa-user"></i></div>
+    <div class="header-text">
+      <div class="author-line">
+        <span class="sender-name">{{ senderName }}</span>
+        <i class="fa-solid fa-arrow-right arrow"></i>
+        <span class="recipient-name">{{ recipientName }}</span>
+        <span class="dot">&middot;</span>
+        <span class="time" [title]="recognition.createdAt | date: 'medium'">{{ recognition.createdAt | relativeTime : (timeTicker.now$ | async) }}</span>
+        <span class="badge award-badge" *ngIf="recognition.isHrIssued">
+          <i class="fa-solid fa-trophy"></i> Formal Award
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="badge-chips" *ngIf="recognition.badges?.length" (click)="openDetailModal()">
+    <div class="badge-chip" *ngFor="let badge of recognition.badges" [style.background]="(badge.color || '#6366f1') + '1f'" [style.color]="badge.color || '#6366f1'">
+      <i [class]="badge.icon || 'fa-solid fa-star'"></i>
+      <span>{{ badge.name }}</span>
+    </div>
+  </div>
+
+  <div class="award-title" *ngIf="recognition.awardTitle" (click)="openDetailModal()">{{ recognition.awardTitle }}</div>
+
+  <div class="recognition-message" *ngIf="recognition.message" (click)="openDetailModal()">{{ recognition.message }}</div>
+
+  <div class="recognition-footer">
+    <app-recognition-reaction-bar [recognitionId]="recognition.recognitionId"></app-recognition-reaction-bar>
+    <button type="button" class="link-action" (click)="toggleComments()">
+      <i class="fa-regular fa-comment"></i>
+      {{ showComments ? 'Hide comments' : 'Comments' }}
+      <span *ngIf="commentCount > 0">({{ commentCount }})</span>
+    </button>
+  </div>
+
+  <app-recognition-comment-thread
+    *ngIf="showComments"
+    [recognitionId]="recognition.recognitionId"
+    (countChanged)="onCommentCountChanged($event)"
+  ></app-recognition-comment-thread>
+
+  <p-dialog
+    *ngIf="!isModalView"
+    header="Recognition"
+    [(visible)]="showDetailModal"
+    [modal]="true"
+    [dismissableMask]="true"
+    [style]="{ width: '42rem' }"
+    [contentStyle]="{ 'max-height': '80vh', 'overflow-y': 'auto' }"
+  >
+    <app-recognition-card *ngIf="showDetailModal" [recognition]="recognition" [isModalView]="true"></app-recognition-card>
+  </p-dialog>
+</div>
