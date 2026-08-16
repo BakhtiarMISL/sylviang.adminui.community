@@ -1,0 +1,9 @@
+<p-dialog header="Report listing" [(visible)]="visible" [modal]="true" [dismissableMask]="true" [style]="{ width: '28rem' }" (onHide)="close()">
+  <p class="report-intro">Let HR/Admin know why this listing looks fraudulent, inappropriate, or spammy.</p>
+  <textarea pInputTextarea rows="4" class="w-full" placeholder="Reason for reporting..." [(ngModel)]="reason"></textarea>
+
+  <ng-template pTemplate="footer">
+    <button pButton severity="secondary" (click)="close()">Cancel</button>
+    <button pButton [disabled]="!reason.trim() || submitting" (click)="submit()">Submit Report</button>
+  </ng-template>
+</p-dialog>

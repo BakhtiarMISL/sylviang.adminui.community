@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } fro
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { IVisibilityOption, VISIBILITY_OPTIONS } from '@core/constants/community/visibility-options';
+import { isImageFile, isVideoFile } from '@core/constants/community/attachment.constants';
 import { IPostResponse, PostVisibility } from '@core/interfaces/community/post.interface';
 import { IMentionTag } from '@core/interfaces/community/mention.interface';
 import { IPostAttachmentResponse } from '@core/interfaces/community/attachment.interface';
@@ -11,11 +12,11 @@ import { MentionRenderService } from '@core/services/community/mention-render.se
 import { PostCommentService } from '@core/services/community/post-comment.service';
 import { PostService } from '@core/services/community/post.service';
 import { PostAttachmentService } from '@core/services/community/post-attachment.service';
+import { AttachmentService } from '@core/services/community/attachment.service';
 import { ToastService } from '@core/services/misc/toast.service';
+import { TimeTickerService } from '@core/services/misc/time-ticker.service';
 import { Base_URL } from '@env/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-
-const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.webm'];
 
 @UntilDestroy()
 @Component({
@@ -28,6 +29,10 @@ export class PostCardComponent implements OnInit {
   @Input({ required: true }) post!: IPostResponse;
   /** True only for the nested instance rendered inside the detail modal - prevents it from opening another modal on click. */
   @Input() isModalView = false;
+  /** Set when the viewer is a Creator/GroupAdmin/Contributor of this post's group - grants the same moderation rights as HR/Admin, scoped to this post. */
+  @Input() groupModerator = false;
+  /** When true, opens the detail modal as soon as this card loads - used for deep-linking straight to a specific post (e.g. from the Moderation Queue). */
+  @Input() autoOpenModal = false;
   @Output() deleted = new EventEmitter<number>();
 
   authorName = 'Loading...';
@@ -41,6 +46,8 @@ export class PostCardComponent implements OnInit {
   attachments: IPostAttachmentResponse[] = [];
   showReportDialog = false;
   showDetailModal = false;
+  lightboxVisible = false;
+  lightboxAttachment: IPostAttachmentResponse | null = null;
   private mentionLinks: IMentionTag[] = [];
 
   visibilityOptions: IVisibilityOption[] = VISIBILITY_OPTIONS;
@@ -49,6 +56,7 @@ export class PostCardComponent implements OnInit {
     private postService: PostService,
     private postCommentService: PostCommentService,
     private postAttachmentService: PostAttachmentService,
+    private attachmentService: AttachmentService,
     private employeeLookupService: EmployeeLookupService,
     private mentionRenderService: MentionRenderService,
     private currentUserService: CurrentUserService,
@@ -56,14 +64,19 @@ export class PostCardComponent implements OnInit {
     private sanitizer: DomSanitizer,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    public timeTicker: TimeTickerService,
   ) {}
 
   get canEdit(): boolean {
-    return this.currentUserService.isHrOrAdmin() || this.post.employeeId === this.currentUserService.currentUser.employeeId;
+    return (
+      this.currentUserService.isHrOrAdmin() ||
+      this.post.employeeId === this.currentUserService.currentUser.employeeId ||
+      this.groupModerator
+    );
   }
 
   get canModerate(): boolean {
-    return this.currentUserService.isHrOrAdmin();
+    return this.currentUserService.isHrOrAdmin() || this.groupModerator;
   }
 
   get isOwnPost(): boolean {
@@ -73,6 +86,10 @@ export class PostCardComponent implements OnInit {
   ngOnInit(): void {
     if (this.isModalView) {
       this.showComments = true;
+    }
+
+    if (this.autoOpenModal) {
+      this.openDetailModal();
     }
 
     this.employeeLookupService
@@ -154,8 +171,30 @@ export class PostCardComponent implements OnInit {
   }
 
   isVideoAttachment(attachment: IPostAttachmentResponse): boolean {
-    const lower = attachment.fileName.toLowerCase();
-    return VIDEO_EXTENSIONS.some((ext) => lower.endsWith(ext));
+    return isVideoFile(attachment.fileName);
+  }
+
+  isImageAttachment(attachment: IPostAttachmentResponse): boolean {
+    return isImageFile(attachment.fileName);
+  }
+
+  /** Anything that isn't a recognized image/video extension - PDFs, Office docs, etc. */
+  isDocumentAttachment(attachment: IPostAttachmentResponse): boolean {
+    return !this.isImageAttachment(attachment) && !this.isVideoAttachment(attachment);
+  }
+
+  openLightbox(attachment: IPostAttachmentResponse, event: MouseEvent): void {
+    event.stopPropagation();
+    this.lightboxAttachment = attachment;
+    this.lightboxVisible = true;
+  }
+
+  downloadAttachment(attachment: IPostAttachmentResponse): void {
+    // Plain navigation to a backend endpoint that sets Content-Disposition: attachment,
+    // rather than a client-side fetch()+blob - that approach turned out unreliable (depends
+    // on CORS letting JS read the response body cross-origin). A direct navigation doesn't
+    // need CORS at all, and the server-set header forces the save dialog in every browser.
+    window.location.href = this.attachmentService.downloadUrl(attachment.filePath, attachment.fileName);
   }
 
   startEdit(): void {

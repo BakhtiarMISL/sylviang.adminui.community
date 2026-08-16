@@ -1,4 +1,4 @@
-<p-dialog header="Report post" [(visible)]="visible" [modal]="true" [style]="{ width: '28rem' }" (onHide)="close()">
+<p-dialog header="Report post" [(visible)]="visible" [modal]="true" [dismissableMask]="true" [style]="{ width: '28rem' }" (onHide)="close()">
   <p class="report-intro">Let HR/Admin know why this post violates community guidelines.</p>
   <textarea pInputTextarea rows="4" class="w-full" placeholder="Reason for reporting..." [(ngModel)]="reason"></textarea>
 

@@ -1,0 +1,109 @@
+.thread-container {
+  background: var(--surface-elevated);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.thread-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.thread-header-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.listing-title {
+  margin: 0;
+  font-weight: 600;
+
+  a {
+    color: var(--text-primary);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+}
+
+.closed-badge {
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--text-primary);
+}
+
+.message-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  min-height: 6rem;
+}
+
+.message-bubble {
+  max-width: 75%;
+  background: var(--surface-secondary);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  align-self: flex-start;
+
+  &.own {
+    align-self: flex-end;
+    background: var(--p-primary-color, #6366f1);
+
+    .sender-name,
+    .message-text {
+      color: #ffffff;
+    }
+  }
+}
+
+.sender-name {
+  font-size: 0.7rem;
+  opacity: 0.7;
+  margin: 0 0 0.15rem;
+  color: var(--text-primary);
+}
+
+.message-text {
+  margin: 0;
+  white-space: pre-wrap;
+  color: var(--text-primary);
+}
+
+.no-messages {
+  text-align: center;
+  opacity: 0.6;
+  color: var(--text-primary);
+}
+
+.composer {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.closed-note {
+  color: var(--text-primary);
+  opacity: 0.7;
+  font-size: 0.85rem;
+}
+
+:host-context(.dark) {
+  .closed-badge {
+    background: rgba(255, 255, 255, 0.1);
+  }
+}

@@ -84,6 +84,12 @@ export const webSidebarMenuItems: IMenuItem[] = [
         icon: 'fa-solid fa-award',
       },
       {
+        href: '/community/marketplace',
+        title: 'Marketplace',
+        active: false,
+        icon: 'fa-solid fa-store',
+      },
+      {
         href: '/community/profile/me',
         title: 'Profile',
         active: false,

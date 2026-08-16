@@ -1,0 +1,57 @@
+<section class="browse-container">
+  <div class="browse-header">
+    <h2 class="title">Browse Listings</h2>
+    <a pButton routerLink="/community/marketplace/new"><i class="fa-solid fa-plus"></i> Post a Listing</a>
+  </div>
+
+  <div class="filter-bar">
+    <input pInputText type="text" placeholder="Search listings..." [ngModel]="searchTerm" (ngModelChange)="onSearchInput($event)" />
+
+    <p-select
+      [options]="categoryOptions"
+      optionLabel="label"
+      optionValue="value"
+      placeholder="Category"
+      [(ngModel)]="category"
+      [showClear]="true"
+      [appendTo]="'body'"
+      [autoDisplayFirst]="false"
+      (onChange)="applyFilters()"
+      (onClear)="applyFilters()"
+    ></p-select>
+
+    <input pInputText type="number" placeholder="Min price" [(ngModel)]="minPrice" (change)="applyFilters()" />
+    <input pInputText type="number" placeholder="Max price" [(ngModel)]="maxPrice" (change)="applyFilters()" />
+
+    <button pButton severity="secondary" (click)="resetFilters()">Reset</button>
+  </div>
+
+  <div *ngIf="loading" class="listing-grid">
+    <p-skeleton *ngFor="let item of skeletonItems" width="100%" height="14rem"></p-skeleton>
+  </div>
+
+  <div *ngIf="!loading">
+    <div *ngIf="listings.length === 0" class="not-found">
+      <i class="fa-solid fa-store-slash"></i>
+      <p>No listings match your search.</p>
+    </div>
+
+    <div *ngIf="listings.length > 0" class="listing-grid">
+      <app-listing-card
+        *ngFor="let listing of listings"
+        [listing]="listing"
+        [isFavorited]="favoritedListingIds.has(listing.listingId)"
+        (favoriteToggled)="toggleFavorite($event)"
+      ></app-listing-card>
+    </div>
+
+    <p-paginator
+      *ngIf="totalRecords > rows"
+      [rows]="rows"
+      [totalRecords]="totalRecords"
+      [first]="(currentPage - 1) * rows"
+      [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+      (onPageChange)="onPageChange($event)"
+    ></p-paginator>
+  </div>
+</section>

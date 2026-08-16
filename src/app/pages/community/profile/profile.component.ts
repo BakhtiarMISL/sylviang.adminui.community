@@ -6,8 +6,10 @@ import { CurrentUserService } from '@core/services/current-user.service';
 import { IEmployeeResponse, IEmployeeUpdateProfileRequest } from '@core/interfaces/employee-directory/employee.interface';
 import { IUploadedAttachment } from '@core/interfaces/community/attachment.interface';
 import { IPostFilterParams, IPostResponse } from '@core/interfaces/community/post.interface';
+import { IRecognitionFilterParams, IRecognitionResponse } from '@core/interfaces/community/recognition.interface';
 import { EmployeeService } from '@core/services/employee-directory/employee/employee.service';
 import { PostService } from '@core/services/community/post.service';
+import { RecognitionService } from '@core/services/community/recognition.service';
 import { ToastService } from '@core/services/misc/toast.service';
 import { Base_URL } from '@env/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -33,6 +35,7 @@ export class CommunityProfileComponent implements OnInit {
     private router: Router,
     private employeeService: EmployeeService,
     private postService: PostService,
+    private recognitionService: RecognitionService,
     private currentUserService: CurrentUserService,
     private breadcrumbService: BreadcrumbService,
     private toast: ToastService,
@@ -50,6 +53,13 @@ export class CommunityProfileComponent implements OnInit {
   postsTotalRecords = 0;
   postsRows: number = UI_CONFIG.defaultPageSize;
   postsCurrentPage = 1;
+
+  recognitions: IRecognitionResponse[] = [];
+  recognitionsLoading = true;
+  recognitionsTotalRecords = 0;
+  recognitionsRows: number = UI_CONFIG.defaultPageSize;
+  recognitionsCurrentPage = 1;
+
   UI_CONFIG = UI_CONFIG;
 
   ngOnInit(): void {
@@ -87,6 +97,8 @@ export class CommunityProfileComponent implements OnInit {
           ]);
           this.postsCurrentPage = 1;
           this.loadEmployeePosts(this.employee.employeeId);
+          this.recognitionsCurrentPage = 1;
+          this.loadEmployeeRecognitions(this.employee.employeeId);
         } else {
           this.employee = null;
           this.notFound = true;
@@ -183,6 +195,49 @@ export class CommunityProfileComponent implements OnInit {
   onPostDeleted(postId: number): void {
     this.posts = this.posts.filter((p) => p.postId !== postId);
     this.postsTotalRecords = Math.max(0, this.postsTotalRecords - 1);
+  }
+
+  onRecognitionsPageChange(event: { first: number; rows: number }): void {
+    if (!this.employee) return;
+
+    this.recognitionsCurrentPage = Math.floor(event.first / event.rows) + 1;
+    this.recognitionsRows = event.rows;
+    this.loadEmployeeRecognitions(this.employee.employeeId);
+  }
+
+  private loadEmployeeRecognitions(employeeId: number): void {
+    this.recognitionsLoading = true;
+
+    const params: IRecognitionFilterParams = {
+      page: this.recognitionsCurrentPage,
+      pageSize: this.recognitionsRows,
+      sortBy: 'CreatedAt',
+      sortDirection: 'desc',
+      recipientId: employeeId,
+    };
+
+    this.recognitionService
+      .getPaged(params)
+      .pipe(untilDestroyed(this))
+      .subscribe({
+        next: (response) => {
+          if (!response.hasError && response.content) {
+            this.recognitions = response.content.data || [];
+            this.recognitionsTotalRecords = response.content.totalCount || 0;
+          } else {
+            this.recognitions = [];
+            this.recognitionsTotalRecords = 0;
+          }
+          this.recognitionsLoading = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.recognitions = [];
+          this.recognitionsTotalRecords = 0;
+          this.recognitionsLoading = false;
+          this.cdr.detectChanges();
+        },
+      });
   }
 
   private loadEmployeePosts(employeeId: number): void {

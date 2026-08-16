@@ -1,0 +1,33 @@
+<section class="favorites-container">
+  <div *ngIf="loading" class="favorites-grid">
+    <p-skeleton width="100%" height="14rem"></p-skeleton>
+    <p-skeleton width="100%" height="14rem"></p-skeleton>
+  </div>
+
+  <div *ngIf="!loading && rows.length === 0" class="not-found">
+    <i class="fa-solid fa-heart-crack"></i>
+    <p>You haven't favorited any listings yet.</p>
+  </div>
+
+  <div *ngIf="!loading && rows.length > 0" class="favorites-grid">
+    <div class="favorite-tile" *ngFor="let row of rows">
+      <app-listing-card *ngIf="row.listing" [listing]="row.listing" [showFavoriteToggle]="false"></app-listing-card>
+
+      <div *ngIf="!row.listing" class="unavailable-tile">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <p>This listing is no longer available.</p>
+      </div>
+
+      <button
+        pButton
+        severity="secondary"
+        size="small"
+        class="remove-btn"
+        [disabled]="pendingRemovalListingId === row.favorite.listingId"
+        (click)="removeFavorite(row)"
+      >
+        <i class="fa-solid fa-heart-crack"></i> Remove
+      </button>
+    </div>
+  </div>
+</section>

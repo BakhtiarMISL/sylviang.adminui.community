@@ -1,0 +1,15 @@
+<section class="page-container">
+  <p-tabView [activeIndex]="activeTabIndex" (onChange)="onTabChange($event.index)">
+    <p-tabPanel header="Browse"></p-tabPanel>
+    <p-tabPanel header="My Listings"></p-tabPanel>
+    <p-tabPanel header="Favorites"></p-tabPanel>
+    <p-tabPanel header="Messages"></p-tabPanel>
+  </p-tabView>
+
+  <div class="tab-content">
+    <app-marketplace-browse *ngIf="activeTabIndex === 0"></app-marketplace-browse>
+    <app-my-listings *ngIf="activeTabIndex === 1"></app-my-listings>
+    <app-favorites *ngIf="activeTabIndex === 2"></app-favorites>
+    <app-conversations-inbox *ngIf="activeTabIndex === 3"></app-conversations-inbox>
+  </div>
+</section>

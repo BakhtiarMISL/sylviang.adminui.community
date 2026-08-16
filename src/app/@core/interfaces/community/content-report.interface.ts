@@ -21,6 +21,9 @@ export interface IContentReportQueueItem {
   postAuthorName: string;
   isPostHidden: boolean;
   isPostLocked: boolean;
+  groupId: number | null;
+  groupName: string | null;
+  attachmentCount: number;
   reason: string;
   status: string;
   reviewedBy: number | null;

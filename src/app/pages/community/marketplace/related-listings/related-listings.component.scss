@@ -1,0 +1,25 @@
+.related-container {
+  margin-top: 1.5rem;
+}
+
+.section-title {
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.no-related {
+  color: var(--text-primary);
+  opacity: 0.6;
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.load-more-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}

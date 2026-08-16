@@ -39,10 +39,30 @@
 
   <div class="post-body" *ngIf="!editing" [innerHTML]="renderedContent()" (click)="onContentClick($event)"></div>
 
-  <div class="attachment-gallery" *ngIf="!editing && attachments.length > 0" (click)="openDetailModal()">
+  <div class="attachment-gallery" *ngIf="!editing && attachments.length > 0">
     <div class="attachment-tile" *ngFor="let attachment of attachments">
-      <img *ngIf="!isVideoAttachment(attachment)" [src]="servedUrl(attachment.filePath)" [alt]="attachment.fileName" />
-      <video *ngIf="isVideoAttachment(attachment)" [src]="servedUrl(attachment.filePath)" controls></video>
+      <img
+        *ngIf="isImageAttachment(attachment)"
+        [src]="servedUrl(attachment.filePath)"
+        [alt]="attachment.fileName"
+        (click)="openLightbox(attachment, $event)"
+      />
+      <video
+        *ngIf="isVideoAttachment(attachment)"
+        [src]="servedUrl(attachment.filePath)"
+        (click)="openLightbox(attachment, $event)"
+      ></video>
+      <a
+        *ngIf="isDocumentAttachment(attachment)"
+        class="document-tile"
+        [href]="servedUrl(attachment.filePath)"
+        target="_blank"
+        rel="noopener"
+        (click)="$event.stopPropagation()"
+      >
+        <i class="fa-solid fa-file-lines"></i>
+        <span class="document-name">{{ attachment.fileName }}</span>
+      </a>
     </div>
   </div>
 
@@ -87,6 +107,29 @@
   ></app-comment-thread>
 
   <app-report-content-dialog [postId]="post.postId" [(visible)]="showReportDialog"></app-report-content-dialog>
+
+  <p-dialog
+    header="Attachment"
+    [(visible)]="lightboxVisible"
+    [modal]="true"
+    [dismissableMask]="true"
+    appendTo="body"
+    [style]="{ width: '90vw', height: '90vh' }"
+    [contentStyle]="{ height: '100%' }"
+    styleClass="lightbox-dialog"
+  >
+    <div class="lightbox-content" *ngIf="lightboxAttachment as attachment">
+      <img *ngIf="isImageAttachment(attachment)" [src]="servedUrl(attachment.filePath)" [alt]="attachment.fileName" />
+      <video *ngIf="isVideoAttachment(attachment)" [src]="servedUrl(attachment.filePath)" controls></video>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button type="button" pButton severity="secondary" *ngIf="lightboxAttachment as attachment" (click)="downloadAttachment(attachment)">
+        <i class="fa-solid fa-download"></i>
+        <span>Download</span>
+      </button>
+    </ng-template>
+  </p-dialog>
 
   <p-dialog
     *ngIf="!isModalView"

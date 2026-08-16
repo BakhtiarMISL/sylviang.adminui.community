@@ -1,4 +1,4 @@
-<p-dialog header="Manage Badges" [(visible)]="visible" [modal]="true" [style]="{ width: '40rem' }" (onShow)="onDialogShow()" (onHide)="close()">
+<p-dialog header="Manage Badges" [(visible)]="visible" [modal]="true" [dismissableMask]="true" [style]="{ width: '40rem' }" (onShow)="onDialogShow()" (onHide)="close()">
   <div class="badge-management">
     <div class="toolbar">
       <button pButton size="small" (click)="startCreate()"><i class="fa-solid fa-plus"></i> New Badge</button>

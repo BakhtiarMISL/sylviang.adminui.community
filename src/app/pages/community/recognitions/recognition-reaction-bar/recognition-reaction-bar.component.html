@@ -27,16 +27,5 @@
     </div>
   </div>
 
-  <div class="reaction-summary" *ngIf="summary.length > 0">
-    <span
-      *ngFor="let s of summary"
-      class="summary-chip"
-      [class.mine]="s.reactedByMe"
-      [style.color]="colorFor(s.reactionType)"
-      [style.background]="colorFor(s.reactionType) + '1f'"
-    >
-      <i [class]="iconFor(s.reactionType)"></i>
-      {{ s.count }}
-    </span>
-  </div>
+  <app-reaction-summary [reactions]="rawReactions"></app-reaction-summary>
 </div>

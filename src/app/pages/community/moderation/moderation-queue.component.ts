@@ -1,16 +1,24 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { UI_CONFIG } from '@core/constants';
 import { IContentReportQueueItem } from '@core/interfaces/community/content-report.interface';
+import { IListingResponse, IMarketplaceReportResponse } from '@core/interfaces/community/marketplace.interface';
 import { ContentReportService } from '@core/services/community/content-report.service';
+import { ListingService } from '@core/services/community/listing.service';
+import { MarketplaceReportService } from '@core/services/community/marketplace-report.service';
 import { PostService } from '@core/services/community/post.service';
 import { CurrentUserService } from '@core/services/current-user.service';
 import { ToastService } from '@core/services/misc/toast.service';
+import { forkJoin } from 'rxjs';
 
 /**
- * HR/Admin moderation queue (US-3.11/3.12). Backend enriches each report row with a content
- * preview, reporter, and post-author name (ContentReportQueueItemResponse) so no per-row
- * drill-through is needed. Hide/lock/remove act directly on the underlying post via the
- * existing PostController moderation endpoints; "Dismiss"/"Resolve" close out the report itself.
+ * HR/Admin moderation queue (US-3.11/3.12, US-6.7). Backend enriches each content-report row with
+ * a content preview, reporter, and post-author name (ContentReportQueueItemResponse) so no
+ * per-row drill-through is needed there. Hide/lock/remove act directly on the underlying post via
+ * the existing PostController moderation endpoints; "Dismiss"/"Resolve" close out the report
+ * itself. The Marketplace tab is a second, independent surface (US-6.7) combining pending listings
+ * (ListingController) and open marketplace reports (MarketplaceReportController) - unlike the
+ * Content Reports tab, ListingResponse/MarketplaceReportResponse aren't pre-joined with
+ * seller/reporter names, so this tab shows raw ids for now.
  */
 @Component({
   selector: 'app-moderation-queue',
@@ -19,6 +27,8 @@ import { ToastService } from '@core/services/misc/toast.service';
   styleUrl: './moderation-queue.component.scss',
 })
 export class ModerationQueueComponent implements OnInit {
+  activeTabIndex = 0;
+
   reports: IContentReportQueueItem[] = [];
   loading = true;
   totalRecords = 0;
@@ -26,9 +36,21 @@ export class ModerationQueueComponent implements OnInit {
   currentPage = 1;
   UI_CONFIG = UI_CONFIG;
 
+  pendingListings: IListingResponse[] = [];
+  openListingReports: IMarketplaceReportResponse[] = [];
+  marketplaceLoading = true;
+  marketplaceLoaded = false;
+  pendingActionListingId: number | null = null;
+  pendingActionReportId: number | null = null;
+
+  rejectingListing: IListingResponse | null = null;
+  rejectReason = '';
+
   constructor(
     private contentReportService: ContentReportService,
     private postService: PostService,
+    private listingService: ListingService,
+    private marketplaceReportService: MarketplaceReportService,
     private currentUserService: CurrentUserService,
     private toastService: ToastService,
     private cdr: ChangeDetectorRef,
@@ -42,6 +64,126 @@ export class ModerationQueueComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+  }
+
+  onTabChange(index: number): void {
+    this.activeTabIndex = index;
+    if (index === 1 && !this.marketplaceLoaded) {
+      this.loadMarketplace();
+    }
+  }
+
+  approveListing(listing: IListingResponse): void {
+    this.pendingActionListingId = listing.listingId;
+    this.listingService.approve(listing.listingId).subscribe({
+      next: (response) => {
+        this.pendingActionListingId = null;
+        if (!response.hasError) {
+          this.toastService.success({ detail: 'Listing approved.' });
+          this.loadMarketplace();
+        } else {
+          this.toastService.error({ detail: response.decentMessage || 'Could not approve listing.' });
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {
+        this.pendingActionListingId = null;
+        this.toastService.error({ detail: 'Could not approve listing.' });
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  openRejectDialog(listing: IListingResponse): void {
+    this.rejectingListing = listing;
+    this.rejectReason = '';
+  }
+
+  closeRejectDialog(): void {
+    this.rejectingListing = null;
+    this.rejectReason = '';
+  }
+
+  submitReject(): void {
+    if (!this.rejectingListing || !this.rejectReason.trim()) return;
+
+    const listingId = this.rejectingListing.listingId;
+    this.pendingActionListingId = listingId;
+    this.listingService.reject(listingId, this.rejectReason.trim()).subscribe({
+      next: (response) => {
+        this.pendingActionListingId = null;
+        this.closeRejectDialog();
+        if (!response.hasError) {
+          this.toastService.success({ detail: 'Listing rejected.' });
+          this.loadMarketplace();
+        } else {
+          this.toastService.error({ detail: response.decentMessage || 'Could not reject listing.' });
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {
+        this.pendingActionListingId = null;
+        this.closeRejectDialog();
+        this.toastService.error({ detail: 'Could not reject listing.' });
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  resolveListingReport(report: IMarketplaceReportResponse, status: 'Resolved' | 'Dismissed'): void {
+    this.pendingActionReportId = report.reportId;
+    this.marketplaceReportService.resolve(report.reportId, { status }).subscribe({
+      next: (response) => {
+        this.pendingActionReportId = null;
+        if (!response.hasError) {
+          this.loadMarketplace();
+        } else {
+          this.toastService.error({ detail: response.decentMessage || 'Could not update report.' });
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {
+        this.pendingActionReportId = null;
+        this.toastService.error({ detail: 'Could not update report.' });
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  private loadMarketplace(): void {
+    this.marketplaceLoading = true;
+    forkJoin({
+      pending: this.listingService.getPaged({ approvalStatus: 'Pending', page: 1, pageSize: 50 }),
+      reports: this.marketplaceReportService.getPaged({ page: 1, pageSize: 50 }),
+    }).subscribe({
+      next: ({ pending, reports }) => {
+        this.pendingListings = !pending.hasError && pending.content ? pending.content.data || [] : [];
+        const allReports = !reports.hasError && reports.content ? reports.content.data || [] : [];
+        this.openListingReports = allReports.filter((r) => r.status === 'Open');
+        this.marketplaceLoading = false;
+        this.marketplaceLoaded = true;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.pendingListings = [];
+        this.openListingReports = [];
+        this.marketplaceLoading = false;
+        this.marketplaceLoaded = true;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  /** Opens the reported post at its correct destination (main Feed, or its owning Group) in a new tab. */
+  viewReportedContent(report: IContentReportQueueItem): void {
+    const url = report.groupId
+      ? `/community/groups/${report.groupId}?postId=${report.postId}`
+      : `/community/feed?postId=${report.postId}`;
+    window.open(url, '_blank');
+  }
+
+  viewListing(listingId: number): void {
+    window.open(`/community/marketplace/listing/${listingId}`, '_blank');
   }
 
   onPageChange(event: { first: number; rows: number }): void {

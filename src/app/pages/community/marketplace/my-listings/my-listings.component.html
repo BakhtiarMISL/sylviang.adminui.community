@@ -1,0 +1,87 @@
+<div class="table-container">
+  <p-table
+    [value]="loading ? skeletonItems : listings"
+    dataKey="listingId"
+    [paginator]="true"
+    [rows]="rows"
+    [first]="(currentPage - 1) * rows"
+    [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+    [totalRecords]="totalRecords"
+    (onPage)="onPageChange($event)"
+    [lazy]="true"
+    [loading]="false"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} listings"
+  >
+    <ng-template pTemplate="header">
+      <tr>
+        <th>Title</th>
+        <th>Category</th>
+        <th>Price</th>
+        <th>Status</th>
+        <th>Approval</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-listing>
+      @if (loading) {
+        <tr>
+          <td colspan="6" class="p-4"><p-skeleton width="100%" height="2.5rem"></p-skeleton></td>
+        </tr>
+      } @else {
+        <tr class="listing-row" (click)="view(listing)">
+          <td class="title-cell">{{ listing.title }}</td>
+          <td>{{ listing.category }}</td>
+          <td>{{ listing.price | number: '1.2-2' }} {{ listing.currency }}</td>
+          <td><span class="badge status-badge" [ngClass]="'status-' + listing.status.toLowerCase()">{{ listing.status }}</span></td>
+          <td><span class="badge approval-badge" [ngClass]="'approval-' + listing.approvalStatus.toLowerCase()">{{ listing.approvalStatus }}</span></td>
+          <td class="actions-cell" (click)="$event.stopPropagation()">
+            <div class="row-actions">
+              <button pButton size="small" severity="secondary" pTooltip="Edit" [disabled]="pendingActionListingId === listing.listingId" (click)="edit(listing)">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button
+                pButton
+                size="small"
+                severity="secondary"
+                *ngIf="listing.status === 'Active'"
+                pTooltip="Mark as Sold"
+                [disabled]="pendingActionListingId === listing.listingId"
+                (click)="markAsSold(listing)"
+              >
+                <i class="fa-solid fa-tag"></i>
+              </button>
+              <button
+                pButton
+                size="small"
+                severity="secondary"
+                *ngIf="listing.status === 'Sold'"
+                pTooltip="Reactivate"
+                [disabled]="pendingActionListingId === listing.listingId"
+                (click)="reactivate(listing)"
+              >
+                <i class="fa-solid fa-rotate-left"></i>
+              </button>
+              <button pButton size="small" severity="danger" pTooltip="Delete" [disabled]="pendingActionListingId === listing.listingId" (click)="deleteListing(listing)">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      }
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="6" class="not-found">
+          <div>
+            <i class="fa-solid fa-store"></i>
+            <p>You haven't posted any listings yet.</p>
+            <a pButton routerLink="/community/marketplace/new">Post a Listing</a>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>

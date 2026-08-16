@@ -57,22 +57,3 @@
     }
   }
 }
-
-.reaction-summary {
-  display: flex;
-  gap: 0.5rem;
-  font-size: 0.75rem;
-}
-
-.summary-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.1rem 0.45rem;
-  border-radius: 999px;
-
-  &.mine {
-    font-weight: 700;
-    box-shadow: inset 0 0 0 1px currentColor;
-  }
-}

@@ -1,0 +1,23 @@
+<section class="inbox-container">
+  <div *ngIf="loading" class="skeleton-list">
+    <p-skeleton width="100%" height="4rem" styleClass="mb-2"></p-skeleton>
+    <p-skeleton width="100%" height="4rem" styleClass="mb-2"></p-skeleton>
+  </div>
+
+  <div *ngIf="!loading && rows.length === 0" class="not-found">
+    <i class="fa-solid fa-comments"></i>
+    <p>No conversations yet. Message a seller from a listing to get started.</p>
+  </div>
+
+  <div *ngIf="!loading && rows.length > 0" class="conversation-list">
+    <button type="button" class="conversation-row" *ngFor="let row of rows" (click)="openThread(row)">
+      <div class="conversation-main">
+        <p class="listing-title">{{ row.listing?.title || 'Listing unavailable' }}</p>
+        <p class="participant-name">
+          <i class="fa-solid fa-user"></i> {{ row.otherParticipant?.employeeName || 'Unknown' }}
+        </p>
+      </div>
+      <span class="badge status-badge" [ngClass]="'status-' + row.conversation.status.toLowerCase()">{{ row.conversation.status }}</span>
+    </button>
+  </div>
+</section>
