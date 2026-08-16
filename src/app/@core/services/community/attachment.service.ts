@@ -25,4 +25,16 @@ export class AttachmentService {
 
     return this.httpClient.post<ApiResponse<IFileUploadResponse>>(`${BASE_URL_Community}/file-upload`, formData);
   }
+
+  /**
+   * URL for FileUploadController's [AllowAnonymous] download endpoint, which sets
+   * Content-Disposition: attachment so a plain navigation reliably triggers a save-as
+   * dialog - unlike the /uploads static file URL (servedUrl elsewhere), which always
+   * displays inline, and unlike a client-side fetch()+blob download, which depends on
+   * CORS letting JS read the response body cross-origin.
+   */
+  downloadUrl(storagePath: string, fileName: string): string {
+    const params = new URLSearchParams({ path: storagePath, fileName });
+    return `${BASE_URL_Community}/file-upload/download?${params.toString()}`;
+  }
 }

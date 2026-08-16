@@ -1,0 +1,53 @@
+:host {
+  display: block;
+
+  // PrimeNG's Aura theme ties the tab list background to the `content.background`
+  // design token, which resolves dark in this app - override it explicitly so the
+  // tab bar matches the surrounding white/dark panel instead.
+  ::ng-deep .p-tablist-tab-list {
+    background: #ffffff;
+  }
+
+  // The tab panels here have no body content - the actual tab content renders
+  // below, driven by the active tab index. PrimeNG still renders an empty
+  // `.p-tabpanels` box with its own themed background/padding; collapse it since
+  // there's nothing to show in it.
+  ::ng-deep .p-tabpanels {
+    display: none;
+  }
+
+  // Inactive tab labels use PrimeNG's muted default color - make them black.
+  // The active tab's green comes from a separate token (tabs.tab.active.color)
+  // and is left untouched.
+  ::ng-deep .p-tab:not(.p-tab-active) {
+    color: #000000;
+  }
+
+  // Neutralize PrimeNG's default hover state on inactive tabs (background/border
+  // shift on :hover) - keep the same look as the resting state.
+  ::ng-deep .p-tab:not(.p-tab-active):not(.p-disabled):hover {
+    background: transparent;
+    border-color: transparent;
+    color: #000000;
+  }
+}
+
+:host-context(.dark) {
+  ::ng-deep .p-tablist-tab-list {
+    background: #1f2937;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active) {
+    color: #e5e7eb;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active):not(.p-disabled):hover {
+    background: transparent;
+    border-color: transparent;
+    color: #e5e7eb;
+  }
+}
+
+.tab-content {
+  margin-top: 0.5rem;
+}

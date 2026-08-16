@@ -19,11 +19,16 @@
   min-width: 0;
 }
 
-.feed-logo {
-  height: 2.25rem;
-  width: auto;
-  border-radius: 0.375rem;
-  flex-shrink: 0;
+.highlighted-post-banner {
+  @apply mb-4 pb-4 border-b border-borderLight dark:border-borderDark;
+
+  p {
+    @apply text-sm text-neutral dark:text-white/60 mb-2;
+  }
+
+  a {
+    @apply text-primary hover:underline cursor-pointer;
+  }
 }
 
 .skeleton-list {

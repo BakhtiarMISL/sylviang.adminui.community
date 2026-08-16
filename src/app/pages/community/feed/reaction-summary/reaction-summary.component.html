@@ -1,0 +1,30 @@
+<button type="button" class="reaction-summary-trigger" *ngIf="totalCount() > 0" (click)="openDialog()">
+  <span class="icon-cluster">
+    <span class="icon-badge" *ngFor="let t of topTypes()" [style.background]="colorFor(t)">
+      <i [class]="iconFor(t)"></i>
+    </span>
+  </span>
+  <span class="total-count">{{ totalCount() }}</span>
+</button>
+
+<p-dialog header="Reactions" [(visible)]="dialogVisible" [modal]="true" [dismissableMask]="true" [style]="{ width: '26rem' }" (onHide)="close()">
+  <p-tabView [(activeIndex)]="activeTabIndex">
+    <p-tabPanel header="All"></p-tabPanel>
+    <p-tabPanel *ngFor="let t of typesPresent()" [header]="t + ' (' + countFor(t) + ')'"></p-tabPanel>
+  </p-tabView>
+
+  <div class="reactor-list">
+    <div class="reactor-row" *ngFor="let r of filteredRows()" (click)="goToProfile(r.employeeId)">
+      <div class="avatar">
+        <img *ngIf="r.photoUrl" [src]="r.photoUrl" alt="" />
+        <i *ngIf="!r.photoUrl" class="fa-solid fa-user"></i>
+        <span class="reaction-badge" [style.background]="colorFor(r.reactionType)">
+          <i [class]="iconFor(r.reactionType)"></i>
+        </span>
+      </div>
+      <span class="reactor-name">{{ r.name }}</span>
+    </div>
+
+    <p *ngIf="!loadingReactors && filteredRows().length === 0" class="empty-message">No reactions yet.</p>
+  </div>
+</p-dialog>

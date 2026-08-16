@@ -1,0 +1,22 @@
+<section class="related-container">
+  <h2 class="section-title">Related Listings</h2>
+
+  <div *ngIf="loading" class="related-grid">
+    <p-skeleton width="100%" height="14rem"></p-skeleton>
+    <p-skeleton width="100%" height="14rem"></p-skeleton>
+    <p-skeleton width="100%" height="14rem"></p-skeleton>
+    <p-skeleton width="100%" height="14rem"></p-skeleton>
+  </div>
+
+  <div *ngIf="!loading && listings.length === 0" class="no-related">No related listings found.</div>
+
+  <div *ngIf="!loading && listings.length > 0" class="related-grid">
+    <app-listing-card *ngFor="let listing of listings" [listing]="listing"></app-listing-card>
+  </div>
+
+  <div class="load-more-row" *ngIf="hasMore">
+    <button pButton severity="secondary" [disabled]="loadingMore" (click)="loadMore()">
+      {{ loadingMore ? 'Loading...' : 'Load More' }}
+    </button>
+  </div>
+</section>

@@ -21,6 +21,7 @@ export class RecognitionReactionBarComponent implements OnInit {
 
   reactionTypes: IReactionTypeOption[] = REACTION_TYPES;
   summary: IReactionSummary[] = [];
+  rawReactions: { employeeId: number; reactionType: ReactionType }[] = [];
   pickerOpen = false;
 
   constructor(
@@ -84,6 +85,7 @@ export class RecognitionReactionBarComponent implements OnInit {
         next: (response) => {
           if (!response.hasError && response.content) {
             this.summary = this.aggregate(response.content);
+            this.rawReactions = response.content;
           }
           this.cdr.detectChanges();
         },

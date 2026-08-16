@@ -1,0 +1,57 @@
+.favorites-container {
+  padding: 0.5rem 0;
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.favorite-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.remove-btn {
+  align-self: stretch;
+}
+
+.unavailable-tile {
+  background: var(--surface-elevated);
+  border-radius: 0.75rem;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: var(--text-primary);
+
+  i {
+    font-size: 1.5rem;
+    opacity: 0.5;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  p {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin: 0;
+  }
+}
+
+.not-found {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-primary);
+
+  i {
+    font-size: 2rem;
+    opacity: 0.4;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  p {
+    opacity: 0.7;
+  }
+}

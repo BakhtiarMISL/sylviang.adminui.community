@@ -1,0 +1,53 @@
+<a class="listing-card" [routerLink]="['/community/marketplace/listing', listing.listingId]">
+  <div class="thumbnail">
+    <img *ngIf="thumbnailUrl" [src]="servedUrl(thumbnailUrl)" [alt]="listing.title" />
+    <i *ngIf="!thumbnailUrl" class="fa-solid fa-image placeholder-icon"></i>
+
+    <span class="badge status-badge" [ngClass]="'status-' + listing.status.toLowerCase()">{{ listing.status }}</span>
+
+    <button
+      *ngIf="showFavoriteToggle"
+      type="button"
+      class="favorite-btn"
+      [class.active]="isFavorited"
+      [pTooltip]="isFavorited ? 'Remove from favorites' : 'Save to favorites'"
+      (click)="onFavoriteClick($event)"
+    >
+      <i class="fa-solid fa-heart"></i>
+    </button>
+  </div>
+
+  <div class="listing-body">
+    <p class="listing-title">{{ listing.title }}</p>
+    <p class="listing-price">{{ listing.price | number: '1.2-2' }} {{ listing.currency }}</p>
+
+    <div class="rating-summary" *ngIf="listing.reviewCount > 0">
+      <p-rating [ngModel]="roundedAverageRating" [readonly]="true" [stars]="5"></p-rating>
+      <span class="review-count">({{ listing.reviewCount }})</span>
+    </div>
+
+    <div class="listing-meta">
+      <span
+        *ngIf="listing.status === 'Active'"
+        class="badge stock-badge"
+        [ngClass]="{ 'stock-out': listing.quantity <= 0, 'stock-low': listing.quantity > 0 && listing.quantity <= 2 }"
+      >
+        {{ listing.quantity > 0 ? listing.quantity + ' in stock' : 'Out of stock' }}
+      </span>
+      <span class="badge category-badge">{{ listing.category }}</span>
+      <span class="badge condition-badge" *ngIf="listing.condition">{{ listing.condition }}</span>
+    </div>
+
+    <p class="listing-seller" *ngIf="seller">
+      <i class="fa-solid fa-user"></i> {{ seller.employeeName }}
+    </p>
+
+    <span
+      *ngIf="listing.approvalStatus !== 'Approved'"
+      class="badge approval-badge"
+      [ngClass]="'approval-' + listing.approvalStatus.toLowerCase()"
+    >
+      {{ listing.approvalStatus }}
+    </span>
+  </div>
+</a>

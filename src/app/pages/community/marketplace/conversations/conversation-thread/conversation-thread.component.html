@@ -1,0 +1,35 @@
+<section class="thread-container">
+  <div class="thread-header">
+    <a pButton severity="secondary" routerLink="/community/marketplace" [queryParams]="{ tab: 'messages' }"><i class="fa-solid fa-arrow-left"></i></a>
+    <div class="thread-header-text">
+      <p class="listing-title" *ngIf="listing">
+        <a [routerLink]="['/community/marketplace/listing', listing.listingId]">{{ listing.title }}</a>
+      </p>
+      <span *ngIf="isClosed" class="badge closed-badge">Closed</span>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="skeleton-wrap">
+    <p-skeleton width="100%" height="10rem"></p-skeleton>
+  </div>
+
+  <div *ngIf="!loading" class="message-list">
+    <div
+      class="message-bubble"
+      *ngFor="let message of messages"
+      [class.own]="message.senderId === currentEmployeeId"
+    >
+      <p class="sender-name">{{ senderNames.get(message.senderId) || 'Unknown' }}</p>
+      <p class="message-text">{{ message.messageText }}</p>
+    </div>
+
+    <p *ngIf="messages.length === 0" class="no-messages">No messages yet - say hello!</p>
+  </div>
+
+  <div class="composer" *ngIf="!isClosed">
+    <textarea pInputTextarea rows="2" class="w-full" placeholder="Type a message..." [(ngModel)]="messageText"></textarea>
+    <button pButton [disabled]="!messageText.trim() || sending" (click)="sendMessage()">Send</button>
+  </div>
+
+  <p *ngIf="isClosed" class="closed-note"><i class="fa-solid fa-circle-info"></i> This conversation is closed.</p>
+</section>

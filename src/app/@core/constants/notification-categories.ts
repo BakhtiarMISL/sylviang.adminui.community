@@ -14,6 +14,7 @@ export const NOTIFICATION_CATEGORIES: INotificationCategoryOption[] = [
   { label: 'Recognition', value: 'Recognition', icon: 'fa-solid fa-award' },
   { label: 'Survey', value: 'Survey', icon: 'fa-solid fa-square-poll-vertical' },
   { label: 'Marketplace', value: 'Marketplace', icon: 'fa-solid fa-store' },
+  { label: 'Marketplace Message', value: 'MarketplaceMessage', icon: 'fa-solid fa-comment-dots' },
   { label: 'Social Mention', value: 'SocialMention', icon: 'fa-solid fa-at' },
   { label: 'Task', value: 'Task', icon: 'fa-solid fa-list-check' },
   { label: 'Team', value: 'Team', icon: 'fa-solid fa-people-group' },

@@ -146,17 +146,39 @@
         </div>
       </div>
 
-      <!-- Badges/Recent Recognitions have no backing feature yet (Recognition/Gamification
-           aren't built) - shown on the colleague-facing view only, as empty-state placeholders. -->
+      <div class="profile-section sm:col-span-2">
+        <h3 class="form-section-header">Recognitions</h3>
+
+        <div *ngIf="recognitionsLoading" class="skeleton-list">
+          <p-skeleton width="100%" height="6rem" styleClass="mb-3"></p-skeleton>
+          <p-skeleton width="100%" height="6rem"></p-skeleton>
+        </div>
+
+        <div *ngIf="!recognitionsLoading">
+          <app-recognition-card *ngFor="let recognition of recognitions" [recognition]="recognition"></app-recognition-card>
+
+          <p *ngIf="recognitions.length === 0">
+            {{ employee.isOwnProfile ? "You haven't received any recognitions yet." : "This employee hasn't received any recognitions yet." }}
+          </p>
+
+          <p-paginator
+            *ngIf="recognitionsTotalRecords > recognitionsRows"
+            [rows]="recognitionsRows"
+            [totalRecords]="recognitionsTotalRecords"
+            [first]="(recognitionsCurrentPage - 1) * recognitionsRows"
+            [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+            (onPageChange)="onRecognitionsPageChange($event)"
+          ></p-paginator>
+        </div>
+      </div>
+
+      <!-- Badges has no backing feature yet (employee-earned badges aren't aggregated anywhere -
+           badges only attach to individual Recognition events) - shown on the colleague-facing
+           view only, as an empty-state placeholder. -->
       <ng-container *ngIf="!employee.isOwnProfile">
         <div class="profile-section">
           <h3 class="form-section-header">Badges</h3>
           <p>No badges yet.</p>
-        </div>
-
-        <div class="profile-section">
-          <h3 class="form-section-header">Recent Recognitions</h3>
-          <p>No recognitions yet.</p>
         </div>
       </ng-container>
     </div>

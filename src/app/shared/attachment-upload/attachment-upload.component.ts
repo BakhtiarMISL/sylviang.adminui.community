@@ -1,12 +1,16 @@
 import { Component, EventEmitter, Input, OnDestroy, Output, ViewChild } from '@angular/core';
-import { ATTACHMENT_ACCEPT, ATTACHMENT_MAX_FILE_SIZE_BYTES, isImageFile } from '@core/constants/community/attachment.constants';
+import {
+  ATTACHMENT_ACCEPT,
+  ATTACHMENT_VIDEO_MAX_FILE_SIZE_BYTES,
+  isImageFile,
+  isVideoFile,
+  maxFileSizeFor,
+} from '@core/constants/community/attachment.constants';
 import { IFileUploadResponse, IPendingAttachment, IUploadedAttachment } from '@core/interfaces/community/attachment.interface';
 import { AttachmentService } from '@core/services/community/attachment.service';
 import { ToastService } from '@core/services/misc/toast.service';
 import { Base_URL } from '@env/environment';
 import { FileUpload, FileUploadHandlerEvent } from 'primeng/fileupload';
-
-const VIDEO_EXTENSIONS = ['.mp4', '.mov', '.webm'];
 
 /**
  * Standalone, reusable "pick and upload a file" widget, shared across features (Community
@@ -33,6 +37,8 @@ export class AttachmentUploadComponent implements OnDestroy {
   @Input() chooseIcon = 'fa-solid fa-paperclip';
   /** Renders the browse button as a small circular icon button instead of the default pill - for overlaying on avatars/banners. */
   @Input() compact = false;
+  /** File-picker filter override - defaults to the full media+document allowlist; pass a narrower list (e.g. images-only for review photos) to restrict it. */
+  @Input() accept: string = ATTACHMENT_ACCEPT;
 
   /** Emitted once per file, right after that file's upload succeeds. */
   @Output() uploaded = new EventEmitter<IUploadedAttachment>();
@@ -41,8 +47,12 @@ export class AttachmentUploadComponent implements OnDestroy {
 
   @ViewChild('fileUpload') fileUploadRef?: FileUpload;
 
-  readonly accept = ATTACHMENT_ACCEPT;
-  readonly maxFileSize = ATTACHMENT_MAX_FILE_SIZE_BYTES;
+  /**
+   * Bound to p-fileUpload's own (single, static) size gate - set to the largest of the three
+   * per-type caps (video) so it never blocks a valid video. The accurate, per-type limit
+   * (10 MB images / 150 MB videos / 50 MB documents) is enforced in uploadOne() below.
+   */
+  readonly maxFileSize = ATTACHMENT_VIDEO_MAX_FILE_SIZE_BYTES;
 
   items: IPendingAttachment[] = [];
 
@@ -80,11 +90,16 @@ export class AttachmentUploadComponent implements OnDestroy {
   }
 
   isVideo(fileName: string): boolean {
-    const lower = fileName.toLowerCase();
-    return VIDEO_EXTENSIONS.some((ext) => lower.endsWith(ext));
+    return isVideoFile(fileName);
   }
 
   private uploadOne(file: File): void {
+    const maxSize = maxFileSizeFor(file.name);
+    if (file.size > maxSize) {
+      this.toastService.error({ detail: `"${file.name}" exceeds the maximum allowed size of ${Math.round(maxSize / (1024 * 1024))} MB.` });
+      return;
+    }
+
     const item: IPendingAttachment = {
       key: `${file.name}-${file.size}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
       file,

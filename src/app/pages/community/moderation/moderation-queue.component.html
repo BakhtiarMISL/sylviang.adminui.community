@@ -1,6 +1,11 @@
 <section class="page-container">
   <p-panel header="Moderation Queue">
-    <div class="table-container">
+    <p-tabView [activeIndex]="activeTabIndex" (onChange)="onTabChange($event.index)">
+      <p-tabPanel header="Content Reports"></p-tabPanel>
+      <p-tabPanel header="Marketplace"></p-tabPanel>
+    </p-tabView>
+
+    <div class="table-container" *ngIf="activeTabIndex === 0">
       <p-table
         [value]="loading ? skeletonItems : reports"
         dataKey="reportId"
@@ -39,6 +44,8 @@
                 <span class="state-badges">
                   <span *ngIf="report.isPostHidden" class="badge hidden-badge"><i class="fa-solid fa-eye-slash"></i> Hidden</span>
                   <span *ngIf="report.isPostLocked" class="badge locked-badge"><i class="fa-solid fa-lock"></i> Locked</span>
+                  <span *ngIf="report.groupId" class="badge group-badge"><i class="fa-solid fa-people-group"></i> {{ report.groupName || ('Group #' + report.groupId) }}</span>
+                  <span *ngIf="report.attachmentCount > 0" class="badge attachment-badge"><i class="fa-solid fa-paperclip"></i> {{ report.attachmentCount }}</span>
                 </span>
               </td>
               <td>{{ report.postAuthorName }}</td>
@@ -49,6 +56,9 @@
               </td>
               <td>
                 <div class="row-actions">
+                  <button pButton size="small" severity="secondary" pTooltip="View reported content" (click)="viewReportedContent(report)">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  </button>
                   <button pButton size="small" severity="secondary" [pTooltip]="report.isPostLocked ? 'Unlock comments' : 'Lock comments'" (click)="toggleLocked(report)">
                     <i class="fa-solid" [ngClass]="report.isPostLocked ? 'fa-unlock' : 'fa-lock'"></i>
                   </button>
@@ -82,5 +92,110 @@
         </ng-template>
       </p-table>
     </div>
+
+    <div class="table-container marketplace-tab" *ngIf="activeTabIndex === 1">
+      <h3 class="subsection-header">Pending Listings</h3>
+      <p-table [value]="marketplaceLoading ? skeletonItems : pendingListings" dataKey="listingId">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Seller</th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-listing>
+          @if (marketplaceLoading) {
+            <tr>
+              <td colspan="5" class="p-4"><p-skeleton width="100%" height="2.5rem"></p-skeleton></td>
+            </tr>
+          } @else {
+            <tr>
+              <td>{{ listing.title }}</td>
+              <td>{{ listing.category }}</td>
+              <td>{{ listing.price | number: '1.2-2' }} {{ listing.currency }}</td>
+              <td>#{{ listing.sellerId }}</td>
+              <td>
+                <div class="row-actions">
+                  <button pButton size="small" severity="success" [disabled]="pendingActionListingId === listing.listingId" pTooltip="Approve" (click)="approveListing(listing)">
+                    <i class="fa-solid fa-check"></i>
+                  </button>
+                  <button pButton size="small" severity="danger" [disabled]="pendingActionListingId === listing.listingId" pTooltip="Reject" (click)="openRejectDialog(listing)">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5" class="not-found">
+              <div>
+                <i class="fa-solid fa-store"></i>
+                <p>No listings awaiting approval.</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+
+      <h3 class="subsection-header">Reported Listings</h3>
+      <p-table [value]="marketplaceLoading ? [] : openListingReports" dataKey="reportId">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Listing</th>
+            <th>Reported By</th>
+            <th>Reason</th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-report>
+          <tr>
+            <td>#{{ report.listingId }}</td>
+            <td>#{{ report.reportedBy }}</td>
+            <td>{{ report.reason }}</td>
+            <td>
+              <div class="row-actions">
+                <button pButton size="small" severity="secondary" pTooltip="View listing" (click)="viewListing(report.listingId)">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                </button>
+                <button pButton size="small" severity="success" [disabled]="pendingActionReportId === report.reportId" pTooltip="Resolve" (click)="resolveListingReport(report, 'Resolved')">
+                  <i class="fa-solid fa-check"></i>
+                </button>
+                <button pButton size="small" severity="secondary" [disabled]="pendingActionReportId === report.reportId" pTooltip="Dismiss" (click)="resolveListingReport(report, 'Dismissed')">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="4" class="not-found">
+              <div>
+                <i class="fa-solid fa-flag"></i>
+                <p>No reported listings.</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
   </p-panel>
+
+  <p-dialog header="Reject listing" [visible]="!!rejectingListing" [modal]="true" [dismissableMask]="true" [style]="{ width: '28rem' }" (onHide)="closeRejectDialog()">
+    <p class="report-intro">Let the seller know why "{{ rejectingListing?.title }}" was rejected.</p>
+    <textarea pInputTextarea rows="4" class="w-full" placeholder="Rejection reason..." [(ngModel)]="rejectReason"></textarea>
+
+    <ng-template pTemplate="footer">
+      <button pButton severity="secondary" (click)="closeRejectDialog()">Cancel</button>
+      <button pButton [disabled]="!rejectReason.trim()" (click)="submitReject()">Reject Listing</button>
+    </ng-template>
+  </p-dialog>
 </section>

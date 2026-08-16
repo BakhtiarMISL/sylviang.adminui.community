@@ -1,4 +1,5 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UI_CONFIG } from '@core/constants';
 import { IPostFilterParams, IPostResponse } from '@core/interfaces/community/post.interface';
 import { PostService } from '@core/services/community/post.service';
@@ -19,9 +20,12 @@ type FeedTypeFilter = 'all' | 'announcements' | 'polls';
   templateUrl: './feed.component.html',
   styleUrl: './feed.component.scss',
 })
-export class FeedComponent implements OnInit {
+export class FeedComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('scrollAnchor') scrollAnchor?: ElementRef<HTMLElement>;
+
   posts: IPostResponse[] = [];
   loading = true;
+  loadingMore = false;
   totalRecords = 0;
   rows: number = UI_CONFIG.defaultPageSize;
   currentPage = 1;
@@ -29,29 +33,62 @@ export class FeedComponent implements OnInit {
 
   typeFilter: FeedTypeFilter = 'all';
 
+  /** Set when the page is opened via a `?postId=` deep link (e.g. from the Moderation Queue) - renders separately from the normal paginated list and auto-opens its detail modal. */
+  highlightedPost: IPostResponse | null = null;
+
+  private observer?: IntersectionObserver;
+
   constructor(
     private postService: PostService,
+    private route: ActivatedRoute,
+    private router: Router,
     private cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
-    this.loadFeed();
+    this.loadFeed(true);
+
+    const postId = Number(this.route.snapshot.queryParamMap.get('postId'));
+    if (postId) {
+      this.postService.getById(postId).subscribe({
+        next: (response) => {
+          this.highlightedPost = !response.hasError && response.content ? response.content : null;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.highlightedPost = null;
+          this.cdr.detectChanges();
+        },
+      });
+    }
+  }
+
+  clearHighlightedPost(): void {
+    this.highlightedPost = null;
+    this.router.navigate([], { relativeTo: this.route, queryParams: {} });
+  }
+
+  ngAfterViewInit(): void {
+    if (!this.scrollAnchor) return;
+
+    this.observer = new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        this.loadMore();
+      }
+    });
+    this.observer.observe(this.scrollAnchor.nativeElement);
+  }
+
+  ngOnDestroy(): void {
+    this.observer?.disconnect();
   }
 
   onTypeFilterChange(): void {
-    this.currentPage = 1;
-    this.loadFeed();
-  }
-
-  onPageChange(event: { first: number; rows: number }): void {
-    this.currentPage = Math.floor(event.first / event.rows) + 1;
-    this.rows = event.rows;
-    this.loadFeed();
+    this.loadFeed(true);
   }
 
   onPostCreated(): void {
-    this.currentPage = 1;
-    this.loadFeed();
+    this.loadFeed(true);
   }
 
   onPostDeleted(postId: number): void {
@@ -59,8 +96,20 @@ export class FeedComponent implements OnInit {
     this.totalRecords = Math.max(0, this.totalRecords - 1);
   }
 
-  private loadFeed(): void {
-    this.loading = true;
+  private loadMore(): void {
+    if (this.loading || this.loadingMore || this.posts.length >= this.totalRecords) return;
+    this.currentPage += 1;
+    this.loadFeed(false);
+  }
+
+  private loadFeed(reset: boolean): void {
+    if (reset) {
+      this.currentPage = 1;
+      this.posts = [];
+      this.loading = true;
+    } else {
+      this.loadingMore = true;
+    }
 
     const params: IPostFilterParams = {
       page: this.currentPage,
@@ -76,20 +125,22 @@ export class FeedComponent implements OnInit {
       .pipe(untilDestroyed(this))
       .subscribe({
         next: (response) => {
-          if (!response.hasError && response.content) {
-            this.posts = response.content.data || [];
-            this.totalRecords = response.content.totalCount || 0;
-          } else {
+          const data = !response.hasError && response.content ? response.content.data || [] : [];
+          const totalCount = !response.hasError && response.content ? response.content.totalCount || 0 : 0;
+
+          this.posts = reset ? data : [...this.posts, ...data];
+          this.totalRecords = totalCount;
+          this.loading = false;
+          this.loadingMore = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          if (reset) {
             this.posts = [];
             this.totalRecords = 0;
           }
           this.loading = false;
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          this.posts = [];
-          this.totalRecords = 0;
-          this.loading = false;
+          this.loadingMore = false;
           this.cdr.detectChanges();
         },
       });

@@ -1,0 +1,120 @@
+<section class="detail-container">
+  <div *ngIf="loading" class="skeleton-wrap">
+    <p-skeleton width="100%" height="20rem" styleClass="mb-3"></p-skeleton>
+    <p-skeleton width="60%" height="2rem"></p-skeleton>
+  </div>
+
+  <div *ngIf="!loading && notFound" class="not-found">
+    <i class="fa-solid fa-box-open"></i>
+    <p>Listing not found. It may have been removed.</p>
+    <a pButton severity="secondary" routerLink="/community/marketplace">Back to Marketplace</a>
+  </div>
+
+  <div *ngIf="!loading && !notFound && listing" class="detail-grid">
+    <div class="gallery">
+      <div class="main-image">
+        <img *ngIf="images.length" [src]="servedUrl(images[activeImageIndex].imageUrl)" [alt]="listing.title" />
+        <i *ngIf="!images.length" class="fa-solid fa-image placeholder-icon"></i>
+      </div>
+      <div class="thumbnail-row" *ngIf="images.length > 1">
+        <button
+          type="button"
+          *ngFor="let image of images; let i = index"
+          class="thumbnail-btn"
+          [class.active]="i === activeImageIndex"
+          (click)="selectImage(i)"
+        >
+          <img [src]="servedUrl(image.imageUrl)" [alt]="listing.title" />
+        </button>
+      </div>
+    </div>
+
+    <div class="info-panel">
+      <div class="badges-row">
+        <span class="badge status-badge" [ngClass]="'status-' + listing.status.toLowerCase()">{{ listing.status }}</span>
+        <span *ngIf="listing.approvalStatus !== 'Approved'" class="badge approval-badge" [ngClass]="'approval-' + listing.approvalStatus.toLowerCase()">
+          {{ listing.approvalStatus }}
+        </span>
+        <span
+          *ngIf="listing.status === 'Active'"
+          class="badge stock-badge"
+          [ngClass]="{ 'stock-out': listing.quantity <= 0, 'stock-low': listing.quantity > 0 && listing.quantity <= 2 }"
+        >
+          {{ listing.quantity > 0 ? listing.quantity + ' in stock' : 'Out of stock' }}
+        </span>
+      </div>
+
+      <h1 class="title">{{ listing.title }}</h1>
+      <p class="price">{{ listing.price | number: '1.2-2' }} {{ listing.currency }}</p>
+
+      <div class="rating-summary" *ngIf="listing.reviewCount > 0">
+        <p-rating [ngModel]="roundedAverageRating" [readonly]="true" [stars]="5"></p-rating>
+        <span class="review-count">({{ listing.reviewCount }} review{{ listing.reviewCount === 1 ? '' : 's' }})</span>
+      </div>
+
+      <p class="meta-line">
+        <span class="badge category-badge">{{ listing.category }}</span>
+        <span class="badge condition-badge" *ngIf="listing.condition">{{ listing.condition }}</span>
+        <span class="badge type-badge">{{ listing.listingType }}</span>
+      </p>
+
+      <p class="location" *ngIf="listing.location"><i class="fa-solid fa-location-dot"></i> {{ listing.location }}</p>
+
+      <p class="description">{{ listing.description }}</p>
+
+      <p *ngIf="listing.approvalStatus === 'Rejected' && listing.rejectionReason" class="rejection-reason">
+        <i class="fa-solid fa-circle-exclamation"></i> Rejected: {{ listing.rejectionReason }}
+      </p>
+
+      <div class="seller-card" *ngIf="seller">
+        <span class="seller-label">Seller</span>
+        <p class="seller-name"><i class="fa-solid fa-user"></i> {{ seller.employeeName }}</p>
+      </div>
+
+      <div class="buy-row" *ngIf="canBuy">
+        <input pInputText type="number" [(ngModel)]="buyQuantity" name="buyQuantity" min="1" [max]="listing.quantity" class="qty-input" />
+        <button pButton [disabled]="buying || buyQuantity < 1 || buyQuantity > listing.quantity" (click)="buyNow()">
+          <i class="fa-solid fa-cart-shopping"></i> Buy
+        </button>
+      </div>
+
+      <div class="action-row">
+        <button pButton *ngIf="!isOwner" [disabled]="messaging" (click)="messageSeller()">
+          <i class="fa-solid fa-comment"></i> Message Seller
+        </button>
+
+        <button pButton severity="secondary" [class.active]="isFavorited" (click)="toggleFavorite()">
+          <i class="fa-solid fa-heart"></i> {{ isFavorited ? 'Favorited' : 'Favorite' }}
+        </button>
+
+        <button pButton severity="secondary" *ngIf="!isOwner" (click)="openReportDialog()">
+          <i class="fa-solid fa-flag"></i> Report
+        </button>
+      </div>
+
+      <div class="manage-row" *ngIf="canManage">
+        <a pButton severity="secondary" [routerLink]="['/community/marketplace', listing.listingId, 'edit']">
+          <i class="fa-solid fa-pen"></i> Edit
+        </a>
+
+        <button pButton severity="secondary" *ngIf="listing.status === 'Active'" [disabled]="updatingStatus" (click)="markAsSold()">
+          <i class="fa-solid fa-tag"></i> Mark as Sold
+        </button>
+
+        <button pButton severity="secondary" *ngIf="listing.status === 'Sold'" [disabled]="updatingStatus" (click)="reactivate()">
+          <i class="fa-solid fa-rotate-left"></i> Reactivate
+        </button>
+
+        <button pButton severity="danger" [disabled]="deleting" (click)="deleteListing()">
+          <i class="fa-solid fa-trash"></i> Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <app-listing-reviews *ngIf="!loading && !notFound && listing" [listingId]="listing.listingId"></app-listing-reviews>
+
+  <app-related-listings *ngIf="!loading && !notFound && listing" [category]="listing.category" [excludeListingId]="listing.listingId"></app-related-listings>
+
+  <app-report-listing-dialog *ngIf="listing" [listingId]="listing.listingId" [(visible)]="showReportDialog"></app-report-listing-dialog>
+</section>

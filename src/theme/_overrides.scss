@@ -71,6 +71,15 @@
 .p-multiselect-list .p-multiselect-empty-message {
   @apply h-8 text-black dark:text-white;
 }
+.p-multiselect-chip {
+  background-color: #4ade80 !important;
+  color: #052e16 !important;
+  border-radius: 999px !important;
+  font-weight: 500 !important;
+}
+.p-multiselect-chip-icon {
+  color: #052e16 !important;
+}
 
 // --------------------------------------------Input text, Textarea Css Override--------------------------------------------
 .p-inputtext {
@@ -254,6 +263,8 @@
 // --------------------------------------------Dialog CSS Override--------------------------------------------
 .p-dialog {
   border: none !important;
+  border-radius: 0.75rem !important;
+  overflow: hidden !important;
   .p-dialog-header {
     @apply bg-light dark:bg-dark text-black dark:text-white rounded-t-xl px-5 pt-3 pb-0 z-20;
   }
@@ -268,6 +279,13 @@
   .p-confirmdialog-accept-button {
     @apply w-14 h-6 text-sm rounded text-white hover:text-white !important;
   }
+}
+
+// --------------------------------------------TabView CSS Override--------------------------------------------
+.p-tablist,
+.p-tablist-tab-list,
+.p-tabpanels {
+  @apply bg-light dark:bg-dark !important;
 }
 
 //--------------------------------------------Toast CSS Override--------------------------------------------

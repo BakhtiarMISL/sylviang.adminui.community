@@ -1,7 +1,6 @@
 <section class="page-container feed-page">
   <div class="feed-header">
     <div class="feed-header-left">
-      <img alt="Sylvia" class="feed-logo" src="assets/images/sylvia_logo.png" />
       <app-colleague-search></app-colleague-search>
     </div>
 
@@ -18,6 +17,11 @@
       (onChange)="onTypeFilterChange()"
       styleClass="w-48"
     ></p-select>
+  </div>
+
+  <div *ngIf="highlightedPost" class="highlighted-post-banner">
+    <p>Viewing a reported post &mdash; <a [routerLink]="[]" (click)="clearHighlightedPost()">back to Feed</a></p>
+    <app-post-card [post]="highlightedPost" [autoOpenModal]="true" (deleted)="clearHighlightedPost()"></app-post-card>
   </div>
 
   <app-post-composer (posted)="onPostCreated()"></app-post-composer>
@@ -38,13 +42,8 @@
       </div>
     </div>
 
-    <p-paginator
-      *ngIf="totalRecords > rows"
-      [rows]="rows"
-      [totalRecords]="totalRecords"
-      [first]="(currentPage - 1) * rows"
-      [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
-      (onPageChange)="onPageChange($event)"
-    ></p-paginator>
+    <div *ngIf="loadingMore" class="load-more-spinner"><i class="fa-solid fa-spinner fa-spin"></i></div>
   </div>
+
+  <div #scrollAnchor class="scroll-anchor"></div>
 </section>

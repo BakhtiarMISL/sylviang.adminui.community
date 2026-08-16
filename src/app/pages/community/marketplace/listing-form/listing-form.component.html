@@ -1,0 +1,115 @@
+<section class="listing-form-container">
+  <h1 class="title">{{ isEditMode ? 'Edit Listing' : 'Post a Listing' }}</h1>
+
+  <div *ngIf="loading" class="skeleton-wrap">
+    <p-skeleton width="100%" height="12rem"></p-skeleton>
+  </div>
+
+  <form *ngIf="!loading" class="listing-form" (ngSubmit)="isEditMode ? saveChanges() : submitForReview()">
+    <div class="form-grid">
+      <p-floatlabel variant="in">
+        <p-select
+          inputId="listingType"
+          [options]="typeOptions"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="listingType"
+          name="listingType"
+          [appendTo]="'body'"
+          [autoDisplayFirst]="false"
+          styleClass="w-full"
+        ></p-select>
+        <label for="listingType">Type</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in">
+        <input pInputText id="title" [(ngModel)]="title" name="title" class="w-full" />
+        <label for="title">Title</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in">
+        <p-select
+          inputId="category"
+          [options]="categoryOptions"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="category"
+          name="category"
+          [appendTo]="'body'"
+          [autoDisplayFirst]="false"
+          styleClass="w-full"
+        ></p-select>
+        <label for="category">Category</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in">
+        <p-select
+          inputId="condition"
+          [options]="conditionOptions"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="condition"
+          name="condition"
+          [appendTo]="'body'"
+          [autoDisplayFirst]="false"
+          [showClear]="true"
+          styleClass="w-full"
+        ></p-select>
+        <label for="condition">Condition</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in">
+        <input pInputText type="number" id="price" [(ngModel)]="price" name="price" class="w-full" min="0" />
+        <label for="price">Price</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in">
+        <input pInputText id="currency" [(ngModel)]="currency" name="currency" class="w-full" maxlength="10" />
+        <label for="currency">Currency</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in">
+        <input pInputText type="number" id="quantity" [(ngModel)]="quantity" name="quantity" class="w-full" min="1" step="1" />
+        <label for="quantity">Quantity</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in" class="sm:col-span-2">
+        <input pInputText id="location" [(ngModel)]="location" name="location" class="w-full" />
+        <label for="location">Location</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in" class="sm:col-span-2">
+        <textarea pInputTextarea id="description" rows="4" [(ngModel)]="description" name="description" class="w-full"></textarea>
+        <label for="description">Description</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="photos-section">
+      <span class="section-label">Photos</span>
+
+      <div class="existing-images" *ngIf="existingImages.length">
+        <div class="image-tile" *ngFor="let image of existingImages">
+          <img [src]="servedUrl(image.imageUrl)" alt="Listing photo" />
+          <button type="button" class="remove-btn" (click)="removeExistingImage(image)"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+      </div>
+
+      <app-attachment-upload module="Listing" [entityId]="listingId ?? undefined" [multiple]="true" chooseLabel="Add Photos" (uploaded)="onImageUploaded($event)" (removed)="onImageRemoved($event)"></app-attachment-upload>
+    </div>
+
+    <div class="form-actions">
+      <a pButton severity="secondary" [routerLink]="isEditMode ? ['/community/marketplace/listing', listingId] : ['/community/marketplace']">Cancel</a>
+
+      <ng-container *ngIf="!isEditMode">
+        <button pButton *ngIf="!isHrOrAdmin" type="button" severity="secondary" [disabled]="!canSubmit || submitting" (click)="saveAsDraft()">
+          Save as Draft
+        </button>
+        <button pButton type="submit" [disabled]="!canSubmit || submitting">
+          {{ isHrOrAdmin ? 'Publish' : 'Submit for Review' }}
+        </button>
+      </ng-container>
+
+      <button pButton *ngIf="isEditMode" type="submit" [disabled]="!canSubmit || submitting">Save Changes</button>
+    </div>
+  </form>
+</section>
