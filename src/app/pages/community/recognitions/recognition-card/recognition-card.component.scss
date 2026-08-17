@@ -67,10 +67,23 @@
   color: #b45309;
 }
 
-.meta-line {
-  font-size: 0.75rem;
+.dot {
+  opacity: 0.5;
+}
+
+.time {
+  font-size: 0.8rem;
+  font-weight: 400;
   opacity: 0.6;
   color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.badge-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
 }
 
 .badge-chip {
@@ -81,7 +94,6 @@
   font-weight: 600;
   padding: 0.2rem 0.6rem;
   border-radius: 999px;
-  margin-top: 0.6rem;
 }
 
 .award-title {

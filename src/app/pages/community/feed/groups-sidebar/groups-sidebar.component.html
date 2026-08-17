@@ -1,0 +1,30 @@
+<div class="groups-sidebar">
+  <a class="groups-link" routerLink="/community/groups">
+    <i class="fa-solid fa-people-roof"></i>
+    <span>Groups</span>
+  </a>
+
+  <div class="my-groups">
+    <h3 class="my-groups-heading">My Groups</h3>
+
+    <div *ngIf="loading" class="skeleton-list">
+      <p-skeleton width="100%" height="1.75rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="100%" height="1.75rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="100%" height="1.75rem"></p-skeleton>
+    </div>
+
+    <ul class="my-groups-list" *ngIf="!loading && myGroups.length > 0">
+      <li *ngFor="let group of myGroups">
+        <a [routerLink]="['/community/groups', group.groupId]">
+          <span class="group-name">{{ group.name }}</span>
+          <span class="group-member-count">{{ group.memberCount }}</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="empty-groups" *ngIf="!loading && myGroups.length === 0">
+      <p>You haven't joined any groups yet.</p>
+      <a routerLink="/community/groups">Browse groups</a>
+    </div>
+  </div>
+</div>

@@ -33,7 +33,7 @@
   font-size: 0.85rem;
   white-space: pre-wrap;
   margin-top: 0.15rem;
-  color: #e7e9ed;
+  color: var(--text-primary);
 
   ::ng-deep .mention-link {
     color: var(--p-primary-color, #6366f1);

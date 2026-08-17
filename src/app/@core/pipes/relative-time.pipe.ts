@@ -1,22 +1,26 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 /**
- * Renders a timestamp as a short "time ago" string (e.g. "5m ago", "3d ago"). No
- * relative-time utility existed anywhere in @core prior to the Notifications feature, so
- * this is a small pure pipe rather than pulling in a date library.
+ * Renders a timestamp as a short "time ago" string (e.g. "5m ago", "3d ago"). Pure pipe:
+ * pass the current time (e.g. from TimeTickerService's now$ via the async pipe) as the
+ * second argument so this recomputes as time passes instead of freezing at first render.
+ *
+ * Standalone so eagerly-loaded modules (e.g. ShellModule, for the notification bell) can
+ * import just this pipe directly instead of pulling in all of SharedModule's PrimeNG
+ * modules, which would bloat the initial bundle since ShellModule isn't lazy-loaded.
  */
 @Pipe({
   name: 'relativeTime',
-  standalone: false,
+  standalone: true,
 })
 export class RelativeTimePipe implements PipeTransform {
-  transform(value: string | Date | null | undefined): string {
+  transform(value: string | Date | null | undefined, now: number | null): string {
     if (!value) return '';
 
     const date = value instanceof Date ? value : new Date(value);
     if (isNaN(date.getTime())) return '';
 
-    const diffSeconds = Math.round((Date.now() - date.getTime()) / 1000);
+    const diffSeconds = Math.round(((now ?? Date.now()) - date.getTime()) / 1000);
 
     if (diffSeconds < 5) return 'just now';
     if (diffSeconds < 60) return `${diffSeconds}s ago`;

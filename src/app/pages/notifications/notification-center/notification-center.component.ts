@@ -6,6 +6,7 @@ import { CurrentUserService } from '@core/services/current-user.service';
 import { NotificationHubService } from '@core/services/notifications/notification-hub.service';
 import { NotificationService } from '@core/services/notifications/notification.service';
 import { ToastService } from '@core/services/misc/toast.service';
+import { TimeTickerService } from '@core/services/misc/time-ticker.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
 /** All / Unread tab indices used by the p-tabView on this page. */
@@ -26,6 +27,7 @@ export class NotificationCenterComponent implements OnInit {
     private currentUserService: CurrentUserService,
     private toastService: ToastService,
     private cdr: ChangeDetectorRef,
+    public timeTicker: TimeTickerService,
   ) {}
 
   notifications: INotificationResponse[] = [];

@@ -20,6 +20,18 @@
   margin-top: 1rem;
 }
 
+.load-more-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+  opacity: 0.6;
+  font-size: 1.1rem;
+}
+
+.scroll-anchor {
+  height: 1px;
+}
+
 // Force the "Recognition Filters" p-panel to match the "Employee Filters" p-panel on the
 // Employee Directory page pixel-for-pixel. Both already get the same rules from the global
 // .p-panel-* overrides in theme/_overrides.scss, but PrimeNG injects each component's own

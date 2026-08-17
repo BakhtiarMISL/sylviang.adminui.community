@@ -41,8 +41,6 @@
         <dl class="profile-fields">
           <dt>Division</dt>
           <dd>{{ employee.division || '—' }}</dd>
-          <dt>Grade</dt>
-          <dd>{{ employee.gradeName || (employee.gradeId ? 'Grade #' + employee.gradeId : '—') }}</dd>
           <dt>Phone</dt>
           <dd>{{ employee.phone || 'Not visible' }}</dd>
           <dt>Email</dt>
@@ -50,6 +48,19 @@
           <dt>Extension</dt>
           <dd>{{ employee.extension || 'Not visible' }}</dd>
         </dl>
+      </div>
+
+      <div class="profile-section">
+        <h3 class="form-section-header">Contact Links</h3>
+        <ul class="contact-link-list" *ngIf="employee.contactLinks.length > 0; else noContactLinks">
+          <li *ngFor="let link of employee.contactLinks">
+            <a [href]="link.url" target="_blank" rel="noopener noreferrer">
+              <i class="fa-solid fa-link"></i>
+              <span>{{ link.platform }}</span>
+            </a>
+          </li>
+        </ul>
+        <ng-template #noContactLinks><p>No contact links added yet.</p></ng-template>
       </div>
 
       <div class="profile-section">

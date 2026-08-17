@@ -41,13 +41,29 @@
     <div *ngIf="hasError('communityContributions')" class="invalid">Community contributions must not exceed 1000 characters.</div>
   </div>
 
-  <h3 class="form-section-header">Contact Field Privacy</h3>
+  <h3 class="form-section-header">Contact Details</h3>
+
+  <div>
+    <p-floatlabel variant="in">
+      <input pInputText inputId="phone" formControlName="phone" class="w-full" [class.ng-invalid]="hasError('phone')" />
+      <label for="phone">Phone</label>
+    </p-floatlabel>
+    <div *ngIf="hasError('phone')" class="invalid">Phone must not exceed 50 characters.</div>
+  </div>
 
   <div>
     <p-floatlabel variant="in">
       <p-select inputId="phoneVisibility" [options]="visibilityOptions" optionLabel="label" optionValue="value" formControlName="phoneVisibility" class="w-full" [appendTo]="'body'" [autoDisplayFirst]="false"></p-select>
       <label for="phoneVisibility">Phone Visibility</label>
     </p-floatlabel>
+  </div>
+
+  <div>
+    <p-floatlabel variant="in">
+      <input pInputText inputId="email" formControlName="email" class="w-full" [class.ng-invalid]="hasError('email')" />
+      <label for="email">Email</label>
+    </p-floatlabel>
+    <div *ngIf="hasError('email')" class="invalid">Enter a valid email address.</div>
   </div>
 
   <div>
@@ -59,9 +75,70 @@
 
   <div>
     <p-floatlabel variant="in">
+      <input pInputText inputId="extension" formControlName="extension" class="w-full" [class.ng-invalid]="hasError('extension')" />
+      <label for="extension">Extension</label>
+    </p-floatlabel>
+    <div *ngIf="hasError('extension')" class="invalid">Extension must not exceed 20 characters.</div>
+  </div>
+
+  <div>
+    <p-floatlabel variant="in">
       <p-select inputId="extensionVisibility" [options]="visibilityOptions" optionLabel="label" optionValue="value" formControlName="extensionVisibility" class="w-full" [appendTo]="'body'" [autoDisplayFirst]="false"></p-select>
       <label for="extensionVisibility">Extension Visibility</label>
     </p-floatlabel>
+  </div>
+
+  <h3 class="form-section-header sm:col-span-2 lg:col-span-3 xl:col-span-4">Contact Links</h3>
+
+  <div class="sm:col-span-2 lg:col-span-3 xl:col-span-4" formArrayName="contactLinks">
+    <div *ngFor="let link of contactLinks.controls; let i = index" [formGroupName]="i" class="contact-link-row flex gap-3 items-start mb-3">
+      <p-floatlabel variant="in" class="flex-1">
+        <p-select
+          [inputId]="'platform-' + i"
+          [options]="platformOptions"
+          optionLabel="label"
+          optionValue="value"
+          formControlName="platform"
+          class="w-full"
+          [appendTo]="'body'"
+          [autoDisplayFirst]="false"
+        ></p-select>
+        <label [for]="'platform-' + i">Platform</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in" class="flex-1" *ngIf="isOtherPlatform(i)">
+        <input pInputText [id]="'customLabel-' + i" formControlName="customLabel" class="w-full" />
+        <label [for]="'customLabel-' + i">Custom Platform Name</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in" class="flex-1">
+        <input pInputText [id]="'url-' + i" formControlName="url" class="w-full" />
+        <label [for]="'url-' + i">URL</label>
+      </p-floatlabel>
+
+      <p-floatlabel variant="in" class="flex-1">
+        <p-select
+          [inputId]="'linkVisibility-' + i"
+          [options]="visibilityOptions"
+          optionLabel="label"
+          optionValue="value"
+          formControlName="visibility"
+          class="w-full"
+          [appendTo]="'body'"
+          [autoDisplayFirst]="false"
+        ></p-select>
+        <label [for]="'linkVisibility-' + i">Visibility</label>
+      </p-floatlabel>
+
+      <button type="button" pButton class="icon-btn danger" pTooltip="Remove" (click)="removeContactLink(i)">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <button type="button" pButton size="small" (click)="addContactLink()">
+      <i class="fa-solid fa-plus"></i>
+      <span>Add Contact Link</span>
+    </button>
   </div>
 
   <div class="sm:col-span-2 lg:col-span-3 xl:col-span-4 flex justify-end gap-3 mt-2">

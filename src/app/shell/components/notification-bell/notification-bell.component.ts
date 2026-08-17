@@ -5,6 +5,7 @@ import { INotificationResponse } from '@core/interfaces/notifications/notificati
 import { CurrentUserService } from '@core/services/current-user.service';
 import { NotificationHubService } from '@core/services/notifications/notification-hub.service';
 import { NotificationService } from '@core/services/notifications/notification.service';
+import { TimeTickerService } from '@core/services/misc/time-ticker.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
 const RECENT_PAGE_SIZE = 8;
@@ -38,6 +39,7 @@ export class NotificationBellComponent implements OnInit {
     private currentUserService: CurrentUserService,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    public timeTicker: TimeTickerService,
   ) {}
 
   ngOnInit(): void {

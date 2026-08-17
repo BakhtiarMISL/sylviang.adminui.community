@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { BadgeModule } from 'primeng/badge';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
+import { RelativeTimePipe } from '@core/pipes/relative-time.pipe';
 
 import { ShellComponent } from './shell.component';
 import { HeaderComponent } from '@app/shell/components/header/header.component';
@@ -24,6 +25,7 @@ import { ThemeToggleComponent } from '@app/shell/components/theme-toggle/theme-t
     TooltipModule,
     BadgeModule,
     ThemeToggleComponent,
+    RelativeTimePipe,
   ],
   declarations: [ShellComponent, HeaderComponent, NotificationBellComponent, SidebarComponent, SidebarMenuItemComponent],
 })

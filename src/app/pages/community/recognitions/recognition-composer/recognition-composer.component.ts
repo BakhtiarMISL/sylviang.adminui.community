@@ -28,7 +28,7 @@ export class RecognitionComposerComponent {
   selectedRecipient: IEmployeeDirectoryCardResponse | null = null;
 
   badges: IBadgeResponse[] = [];
-  selectedBadge: IBadgeResponse | null = null;
+  selectedBadges: IBadgeResponse[] = [];
 
   message = '';
   awardTitle = '';
@@ -75,9 +75,9 @@ export class RecognitionComposerComponent {
     const isHrIssued = this.isHrIssued && this.canGiveFormalAward;
     const request: IRecognitionCreateRequest = {
       recipientId: this.selectedRecipient.employeeId,
-      badgeId: this.selectedBadge?.badgeId ?? null,
-      recognitionType: isHrIssued ? 'Formal Award' : (this.selectedBadge?.name ?? 'Peer Kudos'),
-      coreValue: this.selectedBadge?.name ?? null,
+      badgeIds: this.selectedBadges.map((b) => b.badgeId),
+      recognitionType: isHrIssued ? 'Formal Award' : (this.selectedBadges[0]?.name ?? 'Peer Kudos'),
+      coreValue: this.selectedBadges.map((b) => b.name).join(', ') || null,
       awardTitle: isHrIssued ? this.awardTitle.trim() || null : null,
       message: this.message.trim() || null,
       isPublic: true,
@@ -117,7 +117,7 @@ export class RecognitionComposerComponent {
     this.recipientQuery = '';
     this.recipientSuggestions = [];
     this.selectedRecipient = null;
-    this.selectedBadge = null;
+    this.selectedBadges = [];
     this.message = '';
     this.awardTitle = '';
     this.isHrIssued = false;

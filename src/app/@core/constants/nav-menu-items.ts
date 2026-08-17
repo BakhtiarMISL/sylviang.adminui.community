@@ -78,6 +78,12 @@ export const webSidebarMenuItems: IMenuItem[] = [
         icon: 'fa-solid fa-stream',
       },
       {
+        href: '/community/groups',
+        title: 'Groups',
+        active: false,
+        icon: 'fa-solid fa-people-roof',
+      },
+      {
         href: '/community/recognitions',
         title: 'Recognitions',
         active: false,
@@ -88,6 +94,12 @@ export const webSidebarMenuItems: IMenuItem[] = [
         title: 'Marketplace',
         active: false,
         icon: 'fa-solid fa-store',
+      },
+      {
+        href: '/community/surveys',
+        title: 'Surveys',
+        active: false,
+        icon: 'fa-solid fa-square-poll-vertical',
       },
       {
         href: '/community/profile/me',
