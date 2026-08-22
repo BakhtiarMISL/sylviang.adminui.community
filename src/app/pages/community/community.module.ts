@@ -8,6 +8,7 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { TextareaModule } from 'primeng/textarea';
 import { TabViewModule } from 'primeng/tabview';
 import { RatingModule } from 'primeng/rating';
+import { MessageModule } from 'primeng/message';
 import { SharedModule } from '@shared/shared.module';
 import { CommunityRoutingModule } from './community-routing.module';
 import { FeedComponent } from './feed/feed.component';
@@ -53,6 +54,15 @@ import { SurveyBuilderComponent } from './surveys/survey-builder/survey-builder.
 import { SurveyAudienceTargetingComponent } from './surveys/survey-audience-targeting/survey-audience-targeting.component';
 import { SurveyTakeComponent } from './surveys/survey-take/survey-take.component';
 import { SurveyResultsComponent } from './surveys/survey-results/survey-results.component';
+import { TeamsListComponent } from './teams/teams-list/teams-list.component';
+import { TeamFormDialogComponent } from './teams/team-form-dialog/team-form-dialog.component';
+import { TeamDetailComponent } from './teams/team-detail/team-detail.component';
+import { TeamMembersTabComponent } from './teams/team-detail/team-members-tab/team-members-tab.component';
+import { TasksHomeComponent } from './tasks/tasks-home/tasks-home.component';
+import { MyTasksListComponent } from './tasks/my-tasks-list/my-tasks-list.component';
+import { TaskBoardComponent } from './tasks/task-board/task-board.component';
+import { AssignTaskDialogComponent } from './tasks/assign-task-dialog/assign-task-dialog.component';
+import { TaskDetailDialogComponent } from './tasks/task-detail-dialog/task-detail-dialog.component';
 
 @NgModule({
   declarations: [
@@ -99,6 +109,15 @@ import { SurveyResultsComponent } from './surveys/survey-results/survey-results.
     SurveyAudienceTargetingComponent,
     SurveyTakeComponent,
     SurveyResultsComponent,
+    TeamsListComponent,
+    TeamFormDialogComponent,
+    TeamDetailComponent,
+    TeamMembersTabComponent,
+    TasksHomeComponent,
+    MyTasksListComponent,
+    TaskBoardComponent,
+    AssignTaskDialogComponent,
+    TaskDetailDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -110,6 +129,7 @@ import { SurveyResultsComponent } from './surveys/survey-results/survey-results.
     ProgressBarModule,
     TabViewModule,
     RatingModule,
+    MessageModule,
     DragDropModule,
     CommunityRoutingModule,
   ],

@@ -8,39 +8,58 @@
     <p-skeleton width="100%" height="8rem"></p-skeleton>
   </div>
 
-  <form *ngIf="!loading" class="builder-form">
+  <form *ngIf="!loading" [formGroup]="surveyForm" class="builder-form">
     <section class="form-section">
       <h2>Details</h2>
 
       <div class="field">
-        <label for="survey-title">Title</label>
-        <input id="survey-title" pInputText type="text" [(ngModel)]="title" name="title" placeholder="e.g. Q3 Engagement Pulse" />
+        <p-floatlabel variant="in">
+          <input
+            id="survey-title"
+            pInputText
+            type="text"
+            formControlName="title"
+            class="w-full"
+            [class.ng-invalid]="hasError('title')"
+            (blur)="f['title'].markAsTouched()"
+          />
+          <label for="survey-title">Title *</label>
+        </p-floatlabel>
+        <div *ngIf="hasError('title')" class="invalid">{{ getErrorMessage('title') }}</div>
       </div>
 
       <div class="field">
-        <label for="survey-description">Description</label>
-        <textarea id="survey-description" pTextarea rows="3" [(ngModel)]="description" name="description" placeholder="What is this survey about?"></textarea>
+        <p-floatlabel variant="in">
+          <textarea id="survey-description" pTextarea rows="3" formControlName="description" class="w-full"></textarea>
+          <label for="survey-description">Description</label>
+        </p-floatlabel>
       </div>
 
       <div class="field">
-        <label for="survey-type">Type</label>
-        <p-select
-          id="survey-type"
-          [options]="surveyTypeOptions"
-          [(ngModel)]="surveyType"
-          name="surveyType"
-          placeholder="Choose a type"
-          [appendTo]="'body'"
-          styleClass="w-full"
-        ></p-select>
+        <p-floatlabel variant="in">
+          <p-select
+            id="survey-type"
+            [options]="surveyTypeOptions"
+            formControlName="surveyType"
+            [appendTo]="'body'"
+            [autoDisplayFirst]="false"
+            styleClass="w-full"
+            [class.ng-invalid]="hasError('surveyType')"
+            [class.ng-dirty]="hasError('surveyType')"
+            (onBlur)="f['surveyType'].markAsTouched()"
+            (onChange)="f['surveyType'].markAsTouched()"
+          ></p-select>
+          <label for="survey-type">Type *</label>
+        </p-floatlabel>
+        <div *ngIf="hasError('surveyType')" class="invalid">{{ getErrorMessage('surveyType') }}</div>
       </div>
 
       <div class="toggle-row">
-        <p-checkbox [(ngModel)]="isAnonymous" name="isAnonymous" [binary]="true" inputId="isAnonymous"></p-checkbox>
+        <p-checkbox formControlName="isAnonymous" [binary]="true" inputId="isAnonymous"></p-checkbox>
         <label for="isAnonymous">Anonymous - responses aren't attributed to a respondent in results</label>
       </div>
       <div class="toggle-row">
-        <p-checkbox [(ngModel)]="isMandatory" name="isMandatory" [binary]="true" inputId="isMandatory"></p-checkbox>
+        <p-checkbox formControlName="isMandatory" [binary]="true" inputId="isMandatory"></p-checkbox>
         <label for="isMandatory">Mandatory</label>
       </div>
 
@@ -48,26 +67,30 @@
         <label>Survey source</label>
         <div class="radio-row">
           <div class="radio-option">
-            <p-radioButton name="surveyMode" [value]="false" [ngModel]="isExternal" (ngModelChange)="onModeChange($event)" inputId="mode-ces"></p-radioButton>
+            <p-radioButton name="surveyMode" [value]="false" [ngModel]="isExternal" [ngModelOptions]="{standalone: true}" (ngModelChange)="onModeChange($event)" inputId="mode-ces"></p-radioButton>
             <label for="mode-ces">Build in CES</label>
           </div>
           <div class="radio-option">
-            <p-radioButton name="surveyMode" [value]="true" [ngModel]="isExternal" (ngModelChange)="onModeChange($event)" inputId="mode-external"></p-radioButton>
+            <p-radioButton name="surveyMode" [value]="true" [ngModel]="isExternal" [ngModelOptions]="{standalone: true}" (ngModelChange)="onModeChange($event)" inputId="mode-external"></p-radioButton>
             <label for="mode-external">External Survey Link</label>
           </div>
         </div>
       </div>
 
       <div class="field" *ngIf="isExternal">
-        <label for="external-url">External Survey Link</label>
-        <input
-          id="external-url"
-          pInputText
-          type="url"
-          [(ngModel)]="externalUrl"
-          name="externalUrl"
-          placeholder="https://forms.google.com/..."
-        />
+        <p-floatlabel variant="in">
+          <input
+            id="external-url"
+            pInputText
+            type="url"
+            formControlName="externalUrl"
+            class="w-full"
+            [class.ng-invalid]="hasError('externalUrl')"
+            (blur)="f['externalUrl'].markAsTouched()"
+          />
+          <label for="external-url">External Survey Link *</label>
+        </p-floatlabel>
+        <div *ngIf="hasError('externalUrl')" class="invalid">{{ getErrorMessage('externalUrl') }}</div>
       </div>
     </section>
 
@@ -81,7 +104,7 @@
       ></app-survey-audience-targeting>
     </section>
 
-    <section class="form-section" *ngIf="!isExternal">
+    <section class="form-section" *ngIf="!isExternal" formArrayName="questions">
       <div class="questions-header">
         <h2>Questions</h2>
         <button type="button" pButton size="small" severity="secondary" (click)="addQuestion()">
@@ -90,40 +113,48 @@
       </div>
 
       <div cdkDropList (cdkDropListDropped)="onQuestionDrop($event)">
-        <div class="question-block" *ngFor="let question of questions; let qIndex = index; trackBy: trackByQuestion" cdkDrag>
+        <div
+          class="question-block"
+          *ngFor="let questionGroup of questionsArray.controls; let qIndex = index; trackBy: trackByQuestionGroup"
+          [formGroupName]="qIndex"
+          cdkDrag
+        >
           <div class="question-row">
             <span class="drag-handle" cdkDragHandle pTooltip="Drag to reorder"><i class="fa-solid fa-grip-vertical"></i></span>
             <span class="question-number">{{ qIndex + 1 }}</span>
 
             <div class="question-fields">
-              <input
-                pInputText
-                type="text"
-                [(ngModel)]="question.questionText"
-                [name]="'questionText' + question.clientId"
-                placeholder="Question text"
-                class="question-text-input"
-              />
+              <div class="field">
+                <input
+                  pInputText
+                  type="text"
+                  formControlName="questionText"
+                  placeholder="Question text *"
+                  class="question-text-input"
+                  [class.ng-invalid]="questionHasError(qIndex, 'questionText')"
+                  (blur)="questionGroupAt(qIndex).get('questionText')!.markAsTouched()"
+                />
+                <div *ngIf="questionHasError(qIndex, 'questionText')" class="invalid">Question text is required</div>
+              </div>
 
               <p-select
                 [options]="questionTypeOptions"
                 optionLabel="label"
                 optionValue="value"
-                [(ngModel)]="question.questionType"
-                [name]="'questionType' + question.clientId"
-                [disabled]="question.questionId !== null"
+                formControlName="questionType"
+                [disabled]="questionMeta[qIndex].questionId !== null"
                 [appendTo]="'body'"
+                [autoDisplayFirst]="false"
                 styleClass="question-type-select"
               ></p-select>
 
               <div class="toggle-row">
                 <p-checkbox
-                  [(ngModel)]="question.isRequired"
-                  [name]="'isRequired' + question.clientId"
+                  formControlName="isRequired"
                   [binary]="true"
-                  [inputId]="'isRequired' + question.clientId"
+                  [inputId]="'isRequired' + questionMeta[qIndex].clientId"
                 ></p-checkbox>
-                <label [for]="'isRequired' + question.clientId">Required</label>
+                <label [for]="'isRequired' + questionMeta[qIndex].clientId">Required</label>
               </div>
             </div>
 
@@ -134,46 +165,46 @@
             </div>
           </div>
 
-          <div class="options-block" *ngIf="isChoiceType(question.questionType)">
-            <div class="options-readonly-note" *ngIf="question.questionId !== null">
+          <div class="options-block" *ngIf="isChoiceType(questionGroup.get('questionType')!.value)" formArrayName="options">
+            <div class="options-readonly-note" *ngIf="questionMeta[qIndex].questionId !== null">
               Options on an existing question can't be edited - remove and re-add this question to change them.
             </div>
 
-            <div class="option-row" *ngFor="let option of question.options; let oIndex = index">
+            <div class="option-row" *ngFor="let optionControl of optionsArrayAt(qIndex).controls; let oIndex = index">
               <input
                 pInputText
                 type="text"
-                [(ngModel)]="question.options[oIndex]"
-                [name]="'option' + question.clientId + '_' + oIndex"
-                [disabled]="question.questionId !== null"
+                [formControlName]="oIndex"
                 [placeholder]="'Option ' + (oIndex + 1)"
               />
               <button
                 type="button"
                 class="icon-btn danger"
                 (click)="removeOption(qIndex, oIndex)"
-                [disabled]="question.options.length <= 2 || question.questionId !== null"
+                [disabled]="optionsArrayAt(qIndex).length <= 2 || questionMeta[qIndex].questionId !== null"
                 pTooltip="Remove option"
               >
                 <i class="fa-solid fa-xmark"></i>
               </button>
             </div>
 
-            <button type="button" pButton size="small" severity="secondary" [disabled]="question.questionId !== null" (click)="addOption(qIndex)">
+            <div *ngIf="questionHasMinOptionsError(qIndex)" class="invalid">Choice questions need at least two options.</div>
+
+            <button type="button" pButton size="small" severity="secondary" [disabled]="questionMeta[qIndex].questionId !== null" (click)="addOption(qIndex)">
               <i class="fa-solid fa-plus"></i> Add Option
             </button>
           </div>
         </div>
       </div>
 
-      <div class="not-found" *ngIf="questions.length === 0">
+      <div class="not-found" *ngIf="questionsArray.length === 0">
         <div><i class="fa-solid fa-list-check"></i><p>No questions yet. Add at least one to publish this survey.</p></div>
       </div>
     </section>
 
     <div class="builder-actions">
-      <button type="button" pButton severity="secondary" [disabled]="!canSubmit" (click)="saveDraft()">Save Draft</button>
-      <button type="button" pButton [disabled]="!canSubmit" (click)="publishNow()">Publish</button>
+      <button type="button" pButton severity="secondary" [disabled]="submitting" (click)="saveDraft()">Save Draft</button>
+      <button type="button" pButton [disabled]="submitting" (click)="publishNow()">Publish</button>
     </div>
   </form>
 </section>

@@ -5,6 +5,46 @@ import { INotificationFilterParams, INotificationResponse } from '@core/interfac
 import { PaginatedResponse } from '@core/interfaces/PaginatedResponse';
 import { BASE_URL_Community } from '@env/environment';
 
+export interface INotificationNavigationTarget {
+  commands: any[];
+  queryParams?: Record<string, any>;
+}
+
+/**
+ * Maps a notification's relatedEntityType/relatedEntityId (see the backend's
+ * NotificationCreateRequest usages - PostReactionService, PostCommentService,
+ * CommentReactionService, MentionService, MarketplaceService, GroupService,
+ * RecognitionService, TeamService, TaskService) to where clicking it should navigate. Comment-level types
+ * ("PostComment") are intentionally resolved server-side to their parent Post before
+ * they ever reach here, since there's no standalone comment page - see those services'
+ * "points at the parent Post" comments.
+ */
+export function getNotificationNavigationTarget(notification: INotificationResponse): INotificationNavigationTarget | null {
+  if (!notification.relatedEntityType || notification.relatedEntityId === null) return null;
+
+  switch (notification.relatedEntityType) {
+    case 'Post':
+      return { commands: ['/community/feed'], queryParams: { postId: notification.relatedEntityId } };
+    case 'Conversation':
+      return { commands: ['/community/marketplace/messages', notification.relatedEntityId] };
+    case 'Listing':
+      return { commands: ['/community/marketplace/listing', notification.relatedEntityId] };
+    case 'Group':
+      return { commands: ['/community/groups', notification.relatedEntityId] };
+    case 'Recognition':
+      // No per-item recognition route exists yet - land on the wall itself.
+      return { commands: ['/community/recognitions'] };
+    case 'Team':
+      return { commands: ['/community/teams', notification.relatedEntityId] };
+    case 'Task':
+      // No per-task deep link exists yet (tasks open via dialog from the list) - land on
+      // the tasks list, same as the Recognition case above.
+      return { commands: ['/community/tasks'] };
+    default:
+      return null;
+  }
+}
+
 @Injectable({
   providedIn: 'root',
 })

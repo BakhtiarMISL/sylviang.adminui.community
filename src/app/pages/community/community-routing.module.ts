@@ -16,6 +16,9 @@ import { SurveysComponent } from './surveys/surveys.component';
 import { SurveyBuilderComponent } from './surveys/survey-builder/survey-builder.component';
 import { SurveyTakeComponent } from './surveys/survey-take/survey-take.component';
 import { SurveyResultsComponent } from './surveys/survey-results/survey-results.component';
+import { TeamsListComponent } from './teams/teams-list/teams-list.component';
+import { TeamDetailComponent } from './teams/team-detail/team-detail.component';
+import { TasksHomeComponent } from './tasks/tasks-home/tasks-home.component';
 
 const routes: Routes = [
   {
@@ -102,6 +105,21 @@ const routes: Routes = [
   {
     path: 'marketplace/:id/edit',
     component: ListingFormComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'teams',
+    component: TeamsListComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'teams/:id',
+    component: TeamDetailComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'tasks',
+    component: TasksHomeComponent,
     canActivate: [authGuard],
   },
 ];

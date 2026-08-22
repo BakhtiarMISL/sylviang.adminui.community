@@ -253,6 +253,22 @@
 .p-button-text.p-button-danger:not(:disabled):hover {
   @apply bg-danger-500 dark:bg-danger-700;
 }
+// Icon-only/text danger buttons (e.g. row delete actions) have no background, so the
+// global .p-button icon/span forced-white rule above leaves them invisible on a light
+// page background - give them the danger color at rest, white only once the hover
+// background (above) makes white legible again.
+.p-button-text.p-button-danger:not(:disabled) {
+  i,
+  span {
+    @apply text-danger-500 dark:text-danger-400;
+  }
+}
+.p-button-text.p-button-danger:not(:disabled):hover {
+  i,
+  span {
+    @apply text-white;
+  }
+}
 .p-button-secondary {
   @apply bg-neutral hover:bg-borderDark border-neutral text-white border-none !important;
 }

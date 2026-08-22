@@ -4,6 +4,7 @@ import { CurrentUserService } from '@core/services/current-user.service';
 import { SurveyService } from '@core/services/community/survey.service';
 import { SurveyResponseTrackerService } from '@core/services/community/survey-response-tracker.service';
 import { ToastService } from '@core/services/misc/toast.service';
+import { TimeTickerService } from '@core/services/misc/time-ticker.service';
 
 /**
  * A response-count / participation preview isn't shown here on purpose - computing it would
@@ -27,6 +28,7 @@ export class SurveyCardComponent {
     private currentUserService: CurrentUserService,
     private responseTracker: SurveyResponseTrackerService,
     private toastService: ToastService,
+    public timeTicker: TimeTickerService,
   ) {}
 
   get isHrOrAdmin(): boolean {

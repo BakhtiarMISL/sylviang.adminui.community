@@ -1,0 +1,34 @@
+<section class="page-container" *ngIf="!loading && team">
+  <div class="detail-header">
+    <div>
+      <h1 class="title">{{ team.name }}</h1>
+      <p class="description">{{ team.description }}</p>
+      <p class="supervisor" *ngIf="team.supervisorId">Supervisor: {{ supervisorName ?? '...' }}</p>
+    </div>
+    <div class="header-actions" *ngIf="canManage">
+      <button pButton size="small" severity="secondary" (click)="openEditDialog()"><i class="fa-solid fa-pen"></i> Edit</button>
+      <button pButton size="small" severity="danger" (click)="deleteTeam()"><i class="fa-solid fa-trash"></i> Delete</button>
+    </div>
+  </div>
+
+  <p-tabView>
+    <p-tabPanel header="Members">
+      <app-team-members-tab
+        [teamId]="teamId"
+        [members]="members"
+        [membersLoading]="membersLoading"
+        [canManage]="canManage"
+        (membersChanged)="loadMembers()"
+      ></app-team-members-tab>
+    </p-tabPanel>
+    <p-tabPanel header="Task Board">
+      <app-task-board mode="team" [teamId]="teamId" [teamMembers]="members" [canManage]="canManage"></app-task-board>
+    </p-tabPanel>
+  </p-tabView>
+</section>
+
+<div *ngIf="loading" class="page-container">
+  <p-skeleton width="100%" height="8rem"></p-skeleton>
+</div>
+
+<app-team-form-dialog [(visible)]="showEditDialog" [teamId]="teamId" [editingTeam]="team" (saved)="onTeamSaved()"></app-team-form-dialog>

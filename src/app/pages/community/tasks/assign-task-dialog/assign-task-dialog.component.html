@@ -1,0 +1,97 @@
+<p-dialog
+  [header]="isTeamMode ? 'Assign Team Task' : 'Assign Individual Task'"
+  [(visible)]="visible"
+  [modal]="true"
+  [style]="{ width: '34rem' }"
+  (onHide)="close()"
+>
+  <div class="assign-form">
+    <label>Title</label>
+    <input pInputText type="text" placeholder="Task title" [(ngModel)]="title" />
+
+    <label>Description</label>
+    <textarea pTextarea rows="2" placeholder="Details (optional)" [(ngModel)]="description"></textarea>
+
+    <div class="fields-row">
+      <div class="field">
+        <label>Priority</label>
+        <p-select [options]="['Low', 'Medium', 'High']" [(ngModel)]="priority"></p-select>
+      </div>
+      <div class="field">
+        <label>Due Date</label>
+        <p-datepicker [(ngModel)]="dueDate" dateFormat="dd-M-yy" [showIcon]="true"></p-datepicker>
+      </div>
+      <div class="field">
+        <label>Reminder (days before due)</label>
+        <input pInputText type="number" min="1" max="14" [(ngModel)]="reminderDays" />
+      </div>
+    </div>
+
+    <ng-container *ngIf="!isTeamMode">
+      <label>Filter by</label>
+      <div class="fields-row">
+        <p-select
+          [options]="departments"
+          optionLabel="name"
+          optionValue="departmentId"
+          placeholder="Department"
+          [showClear]="true"
+          [(ngModel)]="selectedDepartmentId"
+          (onChange)="searchDirectory()"
+          (onClear)="searchDirectory()"
+        ></p-select>
+        <p-select
+          [options]="branches"
+          optionLabel="name"
+          optionValue="branchId"
+          placeholder="Branch"
+          [showClear]="true"
+          [(ngModel)]="selectedBranchId"
+          (onChange)="searchDirectory()"
+          (onClear)="searchDirectory()"
+        ></p-select>
+        <button pButton size="small" severity="secondary" (click)="searchDirectory()">Search</button>
+      </div>
+
+      <label>Assignees</label>
+      <p-multiSelect
+        [options]="directoryResults"
+        optionLabel="employeeName"
+        optionValue="employeeId"
+        placeholder="Select employees..."
+        [(ngModel)]="selectedAssigneeIds"
+        [filter]="true"
+      ></p-multiSelect>
+    </ng-container>
+
+    <ng-container *ngIf="isTeamMode">
+      <label>Assignees</label>
+      <p-multiSelect
+        [options]="teamMemberOptions"
+        optionLabel="label"
+        optionValue="employeeId"
+        placeholder="Select team members..."
+        [(ngModel)]="selectedAssigneeIds"
+        [filter]="true"
+      ></p-multiSelect>
+    </ng-container>
+
+    <div class="recurring-block" *ngIf="isHrOrAdmin">
+      <div class="recurring-toggle">
+        <p-checkbox [binary]="true" [(ngModel)]="recurringEnabled" inputId="recurring"></p-checkbox>
+        <label for="recurring">Repeat this task</label>
+      </div>
+      <div class="fields-row recurring-interval-row" *ngIf="recurringEnabled">
+        <p-select [options]="['Daily', 'Weekly', 'Monthly']" [(ngModel)]="recurringFrequency"></p-select>
+        <span>Every</span>
+        <input pInputText type="number" min="1" [(ngModel)]="recurringInterval" />
+        <span>{{ recurringIntervalUnitLabel }}</span>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button pButton size="small" [disabled]="!canSubmit" (click)="submit()">Assign</button>
+      <button pButton size="small" severity="secondary" (click)="close()">Cancel</button>
+    </div>
+  </div>
+</p-dialog>

@@ -1,0 +1,66 @@
+.assign-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+  }
+}
+
+.fields-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+
+    label {
+      margin-top: 0;
+    }
+  }
+
+  > p-select,
+  > input {
+    flex: 1;
+  }
+}
+
+.recurring-interval-row {
+  align-items: center;
+
+  span {
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  input {
+    flex: 0 0 4rem;
+    width: 4rem;
+  }
+}
+
+.recurring-block {
+  margin-top: 0.75rem;
+  padding: 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--p-content-border-color);
+}
+
+.recurring-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}

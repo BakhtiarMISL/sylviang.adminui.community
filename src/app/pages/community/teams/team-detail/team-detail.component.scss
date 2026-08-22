@@ -1,0 +1,74 @@
+:host {
+  // PrimeNG's Aura theme ties the tab list/panel backgrounds to the `content.background`
+  // design token, which follows the OS/browser's prefers-color-scheme (PrimeNG's own
+  // darkModeSelector defaults to "system") rather than this app's own theme toggle - so it
+  // can render dark even while the app is visibly in light mode, making the inactive
+  // "Members"/"Task Board" label unreadable. Same fix as surveys.component.scss, adapted to
+  // keep .p-tabpanels visible since the Members/Task Board content renders inside it.
+  ::ng-deep .p-tablist-tab-list {
+    background: #ffffff;
+  }
+
+  ::ng-deep .p-tabpanels {
+    background: transparent;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active) {
+    color: #000000;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active):not(.p-disabled):hover {
+    background: transparent;
+    border-color: transparent;
+    color: #000000;
+  }
+}
+
+:host-context(.dark) {
+  ::ng-deep .p-tablist-tab-list {
+    background: #1f2937;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active) {
+    color: #e5e7eb;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active):not(.p-disabled):hover {
+    color: #e5e7eb;
+  }
+}
+
+.page-container {
+  padding: 1.5rem;
+}
+
+.detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.description {
+  color: var(--p-text-muted-color);
+  margin: 0.25rem 0 0;
+}
+
+.supervisor {
+  color: var(--p-text-muted-color);
+  font-size: 0.875rem;
+  margin: 0.25rem 0 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.5rem;
+}

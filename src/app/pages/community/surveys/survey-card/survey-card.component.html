@@ -4,11 +4,19 @@
       <div class="title-line">
         <span class="title">{{ survey.title }}</span>
         <span class="badge type-badge">{{ survey.surveyType }}</span>
-        <span class="badge status-badge" [ngClass]="survey.status.toLowerCase()">{{ survey.status }}</span>
+        <span class="badge status-badge" [ngClass]="'status-' + survey.status.toLowerCase()">{{ survey.status }}</span>
         <span class="badge anon-badge" *ngIf="survey.isAnonymous"><i class="fa-solid fa-user-secret"></i> Anonymous</span>
         <span class="badge external-badge" *ngIf="survey.externalUrl"><i class="fa-solid fa-arrow-up-right-from-square"></i> External</span>
       </div>
       <p class="description" *ngIf="survey.description">{{ survey.description }}</p>
+      <div class="meta-times" *ngIf="survey.publishedAt || survey.closedAt">
+        <span class="meta-time" *ngIf="survey.publishedAt" [title]="survey.publishedAt | date: 'medium'">
+          <i class="fa-solid fa-paper-plane"></i> Published {{ survey.publishedAt | relativeTime: (timeTicker.now$ | async) }}
+        </span>
+        <span class="meta-time" *ngIf="survey.closedAt" [title]="survey.closedAt | date: 'medium'">
+          <i class="fa-solid fa-lock"></i> Closed {{ survey.closedAt | relativeTime: (timeTicker.now$ | async) }}
+        </span>
+      </div>
     </div>
   </div>
 

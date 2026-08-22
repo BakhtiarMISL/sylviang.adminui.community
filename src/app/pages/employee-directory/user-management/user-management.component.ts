@@ -6,6 +6,7 @@ import { BreadcrumbService } from '@core/services/breadcrumb.service';
 import { EmployeeService } from '@core/services/employee-directory/employee/employee.service';
 import { ToastService } from '@core/services/misc/toast.service';
 import { ConfirmationService, SortEvent } from 'primeng/api';
+import { GrantAccessDialogMode } from './grant-access-dialog/grant-access-dialog.component';
 import { StatusFilterOptions, UserManagementColumns } from './user-management.component.constants';
 
 /**
@@ -53,6 +54,10 @@ export class UserManagementComponent implements OnInit {
 
   filtersCollapsed = false;
   tableCollapsed = true;
+
+  showGrantAccessDialog = false;
+  selectedEmployeeForAccess: IEmployeeManagementRowResponse | null = null;
+  grantAccessDialogMode: GrantAccessDialogMode = 'grant';
 
   get skeletonItems() {
     return Array(this.rows)
@@ -153,6 +158,25 @@ export class UserManagementComponent implements OnInit {
     this.sortDirection = event.order === 1 ? 'asc' : 'desc';
     this.currentPage = 1;
     this.loadEmployees();
+  }
+
+  openGrantAccessDialog(employee: IEmployeeManagementRowResponse): void {
+    this.selectedEmployeeForAccess = employee;
+    this.grantAccessDialogMode = 'grant';
+    this.showGrantAccessDialog = true;
+  }
+
+  openResetPasswordDialog(employee: IEmployeeManagementRowResponse): void {
+    this.selectedEmployeeForAccess = employee;
+    this.grantAccessDialogMode = 'reset';
+    this.showGrantAccessDialog = true;
+  }
+
+  onGrantAccessDialogVisibilityChange(visible: boolean): void {
+    this.showGrantAccessDialog = visible;
+    if (!visible) {
+      this.loadEmployees();
+    }
   }
 
   deactivateEmployee(employee: IEmployeeManagementRowResponse, event: Event): void {

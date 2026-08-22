@@ -27,9 +27,12 @@ type TabKey = 'active' | 'pending' | 'drafts' | 'closed';
 export class SurveysComponent implements OnInit {
   surveys: ISurveyResponse[] = [];
   loading = true;
+  loadError = false;
   activeTabKey: TabKey = 'active';
   typeFilter: string | null = null;
   UI_CONFIG = UI_CONFIG;
+  pageRows: number = UI_CONFIG.defaultPageSize;
+  currentPage = 1;
 
   constructor(
     private surveyService: SurveyService,
@@ -84,10 +87,26 @@ export class SurveysComponent implements OnInit {
 
   onTabChange(index: number): void {
     this.activeTabKey = this.visibleTabs[index] ?? 'active';
+    this.currentPage = 1;
+  }
+
+  onTypeFilterChange(): void {
+    this.currentPage = 1;
   }
 
   onSurveyChanged(): void {
     this.loadSurveys();
+  }
+
+  /** Client-side pagination over an already-bucketed tab list - see C1 in the survey UI audit. */
+  pagedList(list: ISurveyResponse[]): ISurveyResponse[] {
+    const start = (this.currentPage - 1) * this.pageRows;
+    return list.slice(start, start + this.pageRows);
+  }
+
+  onPageChange(event: { first: number; rows: number }): void {
+    this.pageRows = event.rows;
+    this.currentPage = Math.floor(event.first / event.rows) + 1;
   }
 
   private applyTypeFilter(list: ISurveyResponse[]): ISurveyResponse[] {
@@ -96,16 +115,23 @@ export class SurveysComponent implements OnInit {
 
   private loadSurveys(): void {
     this.loading = true;
+    this.loadError = false;
     const params: ISurveyFilterParams = { page: 1, pageSize: 100, sortBy: 'CreatedAt', sortDirection: 'desc' };
 
     this.surveyService.getPaged(params).subscribe({
       next: (response) => {
-        this.surveys = !response.hasError && response.content ? response.content.data || [] : [];
+        if (!response.hasError && response.content) {
+          this.surveys = response.content.data || [];
+        } else {
+          this.surveys = [];
+          this.loadError = true;
+        }
         this.loading = false;
         this.cdr.detectChanges();
       },
       error: () => {
         this.surveys = [];
+        this.loadError = true;
         this.loading = false;
         this.cdr.detectChanges();
       },

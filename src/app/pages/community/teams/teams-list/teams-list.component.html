@@ -1,0 +1,65 @@
+<section class="page-container">
+  <div class="teams-header">
+    <h1 class="title">Teams</h1>
+    <div class="teams-header-actions">
+      <input pInputText type="text" placeholder="Search teams..." [ngModel]="searchTerm" (ngModelChange)="onSearchInput($event)" />
+      <button *ngIf="canCreateTeam" pButton (click)="openCreateDialog()"><i class="fa-solid fa-plus"></i> Create Team</button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <p-table
+      [value]="loading ? skeletonItems : teams"
+      dataKey="teamId"
+      [paginator]="true"
+      [rows]="rows"
+      [first]="(currentPage - 1) * rows"
+      [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+      [totalRecords]="totalRecords"
+      (onPage)="onPageChange($event)"
+      [lazy]="true"
+      [loading]="false"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} teams"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Name</th>
+          <th>Description</th>
+          <th></th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-team>
+        @if (loading) {
+          <tr>
+            <td colspan="3" class="p-4"><p-skeleton width="100%" height="2.5rem"></p-skeleton></td>
+          </tr>
+        } @else {
+          <tr class="team-row" (click)="openTeam(team)">
+            <td class="name-cell">{{ team.name }}</td>
+            <td class="description-cell">{{ team.description }}</td>
+            <td class="actions-cell" (click)="$event.stopPropagation()">
+              <button *ngIf="canManage(team)" pButton size="small" severity="danger" [text]="true" (click)="deleteTeam(team, $event)">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        }
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="3" class="not-found">
+            <div>
+              <i class="fa-solid fa-people-arrows"></i>
+              <p>No teams yet.</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</section>
+
+<app-team-form-dialog [(visible)]="showCreateDialog" [teamId]="null" (saved)="onTeamCreated()"></app-team-form-dialog>

@@ -2,10 +2,10 @@ export interface ISurveyAnswerSubmitRequest {
   questionId: number;
   optionId?: number | null;
   answerText?: string | null;
+  ratingValue?: number | null;
 }
 
 export interface ISurveySubmissionRequest {
-  employeeId: number;
   answers: ISurveyAnswerSubmitRequest[];
 }
 
@@ -15,12 +15,14 @@ export interface ISurveyAnswerResponse {
   questionId: number;
   optionId: number | null;
   answerText: string | null;
+  ratingValue: number | null;
 }
 
 export interface ISurveySubmissionResponse {
   responseId: number;
   surveyId: number;
-  employeeId: number;
+  /** Null when the parent survey is anonymous - the backend never exposes identity for those. */
+  employeeId: number | null;
   submittedAt: string;
   completionStatus: string;
   answers: ISurveyAnswerResponse[];

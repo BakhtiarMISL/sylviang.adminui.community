@@ -52,6 +52,18 @@
   }
 }
 
+// No global .invalid style exists in this codebase (manage-employee.component.scss, the pattern
+// this form otherwise follows, doesn't define one either) - defined locally so inline validation
+// errors are actually visible, not just present in the DOM.
+.invalid {
+  font-size: 0.78rem;
+  color: #dc2626;
+}
+
+:host-context(.dark) .invalid {
+  color: #f87171;
+}
+
 .toggle-row {
   display: flex;
   align-items: center;

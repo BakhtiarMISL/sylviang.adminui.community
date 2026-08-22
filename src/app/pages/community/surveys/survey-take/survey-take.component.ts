@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiResponse } from '@core/interfaces/ApiResponse';
+import { RATING_SCALE } from '@core/constants/community/survey-types';
 import { ISurveyQuestionResponse, ISurveyResponse } from '@core/interfaces/community/survey.interface';
 import { ISurveyAnswerSubmitRequest } from '@core/interfaces/community/survey-response.interface';
 import { SurveyService } from '@core/services/community/survey.service';
@@ -13,12 +14,17 @@ import { ToastService } from '@core/services/misc/toast.service';
 interface AnswerFormItem {
   questionId: number;
   selectedOptionId: number | null;
-  selectedOptionIds: number[];
+  /**
+   * Keyed by optionId, not an array of selected ids - a p-checkbox needs to two-way bind
+   * directly to a stable per-option boolean (matching badge-management.component.html's
+   * pattern for a per-row checkbox in a *ngFor). Binding instead to a method call re-evaluated
+   * every change-detection cycle (the previous selectedOptionIds + isOptionSelected() approach)
+   * caused the checkboxes to lag and occasionally flicker/unselect under rapid clicks.
+   */
+  optionSelections: Record<number, boolean>;
   answerText: string;
   ratingValue: number | null;
 }
-
-export const RATING_SCALE = [1, 2, 3, 4, 5];
 
 /**
  * US-5.5: take a survey. There's no "have I already responded" read endpoint for a
@@ -38,6 +44,7 @@ export class SurveyTakeComponent implements OnInit {
   questions: ISurveyQuestionResponse[] = [];
   answers: AnswerFormItem[] = [];
   loading = true;
+  loadError = false;
   submitting = false;
   alreadySubmitted = false;
   ratingScale = RATING_SCALE;
@@ -67,7 +74,7 @@ export class SurveyTakeComponent implements OnInit {
         case 'SingleChoice':
           return answer.selectedOptionId !== null;
         case 'MultipleChoice':
-          return answer.selectedOptionIds.length > 0;
+          return Object.values(answer.optionSelections).some(Boolean);
         case 'Rating':
           return answer.ratingValue !== null;
         default:
@@ -82,18 +89,6 @@ export class SurveyTakeComponent implements OnInit {
     this.load();
   }
 
-  isOptionSelected(answer: AnswerFormItem, optionId: number): boolean {
-    return answer.selectedOptionIds.includes(optionId);
-  }
-
-  toggleOption(answer: AnswerFormItem, optionId: number): void {
-    if (answer.selectedOptionIds.includes(optionId)) {
-      answer.selectedOptionIds = answer.selectedOptionIds.filter((id) => id !== optionId);
-    } else {
-      answer.selectedOptionIds = [...answer.selectedOptionIds, optionId];
-    }
-  }
-
   submit(): void {
     const employeeId = this.currentEmployeeId;
     if (employeeId === null || !this.canSubmit) return;
@@ -106,16 +101,18 @@ export class SurveyTakeComponent implements OnInit {
       if (question.questionType === 'SingleChoice' && answer.selectedOptionId !== null) {
         answers.push({ questionId: question.questionId, optionId: answer.selectedOptionId });
       } else if (question.questionType === 'MultipleChoice') {
-        answer.selectedOptionIds.forEach((optionId) => answers.push({ questionId: question.questionId, optionId }));
+        question.options
+          .filter((o) => answer.optionSelections[o.optionId])
+          .forEach((o) => answers.push({ questionId: question.questionId, optionId: o.optionId }));
       } else if (question.questionType === 'Rating' && answer.ratingValue !== null) {
-        answers.push({ questionId: question.questionId, answerText: String(answer.ratingValue) });
+        answers.push({ questionId: question.questionId, ratingValue: answer.ratingValue });
       } else if (answer.answerText.trim()) {
         answers.push({ questionId: question.questionId, answerText: answer.answerText.trim() });
       }
     }
 
     this.submitting = true;
-    this.surveyResponseService.submit(this.surveyId, { employeeId, answers }).subscribe({
+    this.surveyResponseService.submit(this.surveyId, { answers }).subscribe({
       next: (response) => this.handleSubmitResponse(response, employeeId, 'Could not submit your response.'),
       error: () => {
         this.submitting = false;
@@ -135,7 +132,7 @@ export class SurveyTakeComponent implements OnInit {
     if (employeeId === null || this.submitting) return;
 
     this.submitting = true;
-    this.surveyResponseService.submit(this.surveyId, { employeeId, answers: [] }).subscribe({
+    this.surveyResponseService.submit(this.surveyId, { answers: [] }).subscribe({
       next: (response) => this.handleSubmitResponse(response, employeeId, 'Could not mark this survey as completed.'),
       error: () => {
         this.submitting = false;
@@ -161,8 +158,17 @@ export class SurveyTakeComponent implements OnInit {
 
   private load(): void {
     this.loading = true;
-    this.surveyService.getById(this.surveyId).subscribe((response) => {
-      this.survey = !response.hasError && response.content ? response.content : null;
+    this.loadError = false;
+
+    this.surveyService.getById(this.surveyId).subscribe({
+      next: (response) => {
+        this.survey = !response.hasError && response.content ? response.content : null;
+        if (!this.survey) this.loadError = true;
+      },
+      error: () => {
+        this.survey = null;
+        this.loadError = true;
+      },
     });
 
     this.surveyQuestionService.getAll(this.surveyId).subscribe({
@@ -173,7 +179,7 @@ export class SurveyTakeComponent implements OnInit {
         this.answers = this.questions.map((q) => ({
           questionId: q.questionId,
           selectedOptionId: null,
-          selectedOptionIds: [],
+          optionSelections: {},
           answerText: '',
           ratingValue: null,
         }));
@@ -181,6 +187,7 @@ export class SurveyTakeComponent implements OnInit {
       },
       error: () => {
         this.questions = [];
+        this.loadError = true;
         this.loading = false;
       },
     });

@@ -96,6 +96,18 @@ export const webSidebarMenuItems: IMenuItem[] = [
         icon: 'fa-solid fa-store',
       },
       {
+        href: '/community/teams',
+        title: 'Teams',
+        active: false,
+        icon: 'fa-solid fa-people-arrows',
+      },
+      {
+        href: '/community/tasks',
+        title: 'Tasks',
+        active: false,
+        icon: 'fa-solid fa-list-check',
+      },
+      {
         href: '/community/surveys',
         title: 'Surveys',
         active: false,

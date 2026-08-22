@@ -71,6 +71,7 @@ export interface IEmployeeManagementRowResponse {
   siteId: number | null;
   siteName: string | null;
   isActive: boolean;
+  hasCredential: boolean;
 }
 
 export interface IEmployeeResponse {
@@ -106,6 +107,23 @@ export interface IEmployeeResponse {
   contactLinks: IEmployeeContactLink[];
 
   isOwnProfile: boolean;
+}
+
+export interface IEmployeeCredentialCreateRequest {
+  username: string;
+  temporaryPassword: string;
+  role?: string;
+}
+
+export interface IEmployeeCredentialResponse {
+  employeeId: number;
+  username: string;
+  keycloakUserId: string;
+  assignedRole: string;
+}
+
+export interface IEmployeeCredentialResetPasswordRequest {
+  temporaryPassword: string;
 }
 
 export interface IEmployeeFilterParams {

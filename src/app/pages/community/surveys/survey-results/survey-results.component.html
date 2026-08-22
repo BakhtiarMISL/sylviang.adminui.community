@@ -4,55 +4,162 @@
     <p-skeleton width="100%" height="8rem"></p-skeleton>
   </div>
 
+  <p-message *ngIf="!loading && loadError" severity="error" styleClass="w-full mb-4">Couldn't load this survey's results. Please try again.</p-message>
+
   <ng-container *ngIf="!loading && survey && results">
     <div class="results-header">
       <h1>{{ survey.title }} - Results</h1>
       <span class="badge anon-badge" *ngIf="survey.isAnonymous"><i class="fa-solid fa-user-secret"></i> Anonymous survey - no per-respondent breakdown</span>
     </div>
 
-    <div class="summary-row">
-      <div class="summary-tile">
-        <span class="tile-value">{{ results.totalResponses }}</span>
-        <span class="tile-label">Total Responses</span>
-      </div>
-      <div class="summary-tile">
-        <span class="tile-value">{{ results.participationRate !== null ? results.participationRate + '%' : 'N/A' }}</span>
-        <span class="tile-label">Participation Rate</span>
-      </div>
-    </div>
-    <p class="rate-note" *ngIf="results.participationRate === null">
-      Participation rate isn't available for Department/Branch-scoped surveys yet - only company-wide surveys can compute it today.
-    </p>
-
-    <div class="question-result" *ngFor="let question of results.questions; let qIndex = index">
-      <div class="question-text">{{ qIndex + 1 }}. {{ question.questionText }}</div>
-
-      <div class="option-result" *ngFor="let option of question.options">
-        <div class="option-row">
-          <span class="option-text">{{ option.optionText }}</span>
-          <span class="option-count">{{ option.count }} ({{ option.percentage }}%)</span>
+    <p-tabView>
+      <p-tabPanel header="Aggregate Results">
+        <div class="summary-row">
+          <div class="summary-tile">
+            <span class="tile-value">{{ results.totalResponses }}</span>
+            <span class="tile-label">Total Responses</span>
+          </div>
+          <div class="summary-tile">
+            <span class="tile-value">{{ results.participationRate !== null ? (results.participationRate | number: '1.0-1') + '%' : 'N/A' }}</span>
+            <span class="tile-label">Participation Rate</span>
+          </div>
         </div>
-        <p-progressBar [value]="option.percentage" [showValue]="false"></p-progressBar>
-      </div>
+        <p class="rate-note" *ngIf="results.participationRate === null">
+          Participation rate isn't available for this survey - no audience/eligible-headcount is defined for it yet.
+        </p>
 
-      <ul class="text-answers" *ngIf="question.textAnswers.length > 0">
-        <li *ngFor="let answer of question.textAnswers">{{ answer }}</li>
-      </ul>
+        <div class="question-result" *ngFor="let question of results.questions; let qIndex = index">
+          <div class="question-text">
+            {{ qIndex + 1 }}. {{ question.questionText }}
+            <i
+              *ngIf="question.questionType === 'MultipleChoice'"
+              class="fa-solid fa-circle-info percentage-info"
+              pTooltip="Respondents can select multiple options, so percentages may add up to more than 100%."
+              tooltipPosition="top"
+            ></i>
+            <i
+              *ngIf="question.questionType === 'SingleChoice'"
+              class="fa-solid fa-circle-info percentage-info"
+              pTooltip="Percentages are of respondents who answered this question and add up to 100%."
+              tooltipPosition="top"
+            ></i>
+          </div>
 
-      <div class="not-found" *ngIf="question.options.length === 0 && question.textAnswers.length === 0">
-        <div><p>No answers yet for this question.</p></div>
-      </div>
-    </div>
+          <div class="option-result" *ngFor="let option of question.options">
+            <div class="option-row">
+              <span class="option-text">{{ option.optionText }}</span>
+              <span class="option-count">{{ option.count }} ({{ option.percentage | number: '1.0-1' }}%)</span>
+            </div>
+            <p-progressBar [value]="option.percentage" [showValue]="false"></p-progressBar>
+          </div>
 
-    <div class="not-found" *ngIf="results.questions.length === 0 && survey.externalUrl">
-      <div>
-        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-        <p>This is an external survey - responses are collected on the external platform; only completion counts are tracked in CES.</p>
-      </div>
-    </div>
+          <div class="rating-result" *ngIf="question.rating as rating">
+            <div class="rating-average">
+              <span class="tile-value">{{ rating.averageValue | number: '1.1-2' }}</span>
+              <span class="tile-label">Average rating (out of 5)</span>
+            </div>
+            <div class="option-result" *ngFor="let entry of ratingDistributionEntries(rating.distribution)">
+              <div class="option-row">
+                <span class="option-text">{{ entry.value }} star{{ entry.value === 1 ? '' : 's' }}</span>
+                <span class="option-count">{{ entry.count }}</span>
+              </div>
+              <p-progressBar
+                [value]="results.totalResponses > 0 ? (entry.count / results.totalResponses) * 100 : 0"
+                [showValue]="false"
+              ></p-progressBar>
+            </div>
+          </div>
 
-    <div class="not-found" *ngIf="results.questions.length === 0 && !survey.externalUrl">
-      <div><i class="fa-solid fa-chart-column"></i><p>No questions to report on.</p></div>
-    </div>
+          <ng-container *ngIf="question.textAnswers.length > 0">
+            <ul class="text-answers">
+              <li *ngFor="let answer of (isTextAnswersExpanded(question.questionId) ? question.textAnswers : question.textAnswers.slice(0, textAnswersPreviewCount))">
+                {{ answer }}
+              </li>
+            </ul>
+            <button
+              type="button"
+              pButton
+              severity="secondary"
+              text
+              *ngIf="!isTextAnswersExpanded(question.questionId) && question.textAnswers.length > textAnswersPreviewCount"
+              (click)="showAllTextAnswers(question.questionId)"
+            >
+              Show all ({{ question.textAnswers.length }})
+            </button>
+          </ng-container>
+
+          <div class="not-found" *ngIf="question.options.length === 0 && question.textAnswers.length === 0 && !question.rating">
+            <div><p>No answers yet for this question.</p></div>
+          </div>
+        </div>
+
+        <div class="not-found" *ngIf="results.questions.length === 0 && survey.externalUrl">
+          <div>
+            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            <p>This is an external survey - responses are collected on the external platform; only completion counts are tracked in CES.</p>
+          </div>
+        </div>
+
+        <div class="not-found" *ngIf="results.questions.length === 0 && !survey.externalUrl">
+          <div><i class="fa-solid fa-chart-column"></i><p>No questions to report on.</p></div>
+        </div>
+      </p-tabPanel>
+
+      <p-tabPanel header="Individual Responses">
+        <p-message *ngIf="!responsesLoading && responsesError" severity="error" styleClass="w-full mb-4">
+          Couldn't load individual responses. Please try again.
+        </p-message>
+
+        <div class="table-container">
+          <p-table
+            [value]="responses"
+            dataKey="responseId"
+            [paginator]="true"
+            [rows]="responsesRows"
+            [first]="(responsesCurrentPage - 1) * responsesRows"
+            [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+            [totalRecords]="responsesTotalRecords"
+            (onPage)="onResponsesPageChange($event)"
+            [lazy]="true"
+            [loading]="responsesLoading"
+            [responsiveLayout]="'scroll'"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} responses"
+          >
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Respondent</th>
+                <th>Submitted</th>
+                <th>Status</th>
+                <th>Answers</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-response>
+              <tr>
+                <td>
+                  <span *ngIf="survey.isAnonymous" class="anon-respondent"><i class="fa-solid fa-user-secret"></i> Anonymous</span>
+                  <span *ngIf="!survey.isAnonymous">{{ response.employeeId !== null ? ('Employee #' + response.employeeId) : 'Anonymous' }}</span>
+                </td>
+                <td>{{ response.submittedAt | date: 'dd-MMM-yyyy HH:mm' }}</td>
+                <td>{{ response.completionStatus }}</td>
+                <td>{{ response.answers.length }}</td>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="4" class="not-found">
+                  <div>
+                    <i class="fa-solid fa-inbox"></i>
+                    <p>No responses yet.</p>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
   </ng-container>
 </section>
