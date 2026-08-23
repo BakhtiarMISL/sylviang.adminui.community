@@ -1,0 +1,69 @@
+:host {
+  display: block;
+
+  // PrimeNG's Aura theme ties the tab list/panel backgrounds to the `content.background`
+  // design token, which follows the OS/browser's prefers-color-scheme (PrimeNG's own
+  // darkModeSelector defaults to "system") rather than this app's own theme toggle - so it
+  // can render dark even while the app is visibly in light mode. Same fix as group-detail.component.scss,
+  // the only other page using p-tabview, adapted to keep .p-tabpanels visible since the
+  // survey cards render inside it (group-detail hides its panels and renders content elsewhere).
+  ::ng-deep .p-tablist-tab-list {
+    background: #ffffff;
+  }
+
+  ::ng-deep .p-tabpanels {
+    background: transparent;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active) {
+    color: #000000;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active):not(.p-disabled):hover {
+    background: transparent;
+    border-color: transparent;
+    color: #000000;
+  }
+}
+
+:host-context(.dark) {
+  ::ng-deep .p-tablist-tab-list {
+    background: #1f2937;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active) {
+    color: #e5e7eb;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active):not(.p-disabled):hover {
+    color: #e5e7eb;
+  }
+}
+
+.surveys-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .type-filter {
+    min-width: 10rem;
+  }
+}
+
+.skeleton-list {
+  margin-top: 1rem;
+}

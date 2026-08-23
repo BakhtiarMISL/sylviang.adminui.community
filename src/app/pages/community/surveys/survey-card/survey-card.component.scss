@@ -1,0 +1,138 @@
+.survey-card {
+  background: var(--surface-elevated);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1rem;
+
+  &.mandatory {
+    box-shadow:
+      0 0 0 1px rgba(239, 68, 68, 0.3),
+      0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+}
+
+.title-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.description {
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  opacity: 0.85;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+}
+
+.type-badge {
+  background: rgba(99, 102, 241, 0.15);
+  color: #4338ca;
+}
+
+.status-badge {
+  &.status-draft {
+    background: rgba(148, 163, 184, 0.2);
+    color: #475569;
+  }
+  &.status-published {
+    background: rgba(34, 197, 94, 0.15);
+    color: #15803d;
+  }
+  &.status-closed {
+    background: rgba(100, 116, 139, 0.2);
+    color: #334155;
+  }
+}
+
+.anon-badge {
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+}
+
+.submitted-badge {
+  background: rgba(34, 197, 94, 0.15);
+  color: #15803d;
+}
+
+.external-badge {
+  background: rgba(14, 165, 233, 0.15);
+  color: #0369a1;
+}
+
+// Badge text colors above are tuned for a light --surface-elevated card background;
+// re-tune to lighter tones so they stay legible once the card goes dark (see
+// theme.service.ts's _darkThemeColors, --surface-elevated: #374151).
+:host-context(.dark) {
+  .type-badge {
+    background: rgba(129, 140, 248, 0.25);
+    color: #c7d2fe;
+  }
+
+  .status-badge {
+    &.status-draft,
+    &.status-closed {
+      background: rgba(148, 163, 184, 0.3);
+      color: #e2e8f0;
+    }
+    &.status-published {
+      background: rgba(74, 222, 128, 0.25);
+      color: #86efac;
+    }
+  }
+
+  .anon-badge {
+    background: rgba(251, 191, 36, 0.25);
+    color: #fde68a;
+  }
+
+  .submitted-badge {
+    background: rgba(74, 222, 128, 0.25);
+    color: #86efac;
+  }
+
+  .external-badge {
+    background: rgba(56, 189, 248, 0.25);
+    color: #bae6fd;
+  }
+}
+
+.meta-times {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  opacity: 0.7;
+
+  .meta-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+}
+
+.survey-footer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-primary);
+}

@@ -13,10 +13,18 @@ import { DirectoryComponent } from './directory/directory.component';
 import { ManageEmployeeComponent } from './manage-employee/manage-employee.component';
 import { ProfileEditFormComponent } from './profile/profile-edit-form/profile-edit-form.component';
 import { ProfileComponent } from './profile/profile.component';
+import { GrantAccessDialogComponent } from './user-management/grant-access-dialog/grant-access-dialog.component';
 import { UserManagementComponent } from './user-management/user-management.component';
 
 @NgModule({
-  declarations: [DirectoryComponent, ProfileComponent, ProfileEditFormComponent, ManageEmployeeComponent, UserManagementComponent],
+  declarations: [
+    DirectoryComponent,
+    ProfileComponent,
+    ProfileEditFormComponent,
+    ManageEmployeeComponent,
+    UserManagementComponent,
+    GrantAccessDialogComponent,
+  ],
   imports: [
     CommonModule,
     ReactiveFormsModule,

@@ -3,7 +3,6 @@ import { NgModule } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { SharedModule } from '@app/shared/shared.module';
-import { RelativeTimePipe } from '@core/pipes/relative-time.pipe';
 import { ButtonModule } from 'primeng/button';
 import { PanelModule } from 'primeng/panel';
 import { TabViewModule } from 'primeng/tabview';
@@ -13,7 +12,7 @@ import { NotificationPreferencesComponent } from './notification-preferences/not
 import { NotificationsRoutingModule } from './notifications-routing.module';
 
 @NgModule({
-  declarations: [NotificationCenterComponent, NotificationPreferencesComponent, RelativeTimePipe],
+  declarations: [NotificationCenterComponent, NotificationPreferencesComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,

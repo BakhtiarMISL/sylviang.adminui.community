@@ -1,0 +1,63 @@
+<div class="survey-card" [class.mandatory]="survey.isMandatory">
+  <div class="survey-header">
+    <div class="header-text">
+      <div class="title-line">
+        <span class="title">{{ survey.title }}</span>
+        <span class="badge type-badge">{{ survey.surveyType }}</span>
+        <span class="badge status-badge" [ngClass]="'status-' + survey.status.toLowerCase()">{{ survey.status }}</span>
+        <span class="badge anon-badge" *ngIf="survey.isAnonymous"><i class="fa-solid fa-user-secret"></i> Anonymous</span>
+        <span class="badge external-badge" *ngIf="survey.externalUrl"><i class="fa-solid fa-arrow-up-right-from-square"></i> External</span>
+      </div>
+      <p class="description" *ngIf="survey.description">{{ survey.description }}</p>
+      <div class="meta-times" *ngIf="survey.publishedAt || survey.closedAt">
+        <span class="meta-time" *ngIf="survey.publishedAt" [title]="survey.publishedAt | date: 'medium'">
+          <i class="fa-solid fa-paper-plane"></i> Published {{ survey.publishedAt | relativeTime: (timeTicker.now$ | async) }}
+        </span>
+        <span class="meta-time" *ngIf="survey.closedAt" [title]="survey.closedAt | date: 'medium'">
+          <i class="fa-solid fa-lock"></i> Closed {{ survey.closedAt | relativeTime: (timeTicker.now$ | async) }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="survey-footer">
+    <ng-container *ngIf="isHrOrAdmin">
+      <button
+        *ngIf="survey.status === 'Draft'"
+        pButton
+        size="small"
+        severity="secondary"
+        [routerLink]="['/community/surveys', survey.surveyId, 'edit']"
+      >
+        <i class="fa-solid fa-pen"></i> Edit
+      </button>
+      <button *ngIf="survey.status === 'Draft'" pButton size="small" [disabled]="submitting" (click)="publish()">
+        <i class="fa-solid fa-paper-plane"></i> Publish
+      </button>
+      <button *ngIf="survey.status === 'Published'" pButton size="small" severity="secondary" [disabled]="submitting" (click)="close()">
+        <i class="fa-solid fa-lock"></i> Close
+      </button>
+      <button
+        *ngIf="survey.status !== 'Draft'"
+        pButton
+        size="small"
+        severity="secondary"
+        [routerLink]="['/community/surveys', survey.surveyId, 'results']"
+      >
+        <i class="fa-solid fa-chart-column"></i> Results
+      </button>
+      <button *ngIf="survey.status !== 'Closed'" pButton size="small" severity="danger" [disabled]="submitting" (click)="deleteSurvey()">
+        <i class="fa-solid fa-trash"></i> Delete
+      </button>
+    </ng-container>
+
+    <ng-container *ngIf="currentEmployeeId !== null">
+      <button *ngIf="survey.status === 'Published' && !alreadyResponded" pButton size="small" [routerLink]="['/community/surveys', survey.surveyId, 'take']">
+        <i class="fa-solid fa-square-poll-vertical"></i> Take Survey
+      </button>
+      <span class="badge submitted-badge" *ngIf="survey.status === 'Published' && alreadyResponded">
+        <i class="fa-solid fa-check"></i> Already Submitted
+      </span>
+    </ng-container>
+  </div>
+</div>

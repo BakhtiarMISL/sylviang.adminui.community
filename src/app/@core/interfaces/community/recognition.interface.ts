@@ -1,11 +1,10 @@
+import { IBadgeResponse } from '@core/interfaces/community/badge.interface';
+
 export interface IRecognitionResponse {
   recognitionId: number;
   senderId: number;
   recipientId: number;
-  badgeId: number | null;
-  badgeName: string | null;
-  badgeIcon: string | null;
-  badgeColor: string | null;
+  badges: IBadgeResponse[];
   recognitionType: string;
   coreValue: string | null;
   awardTitle: string | null;
@@ -17,7 +16,7 @@ export interface IRecognitionResponse {
 
 export interface IRecognitionCreateRequest {
   recipientId: number;
-  badgeId?: number | null;
+  badgeIds?: number[];
   recognitionType: string;
   coreValue?: string | null;
   awardTitle?: string | null;

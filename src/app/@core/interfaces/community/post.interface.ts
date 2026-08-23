@@ -12,6 +12,7 @@ export interface IPostResponse {
   isHidden: boolean;
   createdAt: string | null;
   createdBy: number | null;
+  groupId?: number | null;
 }
 
 export interface IPostCreateRequest {
@@ -22,6 +23,7 @@ export interface IPostCreateRequest {
   isAnnouncement: boolean;
   isPoll: boolean;
   mentionedEmployeeIds?: number[] | null;
+  groupId?: number | null;
 }
 
 export interface IPostUpdateRequest {

@@ -1,0 +1,109 @@
+<div class="task-board">
+  <div class="stats-row">
+    <div class="stat-card total">
+      <span class="stat-value">{{ stats.total }}</span>
+      <span class="stat-label">Total</span>
+    </div>
+    <div class="stat-card in-progress">
+      <span class="stat-value">{{ stats.inProgress }}</span>
+      <span class="stat-label">In Progress</span>
+    </div>
+    <div class="stat-card completed">
+      <span class="stat-value">{{ stats.completed }}</span>
+      <span class="stat-label">Completed</span>
+    </div>
+    <div class="stat-card overdue">
+      <span class="stat-value">{{ stats.overdue }}</span>
+      <span class="stat-label">Overdue</span>
+    </div>
+  </div>
+
+  <div class="board-toolbar">
+    <div class="filters">
+      <p-select [options]="statusOptions" placeholder="All Statuses" [showClear]="true" [(ngModel)]="statusFilter" (onChange)="onFilterChange()" (onClear)="onFilterChange()"></p-select>
+    </div>
+    <button *ngIf="canManage" pButton size="small" (click)="openAssignDialog()"><i class="fa-solid fa-plus"></i> Assign Task</button>
+  </div>
+
+  <div class="bulk-toolbar" *ngIf="canManage && selectedTasks.length > 0">
+    <span>{{ selectedTasks.length }} selected</span>
+    <p-autocomplete
+      [(ngModel)]="bulkReassignQuery"
+      [suggestions]="bulkReassignSuggestions"
+      optionLabel="employeeName"
+      placeholder="Reassign to..."
+      (completeMethod)="searchBulkReassignTarget($event)"
+      (onSelect)="onBulkReassignTargetSelect($event.value)"
+    ></p-autocomplete>
+    <button pButton size="small" [disabled]="bulkNewAssigneeId === null || bulkSubmitting" (click)="bulkReassign()">Reassign</button>
+    <button pButton size="small" severity="danger" [disabled]="bulkSubmitting" (click)="bulkCancel()">Cancel Selected</button>
+  </div>
+
+  <div class="table-container">
+    <p-table
+      [value]="loading ? skeletonItems : tasks"
+      dataKey="taskId"
+      [paginator]="true"
+      [rows]="rows"
+      [first]="(currentPage - 1) * rows"
+      [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+      [totalRecords]="totalRecords"
+      (onPage)="onPageChange($event)"
+      [lazy]="true"
+      [loading]="false"
+      [(selection)]="selectedTasks"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} tasks"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th *ngIf="canManage" style="width: 3rem"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+          <th>Title</th>
+          <th>Assignee</th>
+          <th>Priority</th>
+          <th>Due Date</th>
+          <th>Status</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-task>
+        @if (loading) {
+          <tr>
+            <td [colSpan]="canManage ? 6 : 5" class="p-4"><p-skeleton width="100%" height="2.5rem"></p-skeleton></td>
+          </tr>
+        } @else {
+          <tr class="task-row">
+            <td *ngIf="canManage" (click)="$event.stopPropagation()"><p-tableCheckbox [value]="task"></p-tableCheckbox></td>
+            <td (click)="openTask(task)">{{ task.title }}</td>
+            <td (click)="openTask(task)">{{ nameFor(task.assignedTo) }}</td>
+            <td (click)="openTask(task)">{{ task.priority }}</td>
+            <td (click)="openTask(task)">{{ task.dueDate ? (task.dueDate | date: 'dd-MMM-yyyy') : '-' }}</td>
+            <td (click)="openTask(task)">
+              <span class="badge status-badge" [ngClass]="'status-' + statusSeverity(task)">{{ task.derivedStatus }}</span>
+            </td>
+          </tr>
+        }
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td [colSpan]="canManage ? 6 : 5" class="not-found">
+            <div>
+              <i class="fa-solid fa-list-check"></i>
+              <p>No tasks yet.</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<app-assign-task-dialog
+  [(visible)]="showAssignDialog"
+  [teamId]="mode === 'team' ? teamId : null"
+  [teamMembers]="teamMembers"
+  (assigned)="onAssigned()"
+></app-assign-task-dialog>
+
+<app-task-detail-dialog [(visible)]="showDetailDialog" [taskId]="openTaskId" (changed)="onTaskChanged()"></app-task-detail-dialog>

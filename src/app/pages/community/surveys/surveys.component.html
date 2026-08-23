@@ -1,0 +1,100 @@
+<section class="page-container surveys-page">
+  <div class="surveys-header">
+    <h1>Surveys</h1>
+
+    <div class="header-actions">
+      <p-select
+        [options]="surveyTypes"
+        [(ngModel)]="typeFilter"
+        (onChange)="onTypeFilterChange()"
+        placeholder="All types"
+        [showClear]="true"
+        [appendTo]="'body'"
+        styleClass="type-filter"
+      ></p-select>
+
+      <button *ngIf="isHrOrAdmin" pButton routerLink="/community/surveys/create">
+        <i class="fa-solid fa-plus"></i>
+        Create Survey
+      </button>
+    </div>
+  </div>
+
+  <p-message *ngIf="!loading && loadError" severity="error" styleClass="w-full mb-4">
+    Couldn't load surveys. Please try again.
+  </p-message>
+
+  <p-tabView [activeIndex]="activeTabIndexForView" (onChange)="onTabChange($event.index)">
+    <p-tabPanel header="Active">
+      <div *ngIf="loading" class="skeleton-list">
+        <p-skeleton width="100%" height="6rem" styleClass="mb-3"></p-skeleton>
+        <p-skeleton width="100%" height="6rem"></p-skeleton>
+      </div>
+      <ng-container *ngIf="!loading">
+        <app-survey-card *ngFor="let survey of pagedList(activeSurveys)" [survey]="survey" (changed)="onSurveyChanged()"></app-survey-card>
+        <div class="not-found" *ngIf="activeSurveys.length === 0">
+          <div><i class="fa-solid fa-square-poll-vertical"></i><p>No active surveys right now.</p></div>
+        </div>
+        <p-paginator
+          *ngIf="activeSurveys.length > pageRows"
+          [rows]="pageRows"
+          [totalRecords]="activeSurveys.length"
+          [first]="(currentPage - 1) * pageRows"
+          [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+          (onPageChange)="onPageChange($event)"
+        ></p-paginator>
+      </ng-container>
+    </p-tabPanel>
+
+    <p-tabPanel header="Pending My Response">
+      <ng-container *ngIf="!loading">
+        <app-survey-card *ngFor="let survey of pagedList(pendingSurveys)" [survey]="survey" (changed)="onSurveyChanged()"></app-survey-card>
+        <div class="not-found" *ngIf="pendingSurveys.length === 0">
+          <div><i class="fa-solid fa-circle-check"></i><p>You're all caught up - nothing pending your response.</p></div>
+        </div>
+        <p-paginator
+          *ngIf="pendingSurveys.length > pageRows"
+          [rows]="pageRows"
+          [totalRecords]="pendingSurveys.length"
+          [first]="(currentPage - 1) * pageRows"
+          [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+          (onPageChange)="onPageChange($event)"
+        ></p-paginator>
+      </ng-container>
+    </p-tabPanel>
+
+    <p-tabPanel *ngIf="isHrOrAdmin" header="Drafts">
+      <ng-container *ngIf="!loading">
+        <app-survey-card *ngFor="let survey of pagedList(draftSurveys)" [survey]="survey" (changed)="onSurveyChanged()"></app-survey-card>
+        <div class="not-found" *ngIf="draftSurveys.length === 0">
+          <div><i class="fa-solid fa-file-pen"></i><p>No draft surveys.</p></div>
+        </div>
+        <p-paginator
+          *ngIf="draftSurveys.length > pageRows"
+          [rows]="pageRows"
+          [totalRecords]="draftSurveys.length"
+          [first]="(currentPage - 1) * pageRows"
+          [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+          (onPageChange)="onPageChange($event)"
+        ></p-paginator>
+      </ng-container>
+    </p-tabPanel>
+
+    <p-tabPanel header="Closed">
+      <ng-container *ngIf="!loading">
+        <app-survey-card *ngFor="let survey of pagedList(closedSurveys)" [survey]="survey" (changed)="onSurveyChanged()"></app-survey-card>
+        <div class="not-found" *ngIf="closedSurveys.length === 0">
+          <div><i class="fa-solid fa-box-archive"></i><p>No closed surveys yet.</p></div>
+        </div>
+        <p-paginator
+          *ngIf="closedSurveys.length > pageRows"
+          [rows]="pageRows"
+          [totalRecords]="closedSurveys.length"
+          [first]="(currentPage - 1) * pageRows"
+          [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+          (onPageChange)="onPageChange($event)"
+        ></p-paginator>
+      </ng-container>
+    </p-tabPanel>
+  </p-tabView>
+</section>

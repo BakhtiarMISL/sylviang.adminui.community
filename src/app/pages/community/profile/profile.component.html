@@ -20,20 +20,19 @@
     <app-community-profile-edit-form [employee]="employee" [saving]="saving" (save)="saveProfile($event)" (cancel)="cancelEdit()"></app-community-profile-edit-form>
   } @else {
     <div class="cover-photo-banner" [ngStyle]="employee.coverPhotoUrl ? { 'background-image': 'url(' + coverPhotoUrl(employee.coverPhotoUrl) + ')' } : {}">
-      <div class="cover-photo-upload" *ngIf="employee.isOwnProfile" title="Change cover photo">
+      <div class="cover-photo-upload" *ngIf="employee.isOwnProfile">
         <app-attachment-upload
           module="employee-cover"
           [entityId]="employee.employeeId"
           [multiple]="false"
-          [compact]="true"
-          chooseLabel=""
+          chooseLabel="Edit Cover Photo"
           chooseIcon="fa-solid fa-camera"
           (uploaded)="onCoverPhotoUploaded($event)"
         ></app-attachment-upload>
       </div>
     </div>
 
-    <div class="profile-card">
+    <div class="profile-header-row">
       <div class="profile-photo-wrapper">
         <img *ngIf="employee.photoUrl; else avatarPlaceholder" [src]="photoUrl(employee.photoUrl)" class="profile-photo" alt="" />
         <ng-template #avatarPlaceholder>
@@ -52,28 +51,35 @@
         </div>
       </div>
 
-      <h2 class="profile-name">{{ employee.employeeName }}</h2>
-      <div class="profile-meta">{{ employee.designationName || ('Designation #' + employee.designationId) }}</div>
-      <div class="profile-meta">
-        {{ employee.departmentName || ('Department #' + employee.departmentId) }} &middot; {{ employee.siteName || ('Branch #' + employee.siteId) }}
+      <div class="profile-header-info">
+        <h2 class="profile-name">{{ employee.employeeName }}</h2>
+        <div class="profile-meta">{{ employee.designationName || ('Designation #' + employee.designationId) }}</div>
+        <div class="profile-meta">
+          {{ employee.departmentName || ('Department #' + employee.departmentId) }} &middot; {{ employee.siteName || ('Branch #' + employee.siteId) }}
+        </div>
+        <div class="profile-meta">Employee Code: {{ employee.employeeCode }}</div>
+        <div class="profile-meta" *ngIf="!employee.isActive"><span class="inactive-badge">Inactive</span></div>
       </div>
-      <div class="profile-meta">Employee Code: {{ employee.employeeCode }}</div>
-      <div class="profile-meta" *ngIf="!employee.isActive"><span class="inactive-badge">Inactive</span></div>
 
-      <button *ngIf="employee.isOwnProfile" pButton class="mt-3" (click)="startEdit()">
-        <i class="fa fa-edit"></i>
-        <span>Edit Profile</span>
-      </button>
+      <div class="profile-header-actions">
+        <button *ngIf="employee.isOwnProfile" pButton (click)="startEdit()">
+          <i class="fa fa-edit"></i>
+          <span>Edit Profile</span>
+        </button>
+      </div>
     </div>
 
     <div class="profile-details">
+      <div class="profile-section">
+        <h3 class="form-section-header">Bio</h3>
+        <p>{{ employee.bio || 'No bio yet.' }}</p>
+      </div>
+
       <div class="profile-section">
         <h3 class="form-section-header">Identity</h3>
         <dl class="profile-fields">
           <dt>Division</dt>
           <dd>{{ employee.division || '—' }}</dd>
-          <dt>Grade</dt>
-          <dd>{{ employee.gradeName || (employee.gradeId ? 'Grade #' + employee.gradeId : '—') }}</dd>
           <dt>Phone</dt>
           <dd>{{ employee.phone || 'Not visible' }}</dd>
           <dt>Email</dt>
@@ -84,8 +90,16 @@
       </div>
 
       <div class="profile-section">
-        <h3 class="form-section-header">Bio</h3>
-        <p>{{ employee.bio || 'No bio yet.' }}</p>
+        <h3 class="form-section-header">Contact Links</h3>
+        <ul class="contact-link-list" *ngIf="employee.contactLinks.length > 0; else noContactLinks">
+          <li *ngFor="let link of employee.contactLinks">
+            <a [href]="link.url" target="_blank" rel="noopener noreferrer">
+              <i class="fa-solid fa-link"></i>
+              <span>{{ link.platform }}</span>
+            </a>
+          </li>
+        </ul>
+        <ng-template #noContactLinks><p>No contact links added yet.</p></ng-template>
       </div>
 
       <div class="profile-section">

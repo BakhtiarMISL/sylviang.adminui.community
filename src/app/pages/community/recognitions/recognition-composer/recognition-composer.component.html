@@ -25,11 +25,12 @@
     Recognizing <strong>{{ selectedRecipient.employeeName }}</strong>
   </div>
 
-  <label class="field-label">Badge (optional)</label>
-  <p-select
+  <label class="field-label">Badges (optional)</label>
+  <p-multiSelect
     [options]="badges"
     optionLabel="name"
-    [(ngModel)]="selectedBadge"
+    [(ngModel)]="selectedBadges"
+    display="chip"
     placeholder="No badge"
     [showClear]="true"
     [appendTo]="'body'"
@@ -41,7 +42,7 @@
         <span>{{ badge.name }}</span>
       </div>
     </ng-template>
-  </p-select>
+  </p-multiSelect>
 
   <label class="field-label">Message (optional)</label>
   <textarea pInputTextarea rows="3" placeholder="Say what they did well..." [(ngModel)]="message"></textarea>

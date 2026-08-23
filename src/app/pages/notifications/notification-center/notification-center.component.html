@@ -75,7 +75,7 @@
                       <p class="truncate text-sm text-dark dark:text-borderLight" [ngClass]="{ 'font-semibold': !notification.isRead }">
                         {{ notification.title }}
                       </p>
-                      <span class="text-xs text-borderDark dark:text-neutral whitespace-nowrap">{{ notification.createdAt | relativeTime }}</span>
+                      <span class="text-xs text-borderDark dark:text-neutral whitespace-nowrap">{{ notification.createdAt | relativeTime : (timeTicker.now$ | async) }}</span>
                     </div>
                     <p *ngIf="notification.message" class="text-sm text-borderDark dark:text-neutral mt-0.5 line-clamp-2">
                       {{ notification.message }}

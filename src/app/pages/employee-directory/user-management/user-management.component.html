@@ -142,6 +142,22 @@
                 <button [routerLink]="['/employee-directory/profile', employee.employeeId]" class="text-primary mr-2">
                   <i class="fa fa-eye"></i>
                 </button>
+                <button
+                  class="text-success mr-2"
+                  *ngIf="employee.isActive && !employee.hasCredential"
+                  title="Grant Access"
+                  (click)="openGrantAccessDialog(employee)"
+                >
+                  <i class="fa fa-key"></i>
+                </button>
+                <button
+                  class="text-primary mr-2"
+                  *ngIf="employee.isActive && employee.hasCredential"
+                  title="Reset Password"
+                  (click)="openResetPasswordDialog(employee)"
+                >
+                  <i class="fa fa-rotate"></i>
+                </button>
                 <button class="text-danger" *ngIf="employee.isActive" (click)="deactivateEmployee(employee, $event)">
                   <i class="fa fa-user-slash"></i>
                 </button>
@@ -164,4 +180,13 @@
     </div>
   </div>
   </p-panel>
+
+  <app-grant-access-dialog
+    *ngIf="selectedEmployeeForAccess as emp"
+    [employeeId]="emp.employeeId"
+    [employeeName]="emp.employeeName"
+    [mode]="grantAccessDialogMode"
+    [visible]="showGrantAccessDialog"
+    (visibleChange)="onGrantAccessDialogVisibilityChange($event)"
+  ></app-grant-access-dialog>
 </section>

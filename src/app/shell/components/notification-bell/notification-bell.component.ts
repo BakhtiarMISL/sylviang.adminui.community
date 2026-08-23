@@ -4,7 +4,8 @@ import { NOTIFICATION_CATEGORIES } from '@core/constants/notification-categories
 import { INotificationResponse } from '@core/interfaces/notifications/notification.interface';
 import { CurrentUserService } from '@core/services/current-user.service';
 import { NotificationHubService } from '@core/services/notifications/notification-hub.service';
-import { NotificationService } from '@core/services/notifications/notification.service';
+import { getNotificationNavigationTarget, NotificationService } from '@core/services/notifications/notification.service';
+import { TimeTickerService } from '@core/services/misc/time-ticker.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
 const RECENT_PAGE_SIZE = 8;
@@ -38,6 +39,7 @@ export class NotificationBellComponent implements OnInit {
     private currentUserService: CurrentUserService,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    public timeTicker: TimeTickerService,
   ) {}
 
   ngOnInit(): void {
@@ -73,20 +75,26 @@ export class NotificationBellComponent implements OnInit {
   }
 
   onItemClick(notification: INotificationResponse): void {
-    if (notification.isRead) return;
+    if (!notification.isRead) {
+      this.notificationService.markAsRead(notification.notificationId).subscribe({
+        next: (response) => {
+          if (!response.hasError) {
+            notification.isRead = true;
+            notification.readAt = new Date().toISOString();
+            this.cdr.detectChanges();
+          }
+        },
+        error: () => {
+          // Non-critical - the item just keeps showing as unread.
+        },
+      });
+    }
 
-    this.notificationService.markAsRead(notification.notificationId).subscribe({
-      next: (response) => {
-        if (!response.hasError) {
-          notification.isRead = true;
-          notification.readAt = new Date().toISOString();
-          this.cdr.detectChanges();
-        }
-      },
-      error: () => {
-        // Non-critical - the item just keeps showing as unread.
-      },
-    });
+    const target = getNotificationNavigationTarget(notification);
+    if (target) {
+      this.close();
+      this.router.navigate(target.commands, target.queryParams ? { queryParams: target.queryParams } : undefined);
+    }
   }
 
   goToNotificationCenter(): void {

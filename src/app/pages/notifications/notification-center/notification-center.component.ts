@@ -1,11 +1,13 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { UI_CONFIG } from '@core/constants';
 import { INotificationCategoryOption, NOTIFICATION_CATEGORIES } from '@core/constants/notification-categories';
 import { INotificationFilterParams, INotificationResponse } from '@core/interfaces/notifications/notification.interface';
 import { CurrentUserService } from '@core/services/current-user.service';
 import { NotificationHubService } from '@core/services/notifications/notification-hub.service';
-import { NotificationService } from '@core/services/notifications/notification.service';
+import { getNotificationNavigationTarget, NotificationService } from '@core/services/notifications/notification.service';
 import { ToastService } from '@core/services/misc/toast.service';
+import { TimeTickerService } from '@core/services/misc/time-ticker.service';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
 
 /** All / Unread tab indices used by the p-tabView on this page. */
@@ -25,7 +27,9 @@ export class NotificationCenterComponent implements OnInit {
     private notificationHubService: NotificationHubService,
     private currentUserService: CurrentUserService,
     private toastService: ToastService,
+    private router: Router,
     private cdr: ChangeDetectorRef,
+    public timeTicker: TimeTickerService,
   ) {}
 
   notifications: INotificationResponse[] = [];
@@ -81,20 +85,25 @@ export class NotificationCenterComponent implements OnInit {
   }
 
   onNotificationClick(notification: INotificationResponse): void {
-    if (notification.isRead) return;
+    if (!notification.isRead) {
+      this.notificationService.markAsRead(notification.notificationId).subscribe({
+        next: (response) => {
+          if (!response.hasError) {
+            notification.isRead = true;
+            notification.readAt = new Date().toISOString();
+            this.cdr.detectChanges();
+          }
+        },
+        error: () => {
+          this.toastService.error({ detail: 'Could not mark notification as read.' });
+        },
+      });
+    }
 
-    this.notificationService.markAsRead(notification.notificationId).subscribe({
-      next: (response) => {
-        if (!response.hasError) {
-          notification.isRead = true;
-          notification.readAt = new Date().toISOString();
-          this.cdr.detectChanges();
-        }
-      },
-      error: () => {
-        this.toastService.error({ detail: 'Could not mark notification as read.' });
-      },
-    });
+    const target = getNotificationNavigationTarget(notification);
+    if (target) {
+      this.router.navigate(target.commands, target.queryParams ? { queryParams: target.queryParams } : undefined);
+    }
   }
 
   markAllRead(): void {

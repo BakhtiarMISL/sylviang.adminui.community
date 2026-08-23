@@ -1,0 +1,19 @@
+:host {
+  display: block;
+}
+
+.skeleton-list {
+  margin-top: 1rem;
+}
+
+.load-more-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 1rem 0;
+  opacity: 0.6;
+  font-size: 1.1rem;
+}
+
+.scroll-anchor {
+  height: 1px;
+}

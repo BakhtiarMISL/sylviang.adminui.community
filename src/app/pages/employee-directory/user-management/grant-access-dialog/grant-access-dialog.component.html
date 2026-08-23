@@ -1,0 +1,31 @@
+<p-dialog [header]="headerText" [(visible)]="visible" [modal]="true" [dismissableMask]="true" [style]="{ width: '28rem' }" (onHide)="close()">
+  <p class="grant-access-intro" *ngIf="employeeName">{{ introText }} <strong>{{ employeeName }}</strong>.</p>
+
+  <div class="grant-access-form">
+    <ng-container *ngIf="isGrantMode">
+      <label>Username</label>
+      <input pInputText type="text" placeholder="e.g. jane.doe" [(ngModel)]="username" />
+    </ng-container>
+
+    <label>Temporary Password</label>
+    <input pInputText type="password" placeholder="At least 8 characters" [(ngModel)]="temporaryPassword" />
+
+    <ng-container *ngIf="isGrantMode">
+      <label>Role</label>
+      <p-select
+        [options]="roleOptions"
+        optionLabel="label"
+        optionValue="value"
+        [(ngModel)]="role"
+        [appendTo]="'body'"
+        [autoDisplayFirst]="false"
+        styleClass="w-full"
+      ></p-select>
+    </ng-container>
+
+    <div class="form-actions">
+      <button pButton [disabled]="!canSubmit" (click)="submit()">{{ submitLabel }}</button>
+      <button pButton severity="secondary" (click)="close()">Cancel</button>
+    </div>
+  </div>
+</p-dialog>

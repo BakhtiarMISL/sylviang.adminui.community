@@ -1,8 +1,12 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { DISABLE_TOAST } from '@core/constants/http-context';
 import { ApiResponse } from '@core/interfaces/ApiResponse';
 import {
   IEmployeeCreateRequest,
+  IEmployeeCredentialCreateRequest,
+  IEmployeeCredentialResetPasswordRequest,
+  IEmployeeCredentialResponse,
   IEmployeeDirectoryCardResponse,
   IEmployeeFilterParams,
   IEmployeeManagementRowResponse,
@@ -56,5 +60,28 @@ export class EmployeeService {
 
   deactivateEmployee(employeeId: number) {
     return this.httpClient.put<ApiResponse<void>>(`${this.API_URL}/${employeeId}/deactivate`, {});
+  }
+
+  /**
+   * Grants an employee real login access (Keycloak account creation - see
+   * EmployeeCredentialController). Toast is disabled here because 409 (already has access) and
+   * 403 (employee deactivated) need friendlier, specific messages - handled by the caller
+   * (GrantAccessDialogComponent) instead of the default ErrorHandlerInterceptor toast.
+   */
+  createCredential(employeeId: number, request: IEmployeeCredentialCreateRequest) {
+    return this.httpClient.post<ApiResponse<IEmployeeCredentialResponse>>(`${this.API_URL}/${employeeId}/credential`, request, {
+      context: new HttpContext().set(DISABLE_TOAST, true),
+    });
+  }
+
+  /**
+   * Sets a new temporary password for an employee who already has a Keycloak account (HR-initiated
+   * "forgot password" flow). Toast disabled for the same reason as createCredential - the caller
+   * (GrantAccessDialogComponent, reset mode) shows its own specific messages per status code.
+   */
+  resetCredentialPassword(employeeId: number, request: IEmployeeCredentialResetPasswordRequest) {
+    return this.httpClient.put<ApiResponse<void>>(`${this.API_URL}/${employeeId}/credential/reset-password`, request, {
+      context: new HttpContext().set(DISABLE_TOAST, true),
+    });
   }
 }

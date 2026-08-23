@@ -1,3 +1,45 @@
+:host {
+  // PrimeNG's Aura theme ties the tab list background to the `content.background` design
+  // token, which follows the OS/browser's prefers-color-scheme (PrimeNG's own darkModeSelector
+  // defaults to "system") rather than this app's own theme toggle - so it can render
+  // dark/transparent even while the app is visibly in light mode. Same fix as
+  // group-detail.component.scss: the tab panels here have no body content (the reactor list
+  // renders below, driven by activeTabIndex), so collapse the empty .p-tabpanels box too.
+  ::ng-deep .p-tablist-tab-list {
+    background: #ffffff;
+  }
+
+  ::ng-deep .p-tabpanels {
+    display: none;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active) {
+    color: #000000;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active):not(.p-disabled):hover {
+    background: transparent;
+    border-color: transparent;
+    color: #000000;
+  }
+}
+
+:host-context(.dark) {
+  ::ng-deep .p-tablist-tab-list {
+    background: #1f2937;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active) {
+    color: #e5e7eb;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active):not(.p-disabled):hover {
+    background: transparent;
+    border-color: transparent;
+    color: #e5e7eb;
+  }
+}
+
 .reaction-summary-trigger {
   display: inline-flex;
   align-items: center;

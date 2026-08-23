@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { IVisibilityOption, VISIBILITY_OPTIONS } from '@core/constants/community/visibility-options';
 import { IPostCreateRequest, PostVisibility } from '@core/interfaces/community/post.interface';
 import { IMentionTag } from '@core/interfaces/community/mention.interface';
@@ -25,6 +25,9 @@ type PostKind = 'Text' | 'Announcement' | 'Poll';
   styleUrl: './post-composer.component.scss',
 })
 export class PostComposerComponent {
+  /** Set when composing from within a group's Posts tab (US-3.27) - scopes the new post to that group instead of the company-wide feed. */
+  @Input() groupId?: number;
+
   @Output() posted = new EventEmitter<void>();
 
   content = '';
@@ -90,6 +93,7 @@ export class PostComposerComponent {
       isAnnouncement: this.postKind === 'Announcement',
       isPoll: this.postKind === 'Poll',
       mentionedEmployeeIds: this.mentionedTags.map((t) => t.employeeId),
+      groupId: this.groupId ?? null,
     };
 
     this.submitting = true;

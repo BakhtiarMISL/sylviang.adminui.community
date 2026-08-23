@@ -1,0 +1,96 @@
+<section class="page-container survey-take-page">
+  <div *ngIf="loading" class="skeleton-list">
+    <p-skeleton width="100%" height="4rem" styleClass="mb-3"></p-skeleton>
+    <p-skeleton width="100%" height="8rem"></p-skeleton>
+  </div>
+
+  <p-message *ngIf="!loading && loadError" severity="error" styleClass="w-full mb-4">
+    Couldn't load this survey. Please try again.
+  </p-message>
+
+  <ng-container *ngIf="!loading && survey">
+    <div class="take-header">
+      <h1>{{ survey.title }}</h1>
+      <p class="description" *ngIf="survey.description">{{ survey.description }}</p>
+      <span class="badge anon-badge" *ngIf="survey.isAnonymous"><i class="fa-solid fa-user-secret"></i> Your identity won't be recorded with this response</span>
+    </div>
+
+    <div class="not-found" *ngIf="currentEmployeeId === null">
+      <div><i class="fa-solid fa-circle-exclamation"></i><p>This account can't take surveys.</p></div>
+    </div>
+
+    <div class="not-found" *ngIf="currentEmployeeId !== null && alreadySubmitted">
+      <div><i class="fa-solid fa-circle-check"></i><p>You've already submitted a response to this survey.</p></div>
+    </div>
+
+    <div class="external-take" *ngIf="currentEmployeeId !== null && !alreadySubmitted && survey.externalUrl">
+      <p class="external-note">This survey is hosted externally. Complete it using the link below, then mark it as completed here.</p>
+      <a [href]="survey.externalUrl" target="_blank" rel="noopener" pButton severity="secondary">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Survey
+      </a>
+      <button type="button" pButton [disabled]="submitting" (click)="markCompleted()">
+        <i class="fa-solid fa-check"></i> Mark as Completed
+      </button>
+    </div>
+
+    <form *ngIf="currentEmployeeId !== null && !alreadySubmitted && !survey.externalUrl" class="take-form">
+      <div class="question-block" *ngFor="let question of questions; let qIndex = index">
+        <div class="question-text">
+          {{ qIndex + 1 }}. {{ question.questionText }}
+          <span class="required-star" *ngIf="question.isRequired">*</span>
+        </div>
+
+        <ng-container *ngIf="question.questionType === 'SingleChoice'">
+          <div class="option-row" *ngFor="let option of question.options">
+            <p-radioButton
+              [name]="'q' + question.questionId"
+              [value]="option.optionId"
+              [ngModel]="answers[qIndex].selectedOptionId"
+              (ngModelChange)="answers[qIndex].selectedOptionId = $event"
+              [inputId]="'opt' + option.optionId"
+            ></p-radioButton>
+            <label [for]="'opt' + option.optionId">{{ option.optionText }}</label>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="question.questionType === 'MultipleChoice'">
+          <div class="option-row" *ngFor="let option of question.options">
+            <p-checkbox
+              [binary]="true"
+              [(ngModel)]="answers[qIndex].optionSelections[option.optionId]"
+              [name]="'mc' + option.optionId"
+              [inputId]="'opt' + option.optionId"
+            ></p-checkbox>
+            <label [for]="'opt' + option.optionId">{{ option.optionText }}</label>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="question.questionType === 'Rating'">
+          <div class="rating-row">
+            <button
+              type="button"
+              *ngFor="let value of ratingScale"
+              class="rating-btn"
+              [class.selected]="answers[qIndex].ratingValue === value"
+              (click)="answers[qIndex].ratingValue = value"
+            >
+              {{ value }}
+            </button>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="question.questionType !== 'SingleChoice' && question.questionType !== 'MultipleChoice' && question.questionType !== 'Rating'">
+          <textarea pTextarea rows="3" [(ngModel)]="answers[qIndex].answerText" [name]="'text' + question.questionId" placeholder="Your answer"></textarea>
+        </ng-container>
+      </div>
+
+      <div class="not-found" *ngIf="questions.length === 0">
+        <div><i class="fa-solid fa-list-check"></i><p>This survey has no questions yet.</p></div>
+      </div>
+
+      <div class="take-actions" *ngIf="questions.length > 0">
+        <button type="button" pButton [disabled]="!canSubmit" (click)="submit()">Submit Response</button>
+      </div>
+    </form>
+  </ng-container>
+</section>

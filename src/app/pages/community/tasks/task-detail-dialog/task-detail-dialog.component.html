@@ -1,0 +1,93 @@
+<p-dialog [header]="task?.title || 'Task'" [(visible)]="visible" [modal]="true" [style]="{ width: '40rem' }" (onHide)="close()">
+  <div *ngIf="loading" class="skeleton-list">
+    <p-skeleton width="100%" height="2rem" styleClass="mb-2"></p-skeleton>
+    <p-skeleton width="100%" height="6rem"></p-skeleton>
+  </div>
+
+  <div *ngIf="!loading && task" class="task-detail">
+    <div class="task-meta">
+      <span class="badge status-badge" [ngClass]="'status-' + statusSeverity">{{ task.derivedStatus }}</span>
+      <span class="badge priority-badge">{{ task.priority }}</span>
+      <span *ngIf="task.recurringTaskId" class="badge recurring-badge"><i class="fa-solid fa-repeat"></i> Recurring</span>
+    </div>
+
+    <p *ngIf="task.description" class="description">{{ task.description }}</p>
+
+    <div class="fields-grid">
+      <div><strong>Assigned To</strong><span>{{ nameFor(task.assignedTo) }}</span></div>
+      <div><strong>Assigned By</strong><span>{{ nameFor(task.assignedBy) }}</span></div>
+      <div><strong>Due Date</strong><span>{{ task.dueDate ? (task.dueDate | date: 'dd-MMM-yyyy') : '-' }}</span></div>
+      <div><strong>Status</strong><span>{{ task.status }}</span></div>
+    </div>
+
+    <div class="action-row" *ngIf="isAssignee && task.status !== 'Completed'">
+      <button *ngIf="task.status !== 'InProgress'" pButton size="small" [disabled]="statusSubmitting" (click)="start()">Start</button>
+      <button pButton size="small" severity="success" [disabled]="statusSubmitting" (click)="complete()">Complete</button>
+    </div>
+
+    <div class="action-row" *ngIf="task.status === 'Completed'">
+      <button pButton size="small" severity="secondary" [disabled]="downloadingReport" (click)="downloadReport()">
+        <i class="fa-solid fa-download"></i> Download Report
+      </button>
+    </div>
+
+    <div class="action-row" *ngIf="task.recurringTaskId && canManage">
+      <button pButton size="small" severity="danger" [text]="true" (click)="cancelRecurringSeries()">Cancel Recurring Series</button>
+    </div>
+
+    <p-tabView>
+      <p-tabPanel header="Comments">
+        <div class="comment-list">
+          <div *ngFor="let comment of comments" class="comment-item">
+            <strong>{{ nameFor(comment.employeeId) }}</strong>
+            <span class="comment-time">{{ comment.createdAt | date: 'dd-MMM-yyyy HH:mm' }}</span>
+            <p>{{ comment.comment }}</p>
+          </div>
+          <p *ngIf="comments.length === 0" class="empty-hint">No comments yet.</p>
+        </div>
+        <div class="comment-form" *ngIf="canParticipate">
+          <textarea pTextarea rows="2" placeholder="Add a comment or progress note..." [(ngModel)]="newComment"></textarea>
+          <button pButton size="small" [disabled]="!newComment.trim() || submittingComment" (click)="addComment()">Post</button>
+        </div>
+      </p-tabPanel>
+
+      <p-tabPanel header="Attachments">
+        <div class="attachment-list">
+          <div *ngFor="let attachment of attachments" class="attachment-item">
+            <i class="fa-solid fa-paperclip"></i>
+            <span>{{ attachment.fileName }}</span>
+            <button
+              *ngIf="attachment.uploadedBy === currentEmployeeId || canManage"
+              pButton
+              size="small"
+              severity="danger"
+              [text]="true"
+              (click)="removeAttachment(attachment)"
+            >
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+          <p *ngIf="attachments.length === 0" class="empty-hint">No attachments yet.</p>
+        </div>
+        <app-attachment-upload
+          *ngIf="canParticipate"
+          module="Task"
+          [entityId]="task.taskId"
+          chooseLabel="Attach File"
+          [multiple]="true"
+          (uploaded)="onAttachmentUploaded($event)"
+        ></app-attachment-upload>
+      </p-tabPanel>
+
+      <p-tabPanel header="History">
+        <div class="history-list">
+          <div *ngFor="let entry of history" class="history-item">
+            <span class="history-time">{{ entry.createdAt | date: 'dd-MMM-yyyy HH:mm' }}</span>
+            <span>{{ entry.action }}: {{ entry.oldValue }} &rarr; {{ entry.newValue }}</span>
+          </div>
+          <p *ngIf="history.length === 0" class="empty-hint">No history yet.</p>
+        </div>
+      </p-tabPanel>
+    </p-tabView>
+  </div>
+</p-dialog>

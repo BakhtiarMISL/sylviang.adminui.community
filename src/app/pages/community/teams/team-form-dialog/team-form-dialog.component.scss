@@ -1,0 +1,37 @@
+.team-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 0.5rem;
+  }
+}
+
+.supervisor-search {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+
+  .hint {
+    color: var(--p-text-muted-color);
+  }
+}
+
+.selected-supervisor {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid var(--p-content-border-color);
+  border-radius: 6px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}

@@ -1,0 +1,180 @@
+:host {
+  display: block;
+
+  // Same PrimeNG Aura tab-background workaround as surveys.component.scss (that file has the
+  // full explanation) - needed here now that results are split into Aggregate/Individual tabs.
+  ::ng-deep .p-tablist-tab-list {
+    background: #ffffff;
+  }
+
+  ::ng-deep .p-tabpanels {
+    background: transparent;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active) {
+    color: #000000;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active):not(.p-disabled):hover {
+    background: transparent;
+    border-color: transparent;
+    color: #000000;
+  }
+}
+
+:host-context(.dark) {
+  ::ng-deep .p-tablist-tab-list {
+    background: #1f2937;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active) {
+    color: #e5e7eb;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active):not(.p-disabled):hover {
+    color: #e5e7eb;
+  }
+}
+
+.results-header {
+  margin-bottom: 1rem;
+
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  margin-top: 0.4rem;
+}
+
+.anon-badge {
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+}
+
+:host-context(.dark) .anon-badge {
+  background: rgba(251, 191, 36, 0.25);
+  color: #fde68a;
+}
+
+.summary-row {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.summary-tile {
+  background: var(--surface-elevated);
+  border-radius: 0.75rem;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 8rem;
+
+  .tile-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .tile-label {
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
+}
+
+.rate-note {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin-bottom: 1rem;
+}
+
+.question-result {
+  background: var(--surface-elevated);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 0.75rem;
+  max-width: 40rem;
+}
+
+.question-text {
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+  color: var(--text-primary);
+}
+
+.option-result {
+  margin-bottom: 0.5rem;
+}
+
+.option-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin-bottom: 0.2rem;
+  color: var(--text-primary);
+}
+
+.text-answers {
+  list-style: disc;
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+
+  li {
+    margin-bottom: 0.25rem;
+  }
+}
+
+.percentage-info {
+  margin-left: 0.4rem;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  cursor: help;
+}
+
+.rating-result {
+  margin-top: 0.5rem;
+}
+
+.rating-average {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+
+  .tile-value {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .tile-label {
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+}
+
+.anon-respondent {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  opacity: 0.75;
+  font-style: italic;
+}
+
+.table-container {
+  margin-top: 0.5rem;
+}

@@ -1,0 +1,98 @@
+<section class="page-container group-detail-page">
+  <div *ngIf="loading" class="skeleton-list">
+    <p-skeleton width="100%" height="6rem"></p-skeleton>
+  </div>
+
+  <div *ngIf="!loading && !group" class="not-found">
+    <div>
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <p>Group not found.</p>
+    </div>
+  </div>
+
+  <div *ngIf="!loading && group">
+    <div class="group-header">
+      <div class="group-header-main">
+        <h1 class="title">{{ group.name }}</h1>
+        <span class="badge visibility-badge" [ngClass]="'visibility-' + group.visibility.toLowerCase()">{{ group.visibility }}</span>
+        <span class="member-count"><i class="fa-solid fa-users"></i> {{ group.memberCount }} members</span>
+      </div>
+      <p class="group-description">{{ group.description }}</p>
+
+      <div class="group-header-actions">
+        <button
+          *ngIf="!isMember && group.visibility === 'Public'"
+          pButton
+          size="small"
+          [disabled]="joinLeaveSubmitting"
+          (click)="join()"
+        >
+          Join Group
+        </button>
+        <button
+          *ngIf="!isMember && group.visibility === 'Private'"
+          pButton
+          size="small"
+          severity="secondary"
+          [disabled]="joinLeaveSubmitting"
+          (click)="requestToJoin()"
+        >
+          Request to Join
+        </button>
+        <button *ngIf="isMember && !isCreator" pButton size="small" severity="secondary" [disabled]="joinLeaveSubmitting" (click)="leave()">
+          Leave Group
+        </button>
+        <button *ngIf="isManager" pButton size="small" severity="secondary" (click)="openEditDialog()"><i class="fa-solid fa-pen"></i> Edit</button>
+        <button *ngIf="isCreator || isHrOrAdmin" pButton size="small" severity="danger" (click)="deleteGroup()">
+          <i class="fa-solid fa-trash"></i> Delete
+        </button>
+      </div>
+    </div>
+
+    <p-tabView [activeIndex]="activeTabIndexForView" (onChange)="onTabChange($event.index)">
+      <p-tabPanel header="Info"></p-tabPanel>
+      <p-tabPanel header="Members"></p-tabPanel>
+      <p-tabPanel *ngIf="isManager" header="Join Requests"></p-tabPanel>
+      <p-tabPanel header="Posts"></p-tabPanel>
+    </p-tabView>
+
+    <div class="tab-content">
+      <div *ngIf="activeTabKey === 'info'" class="info-tab">
+        <p class="info-row"><strong>Visibility:</strong> {{ group.visibility }}</p>
+        <p class="info-row"><strong>Members:</strong> {{ group.memberCount }}</p>
+        <p class="info-row" *ngIf="!isMember">
+          <i class="fa-solid fa-circle-info"></i>
+          {{ joinHintText }}
+        </p>
+      </div>
+
+      <app-group-members-tab
+        *ngIf="activeTabKey === 'members'"
+        [groupId]="groupId"
+        [members]="members"
+        [membersLoading]="membersLoading"
+        [isManager]="isManager"
+        [isCreator]="isCreator"
+        [isHrOrAdmin]="isHrOrAdmin"
+        [currentEmployeeId]="currentEmployeeId"
+        (membersChanged)="loadMembers()"
+      ></app-group-members-tab>
+
+      <app-group-join-requests-tab
+        *ngIf="activeTabKey === 'joinRequests' && isManager"
+        [groupId]="groupId"
+        (resolved)="loadMembers()"
+      ></app-group-join-requests-tab>
+
+      <app-group-posts-tab
+        *ngIf="activeTabKey === 'posts'"
+        [groupId]="groupId"
+        [canView]="canViewPosts"
+        [canPost]="isMember || isHrOrAdmin"
+        [canModerate]="canModerateGroupPosts"
+      ></app-group-posts-tab>
+    </div>
+  </div>
+</section>
+
+<app-group-form-dialog [(visible)]="showEditDialog" [groupId]="groupId" [editingGroup]="group" (saved)="onGroupSaved()"></app-group-form-dialog>

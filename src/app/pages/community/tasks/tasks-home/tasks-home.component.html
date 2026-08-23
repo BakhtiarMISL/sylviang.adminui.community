@@ -1,0 +1,19 @@
+<section class="page-container">
+  <div class="tasks-header">
+    <h1 class="title">Tasks</h1>
+    <button *ngIf="canAssignIndividualTasks" pButton (click)="openAssignDialog()">
+      <i class="fa-solid fa-plus"></i> Assign Individual Task
+    </button>
+  </div>
+
+  <p-tabView>
+    <p-tabPanel header="My Tasks">
+      <app-my-tasks-list></app-my-tasks-list>
+    </p-tabPanel>
+    <p-tabPanel header="Assigned By Me" *ngIf="canAssignIndividualTasks">
+      <app-task-board mode="individual" [canManage]="true"></app-task-board>
+    </p-tabPanel>
+  </p-tabView>
+</section>
+
+<app-assign-task-dialog [(visible)]="showAssignDialog" [teamId]="null" (assigned)="onAssigned()"></app-assign-task-dialog>
