@@ -7,8 +7,10 @@ import { ListingService } from '@core/services/community/listing.service';
 import { MarketplaceReportService } from '@core/services/community/marketplace-report.service';
 import { PostService } from '@core/services/community/post.service';
 import { CurrentUserService } from '@core/services/current-user.service';
+import { EmployeeService } from '@core/services/employee-directory/employee/employee.service';
 import { ToastService } from '@core/services/misc/toast.service';
-import { forkJoin } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 /**
  * HR/Admin moderation queue (US-3.11/3.12, US-6.7). Backend enriches each content-report row with
@@ -46,12 +48,16 @@ export class ModerationQueueComponent implements OnInit {
   rejectingListing: IListingResponse | null = null;
   rejectReason = '';
 
+  employeeNames = new Map<number, string>();
+  listingTitles = new Map<number, string>();
+
   constructor(
     private contentReportService: ContentReportService,
     private postService: PostService,
     private listingService: ListingService,
     private marketplaceReportService: MarketplaceReportService,
     private currentUserService: CurrentUserService,
+    private employeeService: EmployeeService,
     private toastService: ToastService,
     private cdr: ChangeDetectorRef,
   ) {}
@@ -162,6 +168,8 @@ export class ModerationQueueComponent implements OnInit {
         this.openListingReports = allReports.filter((r) => r.status === 'Open');
         this.marketplaceLoading = false;
         this.marketplaceLoaded = true;
+        this.resolveEmployeeNames([...this.pendingListings.map((l) => l.sellerId), ...this.openListingReports.map((r) => r.reportedBy)]);
+        this.resolveListingTitles(this.openListingReports.map((r) => r.listingId));
         this.cdr.detectChanges();
       },
       error: () => {
@@ -184,6 +192,51 @@ export class ModerationQueueComponent implements OnInit {
 
   viewListing(listingId: number): void {
     window.open(`/community/marketplace/listing/${listingId}`, '_blank');
+  }
+
+  nameFor(employeeId: number): string {
+    return this.employeeNames.get(employeeId) ?? `Employee #${employeeId}`;
+  }
+
+  titleFor(listingId: number): string {
+    return this.listingTitles.get(listingId) ?? `Listing #${listingId}`;
+  }
+
+  private resolveEmployeeNames(ids: number[]): void {
+    const idsToResolve = ids.filter((id) => !this.employeeNames.has(id));
+    if (idsToResolve.length === 0) return;
+
+    const uniqueIds = Array.from(new Set(idsToResolve));
+    forkJoin(uniqueIds.map((id) => this.employeeService.getEmployeeById(id).pipe(catchError(() => of(null))))).subscribe((responses) => {
+      responses.forEach((response, index) => {
+        const name = response && !response.hasError && response.content ? response.content.employeeName : null;
+        if (name) {
+          this.employeeNames.set(uniqueIds[index], name);
+        }
+      });
+      this.cdr.detectChanges();
+    });
+  }
+
+  private resolveListingTitles(listingIds: number[]): void {
+    // Pending listings already carry their own title - reuse it for free instead of re-fetching.
+    for (const listing of this.pendingListings) {
+      this.listingTitles.set(listing.listingId, listing.title);
+    }
+
+    const idsToResolve = listingIds.filter((id) => !this.listingTitles.has(id));
+    if (idsToResolve.length === 0) return;
+
+    const uniqueIds = Array.from(new Set(idsToResolve));
+    forkJoin(uniqueIds.map((id) => this.listingService.getById(id).pipe(catchError(() => of(null))))).subscribe((responses) => {
+      responses.forEach((response, index) => {
+        const title = response && !response.hasError && response.content ? response.content.title : null;
+        if (title) {
+          this.listingTitles.set(uniqueIds[index], title);
+        }
+      });
+      this.cdr.detectChanges();
+    });
   }
 
   onPageChange(event: { first: number; rows: number }): void {

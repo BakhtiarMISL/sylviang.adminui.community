@@ -114,6 +114,12 @@ export const webSidebarMenuItems: IMenuItem[] = [
         icon: 'fa-solid fa-square-poll-vertical',
       },
       {
+        href: '/community/elections',
+        title: 'Elections',
+        active: false,
+        icon: 'fa-solid fa-check-to-slot',
+      },
+      {
         href: '/community/profile/me',
         title: 'Profile',
         active: false,

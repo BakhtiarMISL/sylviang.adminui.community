@@ -1,0 +1,134 @@
+:host {
+  display: block;
+}
+
+.candidates-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.7rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+}
+
+.status-badge {
+  &.status-draft {
+    background: rgba(148, 163, 184, 0.2);
+    color: #475569;
+  }
+  &.status-open,
+  &.status-active {
+    background: rgba(34, 197, 94, 0.15);
+    color: #15803d;
+  }
+  &.status-closed {
+    background: rgba(100, 116, 139, 0.2);
+    color: #334155;
+  }
+}
+
+.approved-badge {
+  background: rgba(34, 197, 94, 0.15);
+  color: #15803d;
+}
+
+.pending-badge {
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+}
+
+.nominate-section {
+  background: var(--surface-elevated);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+  max-width: 32rem;
+
+  h2 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--text-primary);
+  }
+}
+
+.nominate-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+
+  button {
+    align-self: flex-start;
+  }
+}
+
+.candidate-row {
+  background: var(--surface-elevated);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 0.75rem;
+  max-width: 32rem;
+}
+
+.candidate-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.candidate-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.manifesto {
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  opacity: 0.85;
+}
+
+.candidate-actions {
+  margin-top: 0.6rem;
+}
+
+:host-context(.dark) {
+  .status-badge {
+    &.status-draft,
+    &.status-closed {
+      background: rgba(148, 163, 184, 0.3);
+      color: #e2e8f0;
+    }
+    &.status-open,
+    &.status-active {
+      background: rgba(74, 222, 128, 0.25);
+      color: #86efac;
+    }
+  }
+
+  .approved-badge {
+    background: rgba(74, 222, 128, 0.25);
+    color: #86efac;
+  }
+
+  .pending-badge {
+    background: rgba(251, 191, 36, 0.25);
+    color: #fde68a;
+  }
+}

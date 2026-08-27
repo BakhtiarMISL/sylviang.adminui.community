@@ -1,0 +1,21 @@
+<div class="today-events-card">
+  <h3 class="card-heading"><i class="fa-solid fa-cake-candles text-primary"></i> Today's Events</h3>
+
+  <div *ngIf="loading" class="skeleton-list">
+    <p-skeleton width="100%" height="1.75rem" styleClass="mb-2"></p-skeleton>
+    <p-skeleton width="100%" height="1.75rem"></p-skeleton>
+  </div>
+
+  <ul class="event-list" *ngIf="!loading && events.length > 0">
+    <li *ngFor="let event of events">
+      <span class="event-name">{{ event.employeeName }}</span>
+      <span class="event-badge" [class.anniversary]="event.eventType === EventType.Anniversary" [class.text-primary]="event.eventType === EventType.Anniversary">
+        {{ event.eventType === EventType.Birthday ? 'Birthday' : event.yearsOfService + ' yr Anniversary' }}
+      </span>
+    </li>
+  </ul>
+
+  <div class="empty-events" *ngIf="!loading && events.length === 0">
+    <p>No birthdays or anniversaries today.</p>
+  </div>
+</div>

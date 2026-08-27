@@ -12,7 +12,7 @@
 
   <div *ngIf="!loading && !notFound && listing" class="detail-grid">
     <div class="gallery">
-      <div class="main-image">
+      <div class="main-image" [class.no-image]="!images.length">
         <img *ngIf="images.length" [src]="servedUrl(images[activeImageIndex].imageUrl)" [alt]="listing.title" />
         <i *ngIf="!images.length" class="fa-solid fa-image placeholder-icon"></i>
       </div>

@@ -23,6 +23,7 @@
 .detail-grid {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
+  align-items: start;
   gap: 1.5rem;
 
   @media (max-width: 768px) {
@@ -44,6 +45,11 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
+
+  &.no-image {
+    aspect-ratio: auto;
+    height: 14rem;
+  }
 
   img {
     width: 100%;

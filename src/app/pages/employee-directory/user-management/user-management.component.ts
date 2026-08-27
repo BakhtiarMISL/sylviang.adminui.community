@@ -1,8 +1,12 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { UI_CONFIG } from '@core/constants';
-import { BranchOptions, DepartmentOptions, DesignationOptions, IDropdownOption } from '@core/constants/employee-master-data';
+import { BranchOptions, IDropdownOption } from '@core/constants/employee-master-data';
+import { IDepartmentResponse } from '@core/interfaces/community/department.interface';
+import { IDesignationResponse } from '@core/interfaces/community/designation.interface';
 import { IEmployeeFilterParams, IEmployeeManagementRowResponse } from '@core/interfaces/employee-directory/employee.interface';
 import { BreadcrumbService } from '@core/services/breadcrumb.service';
+import { DepartmentService } from '@core/services/community/department.service';
+import { DesignationService } from '@core/services/community/designation.service';
 import { EmployeeService } from '@core/services/employee-directory/employee/employee.service';
 import { ToastService } from '@core/services/misc/toast.service';
 import { ConfirmationService, SortEvent } from 'primeng/api';
@@ -23,6 +27,8 @@ import { StatusFilterOptions, UserManagementColumns } from './user-management.co
 export class UserManagementComponent implements OnInit {
   constructor(
     private employeeService: EmployeeService,
+    private departmentService: DepartmentService,
+    private designationService: DesignationService,
     private cdr: ChangeDetectorRef,
     private confirmationService: ConfirmationService,
     private toast: ToastService,
@@ -48,9 +54,9 @@ export class UserManagementComponent implements OnInit {
   columns = UserManagementColumns;
   statusOptions = StatusFilterOptions;
 
-  departmentOptions: IDropdownOption[] = [...DepartmentOptions];
+  departmentOptions: IDepartmentResponse[] = [];
   branchOptions: IDropdownOption[] = [...BranchOptions];
-  designationOptions: IDropdownOption[] = [...DesignationOptions];
+  designationOptions: IDesignationResponse[] = [];
 
   filtersCollapsed = false;
   tableCollapsed = true;
@@ -72,6 +78,13 @@ export class UserManagementComponent implements OnInit {
     ]);
 
     this.loadEmployees();
+
+    this.departmentService.getPaged().subscribe((response) => {
+      this.departmentOptions = !response.hasError && response.content ? response.content.data || [] : [];
+    });
+    this.designationService.getPaged().subscribe((response) => {
+      this.designationOptions = !response.hasError && response.content ? response.content.data || [] : [];
+    });
   }
 
   applySearch(): void {

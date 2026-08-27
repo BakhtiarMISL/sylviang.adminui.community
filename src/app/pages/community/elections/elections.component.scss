@@ -1,0 +1,61 @@
+:host {
+  display: block;
+
+  // PrimeNG Aura's tab background follows prefers-color-scheme rather than this app's own
+  // theme toggle - same workaround as surveys.component.scss.
+  ::ng-deep .p-tablist-tab-list {
+    background: #ffffff;
+  }
+
+  ::ng-deep .p-tabpanels {
+    background: transparent;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active) {
+    color: #000000;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active):not(.p-disabled):hover {
+    background: transparent;
+    border-color: transparent;
+    color: #000000;
+  }
+}
+
+:host-context(.dark) {
+  ::ng-deep .p-tablist-tab-list {
+    background: #1f2937;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active) {
+    color: #e5e7eb;
+  }
+
+  ::ng-deep .p-tab:not(.p-tab-active):not(.p-disabled):hover {
+    color: #e5e7eb;
+  }
+}
+
+.elections-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+}
+
+.skeleton-list {
+  margin-top: 1rem;
+}

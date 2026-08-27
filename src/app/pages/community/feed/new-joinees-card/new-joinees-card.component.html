@@ -1,0 +1,19 @@
+<div class="new-joinees-card">
+  <h3 class="card-heading"><i class="fa-solid fa-user-plus text-primary"></i> New Joinees</h3>
+
+  <div *ngIf="loading" class="skeleton-list">
+    <p-skeleton width="100%" height="1.75rem" styleClass="mb-2"></p-skeleton>
+    <p-skeleton width="100%" height="1.75rem"></p-skeleton>
+  </div>
+
+  <ul class="joinee-list" *ngIf="!loading && joinees.length > 0">
+    <li *ngFor="let joinee of joinees">
+      <span class="joinee-name">{{ joinee.employeeName }}</span>
+      <span class="joinee-label">{{ joinedLabel(joinee.dateOfJoining) }}</span>
+    </li>
+  </ul>
+
+  <div class="empty-joinees" *ngIf="!loading && joinees.length === 0">
+    <p>No new joinees.</p>
+  </div>
+</div>

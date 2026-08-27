@@ -1,0 +1,11 @@
+<div class="profile-summary">
+  <span class="profile-avatar">
+    <img *ngIf="photoUrl" [src]="photoUrl" alt="" />
+    <i *ngIf="!photoUrl" class="fas fa-user"></i>
+  </span>
+
+  <div class="profile-info">
+    <p class="profile-name">{{ employeeName }}</p>
+    <p class="profile-role">{{ designationName || roleLabel }}</p>
+  </div>
+</div>

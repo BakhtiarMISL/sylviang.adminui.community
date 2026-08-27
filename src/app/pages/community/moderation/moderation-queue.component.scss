@@ -41,6 +41,7 @@
 .subsection-header {
   color: var(--text-primary);
   margin: 1rem 0 0.5rem;
+  text-align: center;
 
   &:first-child {
     margin-top: 0.5rem;
@@ -58,6 +59,10 @@
 
 .content-cell {
   max-width: 320px;
+}
+
+.clickable-cell {
+  cursor: pointer;
 }
 
 .post-type-badge {

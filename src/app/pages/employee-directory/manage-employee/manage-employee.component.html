@@ -39,8 +39,8 @@
         <p-select
           inputId="designationId"
           [options]="designationOptions"
-          optionLabel="label"
-          optionValue="value"
+          optionLabel="name"
+          optionValue="designationId"
           formControlName="designationId"
           class="w-full"
           [appendTo]="'body'"
@@ -60,8 +60,8 @@
         <p-select
           inputId="departmentId"
           [options]="departmentOptions"
-          optionLabel="label"
-          optionValue="value"
+          optionLabel="name"
+          optionValue="departmentId"
           formControlName="departmentId"
           class="w-full"
           [appendTo]="'body'"
@@ -95,6 +95,25 @@
         <label for="siteId">Branch *</label>
       </p-floatlabel>
       <div *ngIf="hasError('siteId')" class="invalid">{{ getErrorMessage('siteId') }}</div>
+    </div>
+
+    <div>
+      <p-floatlabel variant="in">
+        <p-datepicker
+          inputId="dateOfJoining"
+          formControlName="dateOfJoining"
+          dateFormat="dd-M-yy"
+          [showIcon]="true"
+          [maxDate]="today"
+          [appendTo]="'body'"
+          class="w-full"
+          styleClass="w-full"
+          [class.ng-invalid]="hasError('dateOfJoining')"
+          (onBlur)="f['dateOfJoining'].markAsTouched()"
+        ></p-datepicker>
+        <label for="dateOfJoining">Date of Joining *</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('dateOfJoining')" class="invalid">{{ getErrorMessage('dateOfJoining') }}</div>
     </div>
   </section>
 

@@ -1,7 +1,11 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { UI_CONFIG } from '@core/constants';
-import { BranchOptions, DepartmentOptions, DesignationOptions, IDropdownOption } from '@core/constants/employee-master-data';
+import { BranchOptions, IDropdownOption } from '@core/constants/employee-master-data';
+import { IDepartmentResponse } from '@core/interfaces/community/department.interface';
+import { IDesignationResponse } from '@core/interfaces/community/designation.interface';
 import { IEmployeeDirectoryCardResponse, IEmployeeFilterParams } from '@core/interfaces/employee-directory/employee.interface';
+import { DepartmentService } from '@core/services/community/department.service';
+import { DesignationService } from '@core/services/community/designation.service';
 import { EmployeeService } from '@core/services/employee-directory/employee/employee.service';
 import { SortEvent } from 'primeng/api';
 import { Subject } from 'rxjs';
@@ -24,6 +28,8 @@ import { DirectoryColumns } from './directory.component.constants';
 export class DirectoryComponent implements OnInit {
   constructor(
     private employeeService: EmployeeService,
+    private departmentService: DepartmentService,
+    private designationService: DesignationService,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -46,9 +52,9 @@ export class DirectoryComponent implements OnInit {
   siteId: number | null = null;
   designationId: number | null = null;
 
-  departmentOptions: IDropdownOption[] = [...DepartmentOptions];
+  departmentOptions: IDepartmentResponse[] = [];
   branchOptions: IDropdownOption[] = [...BranchOptions];
-  designationOptions: IDropdownOption[] = [...DesignationOptions];
+  designationOptions: IDesignationResponse[] = [];
 
   filtersCollapsed = false;
   tableCollapsed = true;
@@ -68,6 +74,13 @@ export class DirectoryComponent implements OnInit {
     });
 
     this.loadDirectory();
+
+    this.departmentService.getPaged().subscribe((response) => {
+      this.departmentOptions = !response.hasError && response.content ? response.content.data || [] : [];
+    });
+    this.designationService.getPaged().subscribe((response) => {
+      this.designationOptions = !response.hasError && response.content ? response.content.data || [] : [];
+    });
   }
 
   onSearchInput(value: string): void {

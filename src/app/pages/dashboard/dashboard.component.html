@@ -1,39 +1,253 @@
-<section class="page-container">
-  <div class="welcome-message">
-    <div class="flex flex-col items-center justify-center gap-4 py-16">
-      <div class="flex items-center justify-center w-20 h-20 rounded-full bg-primary/10">
-        <i class="fa-solid fa-chart-line text-4xl text-primary"></i>
+<section class="page-container flex flex-col gap-6">
+  <app-colleague-search></app-colleague-search>
+
+  <!-- US-8.1: widgets every employee sees -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+    <a
+      routerLink="/community/teams"
+      class="flex items-center gap-4 p-4 rounded-xl border border-borderLight dark:border-borderDark bg-light dark:bg-dark hover:border-primary hover:shadow-md transition-all duration-200"
+    >
+      <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 shrink-0">
+        <i class="fa-solid fa-people-arrows text-xl text-primary"></i>
       </div>
-      <h1 class="text-2xl font-bold text-dark dark:text-white">Welcome to Sylvia NG</h1>
-      <p class="text-neutral dark:text-white/60 text-center max-w-md">
-        Use the sidebar to navigate to Attendance or Payroll management modules.
-      </p>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 w-full max-w-xl">
-        <a
-          routerLink="/attendance/shift-list"
-          class="flex items-center gap-4 p-4 rounded-xl border border-borderLight dark:border-borderDark bg-light dark:bg-dark hover:border-primary hover:shadow-md transition-all duration-200 group cursor-pointer"
-        >
-          <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-            <i class="fa-solid fa-clock text-xl text-primary"></i>
-          </div>
-          <div>
-            <p class="font-semibold text-dark dark:text-white">Attendance</p>
-            <p class="text-sm text-neutral dark:text-white/50">Manage shifts &amp; schedules</p>
-          </div>
-        </a>
-        <a
-          routerLink="/payroll/payroll-head-list"
-          class="flex items-center gap-4 p-4 rounded-xl border border-borderLight dark:border-borderDark bg-light dark:bg-dark hover:border-primary hover:shadow-md transition-all duration-200 group cursor-pointer"
-        >
-          <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 group-hover:bg-primary/20 transition-colors">
-            <i class="fa-solid fa-money-bill-wave text-xl text-primary"></i>
-          </div>
-          <div>
-            <p class="font-semibold text-dark dark:text-white">Payroll</p>
-            <p class="text-sm text-neutral dark:text-white/50">Manage payroll heads</p>
-          </div>
-        </a>
+      <div class="min-w-0">
+        <p class="text-sm text-neutral dark:text-white/60">My Teams</p>
+        @if (employeeLoading) {
+          <p-skeleton width="2.5rem" height="1.5rem"></p-skeleton>
+        } @else {
+          <p class="text-xl font-bold text-dark dark:text-white">{{ employeeSummary?.teamCount ?? 0 }}</p>
+        }
+      </div>
+    </a>
+
+    <a
+      routerLink="/community/surveys"
+      class="flex items-center gap-4 p-4 rounded-xl border border-borderLight dark:border-borderDark bg-light dark:bg-dark hover:border-primary hover:shadow-md transition-all duration-200"
+    >
+      <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 shrink-0">
+        <i class="fa-solid fa-square-poll-vertical text-xl text-primary"></i>
+      </div>
+      <div class="min-w-0">
+        <p class="text-sm text-neutral dark:text-white/60">Pending Surveys</p>
+        @if (employeeLoading) {
+          <p-skeleton width="2.5rem" height="1.5rem"></p-skeleton>
+        } @else {
+          <p class="text-xl font-bold text-dark dark:text-white">{{ employeeSummary?.pendingSurveyCount ?? 0 }}</p>
+        }
+      </div>
+    </a>
+
+    <div class="flex items-center gap-4 p-4 rounded-xl border border-borderLight dark:border-borderDark bg-light dark:bg-dark">
+      <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 shrink-0">
+        <i class="fa-solid fa-award text-xl text-primary"></i>
+      </div>
+      <div class="min-w-0">
+        <p class="text-sm text-neutral dark:text-white/60">Recognitions Received</p>
+        @if (employeeLoading) {
+          <p-skeleton width="2.5rem" height="1.5rem"></p-skeleton>
+        } @else {
+          <p class="text-xl font-bold text-dark dark:text-white">{{ employeeSummary?.recognitionsReceivedCount ?? 0 }}</p>
+        }
       </div>
     </div>
+
+    <a
+      routerLink="/community/tasks"
+      class="flex items-center gap-4 p-4 rounded-xl border border-borderLight dark:border-borderDark bg-light dark:bg-dark hover:border-primary hover:shadow-md transition-all duration-200"
+    >
+      <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 shrink-0">
+        <i class="fa-solid fa-list-check text-xl text-primary"></i>
+      </div>
+      <div class="min-w-0">
+        <p class="text-sm text-neutral dark:text-white/60">Open Tasks</p>
+        @if (employeeLoading) {
+          <p-skeleton width="2.5rem" height="1.5rem"></p-skeleton>
+        } @else {
+          <p class="text-xl font-bold text-dark dark:text-white">{{ employeeSummary?.openTaskCount ?? 0 }}</p>
+        }
+      </div>
+    </a>
   </div>
+
+  @if (employeeError) {
+    <p class="text-sm text-red-500">Could not load your dashboard. Please refresh the page.</p>
+  }
+
+  <!-- US-8.2: Team Task Overview, Supervisors only -->
+  @if (employeeSummary?.isSupervisor) {
+    <p-panel header="Team Task Overview">
+      @if (supervisorLoading) {
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <p-skeleton height="3rem"></p-skeleton>
+          <p-skeleton height="3rem"></p-skeleton>
+          <p-skeleton height="3rem"></p-skeleton>
+          <p-skeleton height="3rem"></p-skeleton>
+        </div>
+      } @else if (supervisorOverview) {
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+          <div>
+            <p class="text-2xl font-bold text-dark dark:text-white">{{ supervisorOverview.total }}</p>
+            <p class="text-sm text-neutral dark:text-white/60">Total</p>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-dark dark:text-white">{{ supervisorOverview.inProgress }}</p>
+            <p class="text-sm text-neutral dark:text-white/60">In Progress</p>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-dark dark:text-white">{{ supervisorOverview.completed }}</p>
+            <p class="text-sm text-neutral dark:text-white/60">Completed</p>
+          </div>
+          <div>
+            <p class="text-2xl font-bold text-red-500">{{ supervisorOverview.overdue }}</p>
+            <p class="text-sm text-neutral dark:text-white/60">Overdue</p>
+          </div>
+        </div>
+      }
+    </p-panel>
+  }
+
+  <!-- Recent notifications preview -->
+  <p-panel header="Recent Notifications">
+    @if (employeeLoading) {
+      <p-skeleton width="100%" height="3rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="100%" height="3rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="100%" height="3rem"></p-skeleton>
+    } @else if (employeeSummary && employeeSummary.recentNotifications.length > 0) {
+      <div class="flex flex-col divide-y divide-borderLight dark:divide-borderDark">
+        @for (notification of employeeSummary.recentNotifications; track notification.notificationId) {
+          <div class="flex items-start gap-3 py-3 cursor-pointer" (click)="onNotificationClick(notification)">
+            <div class="flex items-center justify-center w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-800 text-primary shrink-0">
+              <i [class]="getCategoryIcon(notification.category) + ' text-sm'"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-2">
+                <p class="truncate text-sm text-dark dark:text-borderLight" [ngClass]="{ 'font-semibold': !notification.isRead }">
+                  {{ notification.title }}
+                </p>
+                <span class="text-xs text-borderDark dark:text-neutral whitespace-nowrap">{{
+                  notification.createdAt | relativeTime : (timeTicker.now$ | async)
+                }}</span>
+              </div>
+              @if (notification.message) {
+                <p class="text-sm text-borderDark dark:text-neutral mt-0.5 line-clamp-2">{{ notification.message }}</p>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <p class="text-sm text-neutral dark:text-white/60 py-4 text-center">No notifications yet.</p>
+    }
+  </p-panel>
+
+  <!-- US-8.3: HR/Admin company-wide summary -->
+  @if (isHrOrAdmin) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+      <a
+        routerLink="/community/surveys"
+        class="flex items-center gap-4 p-4 rounded-xl border border-borderLight dark:border-borderDark bg-light dark:bg-dark hover:border-primary hover:shadow-md transition-all duration-200"
+      >
+        <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 shrink-0">
+          <i class="fa-solid fa-square-poll-vertical text-xl text-primary"></i>
+        </div>
+        <div class="min-w-0">
+          <p class="text-sm text-neutral dark:text-white/60">Active Surveys</p>
+          @if (adminLoading) {
+            <p-skeleton width="2.5rem" height="1.5rem"></p-skeleton>
+          } @else {
+            <p class="text-xl font-bold text-dark dark:text-white">{{ adminSummary?.activeSurveyCount ?? 0 }}</p>
+          }
+        </div>
+      </a>
+
+      <div class="flex items-center gap-4 p-4 rounded-xl border border-borderLight dark:border-borderDark bg-light dark:bg-dark">
+        <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 shrink-0">
+          <i class="fa-solid fa-chart-pie text-xl text-primary"></i>
+        </div>
+        <div class="min-w-0">
+          <p class="text-sm text-neutral dark:text-white/60">Avg. Survey Participation</p>
+          @if (adminLoading) {
+            <p-skeleton width="2.5rem" height="1.5rem"></p-skeleton>
+          } @else {
+            <p class="text-xl font-bold text-dark dark:text-white">{{ formattedParticipationRate }}</p>
+          }
+        </div>
+      </div>
+
+      <a
+        routerLink="/community/moderation"
+        class="flex items-center gap-4 p-4 rounded-xl border border-borderLight dark:border-borderDark bg-light dark:bg-dark hover:border-primary hover:shadow-md transition-all duration-200"
+      >
+        <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-primary/10 shrink-0">
+          <i class="fa-solid fa-store text-xl text-primary"></i>
+        </div>
+        <div class="min-w-0">
+          <p class="text-sm text-neutral dark:text-white/60">Pending Listings</p>
+          @if (adminLoading) {
+            <p-skeleton width="2.5rem" height="1.5rem"></p-skeleton>
+          } @else {
+            <p class="text-xl font-bold text-dark dark:text-white">{{ adminSummary?.pendingListingCount ?? 0 }}</p>
+          }
+        </div>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <p-panel header="Recent Company-Wide Recognitions">
+        @if (adminLoading) {
+          <p-skeleton width="100%" height="2.5rem" styleClass="mb-2"></p-skeleton>
+          <p-skeleton width="100%" height="2.5rem"></p-skeleton>
+        } @else if (adminSummary && adminSummary.recentRecognitions.length > 0) {
+          <div class="flex flex-col divide-y divide-borderLight dark:divide-borderDark">
+            @for (recognition of adminSummary.recentRecognitions; track recognition.recognitionId) {
+              <a routerLink="/community/recognitions" class="block py-3 hover:text-primary transition-colors">
+                <p class="text-sm text-dark dark:text-borderLight">
+                  {{ recognition.awardTitle || recognition.coreValue || recognition.recognitionType }}
+                </p>
+                @if (recognition.message) {
+                  <p class="text-sm text-neutral dark:text-white/60 line-clamp-1">{{ recognition.message }}</p>
+                }
+                <span class="text-xs text-borderDark dark:text-neutral">{{ recognition.createdAt | relativeTime : (timeTicker.now$ | async) }}</span>
+              </a>
+            }
+          </div>
+        } @else {
+          <p class="text-sm text-neutral dark:text-white/60 py-4 text-center">No recognitions yet.</p>
+        }
+      </p-panel>
+
+      <p-panel header="Quick Actions">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <a
+            routerLink="/employee-directory/manage-employee"
+            class="flex items-center gap-3 p-3 rounded-lg border border-borderLight dark:border-borderDark hover:border-primary transition-colors"
+          >
+            <i class="fa-solid fa-user-plus text-primary"></i>
+            <span class="text-sm text-dark dark:text-white">Add Employee</span>
+          </a>
+          <a
+            routerLink="/employee-directory/user-management"
+            class="flex items-center gap-3 p-3 rounded-lg border border-borderLight dark:border-borderDark hover:border-primary transition-colors"
+          >
+            <i class="fa-solid fa-users-gear text-primary"></i>
+            <span class="text-sm text-dark dark:text-white">User Management</span>
+          </a>
+          <a
+            routerLink="/community/surveys/create"
+            class="flex items-center gap-3 p-3 rounded-lg border border-borderLight dark:border-borderDark hover:border-primary transition-colors"
+          >
+            <i class="fa-solid fa-square-poll-vertical text-primary"></i>
+            <span class="text-sm text-dark dark:text-white">Create Survey</span>
+          </a>
+          <a
+            routerLink="/community/moderation"
+            class="flex items-center gap-3 p-3 rounded-lg border border-borderLight dark:border-borderDark hover:border-primary transition-colors"
+          >
+            <i class="fa-solid fa-shield-halved text-primary"></i>
+            <span class="text-sm text-dark dark:text-white">Moderation Queue</span>
+          </a>
+        </div>
+      </p-panel>
+    </div>
+  }
 </section>

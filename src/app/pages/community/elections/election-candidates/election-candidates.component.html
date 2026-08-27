@@ -1,0 +1,71 @@
+<section class="page-container election-candidates-page">
+  <div *ngIf="loading" class="skeleton-list">
+    <p-skeleton width="100%" height="4rem" styleClass="mb-3"></p-skeleton>
+    <p-skeleton width="100%" height="8rem"></p-skeleton>
+  </div>
+
+  <p-message *ngIf="!loading && loadError" severity="error" styleClass="w-full mb-4">
+    Couldn't load this election's candidates. Please try again.
+  </p-message>
+
+  <ng-container *ngIf="!loading && election">
+    <div class="candidates-header">
+      <h1>{{ election.title }} - Candidates</h1>
+      <span class="badge status-badge" [ngClass]="'status-' + election.status.toLowerCase()">{{ election.status }}</span>
+    </div>
+
+    <section class="nominate-section" *ngIf="election.status === 'Draft' || election.status === 'Open'">
+      <h2>Nominate a Candidate</h2>
+
+      <div class="nominate-form">
+        <p-autoComplete
+          *ngIf="isEmployeeCandidateType"
+          [(ngModel)]="selectedEmployee"
+          [suggestions]="employeeSearchResults"
+          (completeMethod)="searchEmployees($event)"
+          field="employeeName"
+          placeholder="Search colleagues by name"
+          [appendTo]="'body'"
+          styleClass="w-full"
+        ></p-autoComplete>
+
+        <p-select
+          *ngIf="!isEmployeeCandidateType"
+          [options]="teams"
+          optionLabel="name"
+          optionValue="teamId"
+          [(ngModel)]="selectedTeamId"
+          placeholder="Choose a team"
+          [appendTo]="'body'"
+          styleClass="w-full"
+        ></p-select>
+
+        <textarea pTextarea rows="2" [(ngModel)]="manifesto" placeholder="Manifesto (optional)" class="w-full"></textarea>
+
+        <button type="button" pButton [disabled]="!canNominate" (click)="nominate()">
+          <i class="fa-solid fa-plus"></i> Nominate
+        </button>
+      </div>
+    </section>
+
+    <section class="candidates-list">
+      <div class="candidate-row" *ngFor="let candidate of candidates">
+        <div class="candidate-info">
+          <span class="candidate-name">{{ displayName(candidate) }}</span>
+          <span class="badge approved-badge" *ngIf="candidate.isApproved"><i class="fa-solid fa-check"></i> Approved</span>
+          <span class="badge pending-badge" *ngIf="!candidate.isApproved"><i class="fa-solid fa-hourglass-half"></i> Pending Approval</span>
+        </div>
+        <p class="manifesto" *ngIf="candidate.manifesto">{{ candidate.manifesto }}</p>
+        <div class="candidate-actions" *ngIf="isHrOrAdmin && !candidate.isApproved">
+          <button type="button" pButton size="small" [disabled]="submitting" (click)="approve(candidate)">
+            <i class="fa-solid fa-check"></i> Approve
+          </button>
+        </div>
+      </div>
+
+      <div class="not-found" *ngIf="candidates.length === 0">
+        <div><i class="fa-solid fa-user-group"></i><p>No candidates nominated yet.</p></div>
+      </div>
+    </section>
+  </ng-container>
+</section>

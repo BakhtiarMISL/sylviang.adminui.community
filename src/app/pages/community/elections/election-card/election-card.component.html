@@ -1,0 +1,48 @@
+<div class="election-card">
+  <div class="election-header">
+    <div class="header-text">
+      <div class="title-line">
+        <span class="title">{{ election.title }}</span>
+        <span class="badge status-badge" *ngIf="mode === 'admin'" [ngClass]="'status-' + asAdmin.status.toLowerCase()">{{ asAdmin.status }}</span>
+        <span class="badge anon-badge" *ngIf="mode === 'admin' && asAdmin.isAnonymous"><i class="fa-solid fa-user-secret"></i> Anonymous</span>
+        <span class="badge voted-badge" *ngIf="mode === 'eligible' && asEligible.hasVoted"><i class="fa-solid fa-check"></i> Voted</span>
+      </div>
+      <p class="description" *ngIf="election.description">{{ election.description }}</p>
+      <div class="meta-times">
+        <span class="meta-time" [title]="election.startDate | date: 'medium'">
+          <i class="fa-solid fa-play"></i> Starts {{ election.startDate | relativeTime: (timeTicker.now$ | async) }}
+        </span>
+        <span class="meta-time" *ngIf="election.endDate" [title]="election.endDate | date: 'medium'">
+          <i class="fa-solid fa-flag-checkered"></i> Ends {{ election.endDate | relativeTime: (timeTicker.now$ | async) }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="election-footer" *ngIf="mode === 'admin'">
+    <button *ngIf="asAdmin.status === 'Draft'" pButton size="small" severity="secondary" [routerLink]="['/community/elections', asAdmin.electionId, 'edit']">
+      <i class="fa-solid fa-pen"></i> Edit
+    </button>
+    <button pButton size="small" severity="secondary" [routerLink]="['/community/elections', asAdmin.electionId, 'candidates']">
+      <i class="fa-solid fa-user-group"></i> Candidates
+    </button>
+    <button *ngIf="asAdmin.status === 'Draft'" pButton size="small" [disabled]="submitting" (click)="publish()">
+      <i class="fa-solid fa-paper-plane"></i> Publish
+    </button>
+    <button *ngIf="asAdmin.status === 'Open' || asAdmin.status === 'Active'" pButton size="small" severity="secondary" [disabled]="submitting" (click)="close()">
+      <i class="fa-solid fa-lock"></i> Close
+    </button>
+    <button *ngIf="asAdmin.status !== 'Draft'" pButton size="small" severity="secondary" [routerLink]="['/community/elections', asAdmin.electionId, 'results']">
+      <i class="fa-solid fa-chart-column"></i> Results
+    </button>
+    <button *ngIf="asAdmin.status === 'Draft'" pButton size="small" severity="danger" [disabled]="submitting" (click)="deleteElection()">
+      <i class="fa-solid fa-trash"></i> Delete
+    </button>
+  </div>
+
+  <div class="election-footer" *ngIf="mode === 'eligible'">
+    <button *ngIf="!asEligible.hasVoted" pButton size="small" [routerLink]="['/community/elections', asEligible.electionId, 'vote']">
+      <i class="fa-solid fa-square-poll-vertical"></i> Vote Now
+    </button>
+  </div>
+</div>

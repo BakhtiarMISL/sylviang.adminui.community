@@ -16,6 +16,11 @@ import { SurveysComponent } from './surveys/surveys.component';
 import { SurveyBuilderComponent } from './surveys/survey-builder/survey-builder.component';
 import { SurveyTakeComponent } from './surveys/survey-take/survey-take.component';
 import { SurveyResultsComponent } from './surveys/survey-results/survey-results.component';
+import { ElectionsComponent } from './elections/elections.component';
+import { ElectionBuilderComponent } from './elections/election-builder/election-builder.component';
+import { ElectionCandidatesComponent } from './elections/election-candidates/election-candidates.component';
+import { ElectionVoteComponent } from './elections/election-vote/election-vote.component';
+import { ElectionResultsComponent } from './elections/election-results/election-results.component';
 import { TeamsListComponent } from './teams/teams-list/teams-list.component';
 import { TeamDetailComponent } from './teams/team-detail/team-detail.component';
 import { TasksHomeComponent } from './tasks/tasks-home/tasks-home.component';
@@ -64,6 +69,36 @@ const routes: Routes = [
   {
     path: 'surveys/:id/results',
     component: SurveyResultsComponent,
+    canActivate: [authGuard, hrAdminGuard],
+  },
+  {
+    path: 'elections',
+    component: ElectionsComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'elections/create',
+    component: ElectionBuilderComponent,
+    canActivate: [authGuard, hrAdminGuard],
+  },
+  {
+    path: 'elections/:id/edit',
+    component: ElectionBuilderComponent,
+    canActivate: [authGuard, hrAdminGuard],
+  },
+  {
+    path: 'elections/:id/candidates',
+    component: ElectionCandidatesComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'elections/:id/vote',
+    component: ElectionVoteComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'elections/:id/results',
+    component: ElectionResultsComponent,
     canActivate: [authGuard, hrAdminGuard],
   },
   {

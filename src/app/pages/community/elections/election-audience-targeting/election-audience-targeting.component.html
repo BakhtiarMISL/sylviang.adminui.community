@@ -1,0 +1,77 @@
+<div class="audience-targeting">
+  <div class="readonly-note" *ngIf="readonly">
+    <i class="fa-solid fa-lock"></i>
+    Voting scope is set and cannot be changed once configured - delete and recreate the election (while still a Draft) to retarget it.
+  </div>
+
+  <div class="radio-row">
+    <div class="radio-option" *ngFor="let option of scopeOptions">
+      <p-radioButton
+        name="audienceScope"
+        [value]="option.value"
+        [ngModel]="audienceScope"
+        [disabled]="readonly"
+        (ngModelChange)="onScopeChange($event)"
+        [inputId]="'scope-' + option.value"
+      ></p-radioButton>
+      <label [for]="'scope-' + option.value">{{ option.label }}</label>
+    </div>
+  </div>
+
+  <p-multiSelect
+    *ngIf="audienceScope === 'Department'"
+    [options]="departments"
+    optionLabel="name"
+    optionValue="departmentId"
+    [ngModel]="selectedDepartmentIds"
+    [disabled]="readonly"
+    (ngModelChange)="onDepartmentSelectionChange($event)"
+    placeholder="Choose one or more departments"
+    display="chip"
+    [appendTo]="'body'"
+    styleClass="w-full"
+  ></p-multiSelect>
+
+  <p-multiSelect
+    *ngIf="audienceScope === 'Branch'"
+    [options]="branches"
+    optionLabel="name"
+    optionValue="branchId"
+    [ngModel]="selectedBranchIds"
+    [disabled]="readonly"
+    (ngModelChange)="onBranchSelectionChange($event)"
+    placeholder="Choose one or more branches"
+    display="chip"
+    [appendTo]="'body'"
+    styleClass="w-full"
+  ></p-multiSelect>
+
+  <p-multiSelect
+    *ngIf="audienceScope === 'Team'"
+    [options]="teams"
+    optionLabel="name"
+    optionValue="teamId"
+    [ngModel]="selectedTeamIds"
+    [disabled]="readonly"
+    (ngModelChange)="onTeamSelectionChange($event)"
+    placeholder="Choose one or more teams"
+    display="chip"
+    [appendTo]="'body'"
+    styleClass="w-full"
+  ></p-multiSelect>
+
+  <p-autoComplete
+    *ngIf="audienceScope === 'SelectedEmployees'"
+    [(ngModel)]="selectedEmployees"
+    [suggestions]="employeeSearchResults"
+    (completeMethod)="searchEmployees($event)"
+    (onSelect)="onEmployeeSelectionChange(selectedEmployees)"
+    (onUnselect)="onEmployeeSelectionChange(selectedEmployees)"
+    field="employeeName"
+    [multiple]="true"
+    [disabled]="readonly"
+    placeholder="Search colleagues by name"
+    [appendTo]="'body'"
+    styleClass="w-full"
+  ></p-autoComplete>
+</div>
