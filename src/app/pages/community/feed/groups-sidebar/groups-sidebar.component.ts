@@ -10,6 +10,8 @@ import { GroupService } from '@core/services/community/group.service';
   styleUrl: './groups-sidebar.component.scss',
 })
 export class GroupsSidebarComponent implements OnInit {
+  private static readonly VISIBLE_LIMIT = 4;
+
   myGroups: IGroupResponse[] = [];
   loading = true;
 
@@ -17,6 +19,14 @@ export class GroupsSidebarComponent implements OnInit {
     private groupService: GroupService,
     private cdr: ChangeDetectorRef,
   ) {}
+
+  get visibleGroups(): IGroupResponse[] {
+    return this.myGroups.slice(0, GroupsSidebarComponent.VISIBLE_LIMIT);
+  }
+
+  get hasMoreGroups(): boolean {
+    return this.myGroups.length > GroupsSidebarComponent.VISIBLE_LIMIT;
+  }
 
   ngOnInit(): void {
     this.groupService.getMy().subscribe({

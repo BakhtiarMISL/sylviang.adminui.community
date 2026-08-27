@@ -1,0 +1,63 @@
+<section class="page-container election-vote-page">
+  <div *ngIf="loading" class="skeleton-list">
+    <p-skeleton width="100%" height="4rem" styleClass="mb-3"></p-skeleton>
+    <p-skeleton width="100%" height="8rem"></p-skeleton>
+  </div>
+
+  <p-message *ngIf="!loading && loadError" severity="error" styleClass="w-full mb-4">
+    Couldn't load this election. Please try again.
+  </p-message>
+
+  <ng-container *ngIf="!loading && election">
+    <div class="vote-header">
+      <h1>{{ election.title }}</h1>
+      <p class="description" *ngIf="election.description">{{ election.description }}</p>
+      <span class="badge anon-badge" *ngIf="election.isAnonymous"><i class="fa-solid fa-user-secret"></i> Anonymous - your identity won't be shown with your selections</span>
+      <p class="selection-hint" *ngIf="election.allowMultipleChoice">
+        Select between {{ election.minSelection }} and {{ election.maxSelection }} candidates.
+      </p>
+    </div>
+
+    <div class="not-found" *ngIf="currentEmployeeId === null">
+      <div><i class="fa-solid fa-circle-exclamation"></i><p>This account can't vote in elections.</p></div>
+    </div>
+
+    <form *ngIf="currentEmployeeId !== null" class="vote-form">
+      <div class="candidate-row" *ngFor="let candidate of approvedCandidates">
+        <ng-container *ngIf="!election.allowMultipleChoice">
+          <p-radioButton
+            name="candidate"
+            [value]="candidate.electionCandidateId"
+            [ngModel]="selectedCandidateId"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="selectedCandidateId = $event"
+            [inputId]="'candidate-' + candidate.electionCandidateId"
+          ></p-radioButton>
+        </ng-container>
+
+        <ng-container *ngIf="election.allowMultipleChoice">
+          <p-checkbox
+            [binary]="true"
+            [ngModel]="isSelected(candidate.electionCandidateId)"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="toggleSelection(candidate.electionCandidateId, $event)"
+            [inputId]="'candidate-' + candidate.electionCandidateId"
+          ></p-checkbox>
+        </ng-container>
+
+        <label [for]="'candidate-' + candidate.electionCandidateId" class="candidate-label">
+          <span class="candidate-name">{{ displayName(candidate) }}</span>
+          <span class="manifesto" *ngIf="candidate.manifesto">{{ candidate.manifesto }}</span>
+        </label>
+      </div>
+
+      <div class="not-found" *ngIf="approvedCandidates.length === 0">
+        <div><i class="fa-solid fa-user-group"></i><p>No approved candidates yet - check back once HR has finalized the ballot.</p></div>
+      </div>
+
+      <div class="vote-actions" *ngIf="approvedCandidates.length > 0">
+        <button type="button" pButton [disabled]="!canSubmit" (click)="submit()">Submit Vote</button>
+      </div>
+    </form>
+  </ng-container>
+</section>

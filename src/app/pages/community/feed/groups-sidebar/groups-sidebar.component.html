@@ -1,6 +1,6 @@
 <div class="groups-sidebar">
   <a class="groups-link" routerLink="/community/groups">
-    <i class="fa-solid fa-people-roof"></i>
+    <i class="fa-solid fa-people-roof text-primary"></i>
     <span>Groups</span>
   </a>
 
@@ -14,13 +14,15 @@
     </div>
 
     <ul class="my-groups-list" *ngIf="!loading && myGroups.length > 0">
-      <li *ngFor="let group of myGroups">
+      <li *ngFor="let group of visibleGroups">
         <a [routerLink]="['/community/groups', group.groupId]">
           <span class="group-name">{{ group.name }}</span>
           <span class="group-member-count">{{ group.memberCount }}</span>
         </a>
       </li>
     </ul>
+
+    <a *ngIf="!loading && hasMoreGroups" class="show-more-link text-primary" routerLink="/community/groups">Show more</a>
 
     <div class="empty-groups" *ngIf="!loading && myGroups.length === 0">
       <p>You haven't joined any groups yet.</p>

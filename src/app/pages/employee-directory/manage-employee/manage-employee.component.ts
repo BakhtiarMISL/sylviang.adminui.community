@@ -2,18 +2,22 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BreadcrumbService } from '@core/services/breadcrumb.service';
-import { BranchOptions, DepartmentOptions, DesignationOptions } from '@core/constants/employee-master-data';
+import { BranchOptions } from '@core/constants/employee-master-data';
+import { IDepartmentResponse } from '@core/interfaces/community/department.interface';
+import { IDesignationResponse } from '@core/interfaces/community/designation.interface';
 import { IEmployeeCreateRequest } from '@core/interfaces/employee-directory/employee.interface';
+import { DepartmentService } from '@core/services/community/department.service';
+import { DesignationService } from '@core/services/community/designation.service';
 import { EmployeeService } from '@core/services/employee-directory/employee/employee.service';
 import { ToastService } from '@core/services/misc/toast.service';
 
 /**
  * HR/Admin "Add Employee" (US-1.6). No edit-existing-employee form exists - no user story
  * asks for one (HR/Admin's only other action on an employee is Deactivate, from
- * user-management). Department/Designation/Branch are selected from a static demo option
- * list rather than a live-loaded one: the backend's Core master-data integration only
- * supports batch-lookup-by-known-ID (see ICoreGrpcClient), not "list all departments" -
- * there's no API this form could populate the dropdown from yet.
+ * user-management). Department/Designation are loaded live from this backend's own
+ * Department/Designation CRUD (same source Survey/Election audience targeting already uses),
+ * so what gets picked here is exactly what the Employee Table displays afterward. Branch still
+ * uses a static demo option list - the backend has no equivalent local Branch/Site CRUD yet.
  */
 @Component({
   selector: 'app-manage-employee',
@@ -25,6 +29,8 @@ export class ManageEmployeeComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private employeeService: EmployeeService,
+    private departmentService: DepartmentService,
+    private designationService: DesignationService,
     private breadcrumbService: BreadcrumbService,
     private toast: ToastService,
     private router: Router,
@@ -34,18 +40,29 @@ export class ManageEmployeeComponent implements OnInit {
   formSubmitted = false;
   saving = false;
 
-  departmentOptions = DepartmentOptions;
-  designationOptions = DesignationOptions;
+  departmentOptions: IDepartmentResponse[] = [];
+  designationOptions: IDesignationResponse[] = [];
   branchOptions = BranchOptions;
+  today = new Date();
 
   ngOnInit(): void {
     this.initForm();
+    this.loadDepartmentsAndDesignations();
 
     this.breadcrumbService.setBreadcrumbs([
       { title: 'Employee Directory', icon: 'fa-solid fa-id-badge', href: '/employee-directory/directory' },
       { title: 'User Management', icon: 'fa-solid fa-users-gear', href: '/employee-directory/user-management' },
       { title: 'Add Employee', icon: 'fa-solid fa-user-plus', href: '/employee-directory/manage-employee' },
     ]);
+  }
+
+  private loadDepartmentsAndDesignations(): void {
+    this.departmentService.getPaged().subscribe((response) => {
+      this.departmentOptions = !response.hasError && response.content ? response.content.data || [] : [];
+    });
+    this.designationService.getPaged().subscribe((response) => {
+      this.designationOptions = !response.hasError && response.content ? response.content.data || [] : [];
+    });
   }
 
   private initForm(): void {
@@ -55,6 +72,7 @@ export class ManageEmployeeComponent implements OnInit {
       designationId: [null, [Validators.required, Validators.min(1)]],
       departmentId: [null, [Validators.required, Validators.min(1)]],
       siteId: [null, [Validators.required, Validators.min(1)]],
+      dateOfJoining: [new Date(), [Validators.required]],
     });
   }
 
@@ -82,6 +100,7 @@ export class ManageEmployeeComponent implements OnInit {
       designationId: 'Designation',
       departmentId: 'Department',
       siteId: 'Branch',
+      dateOfJoining: 'Date of Joining',
     };
     const displayName = displayNames[fieldName] || fieldName;
 
@@ -103,7 +122,11 @@ export class ManageEmployeeComponent implements OnInit {
       return;
     }
 
-    const request: IEmployeeCreateRequest = this.employeeForm.value;
+    const raw = this.employeeForm.value;
+    const request: IEmployeeCreateRequest = {
+      ...raw,
+      dateOfJoining: (raw.dateOfJoining as Date).toISOString(),
+    };
 
     this.saving = true;
     this.employeeService.addEmployee(request).subscribe({

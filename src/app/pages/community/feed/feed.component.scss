@@ -43,11 +43,22 @@
 }
 
 .feed-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   flex: 0 0 280px;
   position: sticky;
   top: 1rem;
 
   @media (max-width: 900px) {
+    display: none;
+  }
+}
+
+.feed-sidebar-right {
+  // A 3-column flex row needs more room before it's usable, so this collapses earlier
+  // than the left .feed-sidebar's 900px breakpoint.
+  @media (max-width: 1200px) {
     display: none;
   }
 }

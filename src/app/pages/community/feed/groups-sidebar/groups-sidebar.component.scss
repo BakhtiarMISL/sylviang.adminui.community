@@ -70,6 +70,20 @@
   flex-shrink: 0;
 }
 
+.show-more-link {
+  display: block;
+  margin-top: 0.25rem;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .empty-groups {
   padding: 0.5rem;
   font-size: 0.85rem;

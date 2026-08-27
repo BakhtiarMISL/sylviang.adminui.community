@@ -1,0 +1,71 @@
+<section class="page-container election-results-page">
+  <div *ngIf="loading" class="skeleton-list">
+    <p-skeleton width="100%" height="4rem" styleClass="mb-3"></p-skeleton>
+    <p-skeleton width="100%" height="8rem"></p-skeleton>
+  </div>
+
+  <p-message *ngIf="!loading && loadError" severity="error" styleClass="w-full mb-4">
+    Couldn't load this election's results. Please try again.
+  </p-message>
+
+  <ng-container *ngIf="!loading && election && results">
+    <div class="results-header">
+      <h1>{{ election.title }} - Results</h1>
+      <span class="badge anon-badge" *ngIf="results.isAnonymous"><i class="fa-solid fa-user-secret"></i> Anonymous election - no per-voter breakdown</span>
+      <span class="badge live-badge" *ngIf="results.status === 'Open' || results.status === 'Active'"><i class="fa-solid fa-circle-dot"></i> Live totals - voting still open</span>
+    </div>
+
+    <div class="summary-row">
+      <div class="summary-tile">
+        <span class="tile-value">{{ results.totalVotes }}</span>
+        <span class="tile-label">Total Votes</span>
+      </div>
+    </div>
+
+    <div class="candidate-result" *ngFor="let tally of results.candidateTallies">
+      <div class="option-row">
+        <span class="option-text">{{ candidateName(tally.electionCandidateId) }}</span>
+        <span class="option-count">{{ tally.voteCount }} ({{ percentage(tally) | number: '1.0-1' }}%)</span>
+      </div>
+      <p-progressBar [value]="percentage(tally)" [showValue]="false"></p-progressBar>
+    </div>
+
+    <div class="not-found" *ngIf="results.candidateTallies.length === 0">
+      <div><i class="fa-solid fa-chart-column"></i><p>No candidates to report on.</p></div>
+    </div>
+
+    <section class="voters-section" *ngIf="!results.isAnonymous && results.voterDetails">
+      <h2>Individual Votes</h2>
+
+      <div class="table-container">
+        <p-table [value]="results.voterDetails" dataKey="voterId" [responsiveLayout]="'scroll'">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Voter</th>
+              <th>Selections</th>
+              <th>Voted At</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-voter>
+            <tr>
+              <td>{{ voterName(voter.voterId) }}</td>
+              <td>
+                <ng-container *ngFor="let candidateId of voter.candidateIds; let last = last">{{ candidateName(candidateId) }}{{ last ? '' : ', ' }}</ng-container>
+              </td>
+              <td>{{ voter.votedAt | date: 'dd-MMM-yyyy HH:mm' }}</td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="3" class="not-found">
+                <div><i class="fa-solid fa-inbox"></i><p>No votes yet.</p></div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </section>
+  </ng-container>
+</section>

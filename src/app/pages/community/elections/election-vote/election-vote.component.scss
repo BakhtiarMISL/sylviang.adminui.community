@@ -1,0 +1,83 @@
+:host {
+  display: block;
+}
+
+.vote-header {
+  margin-bottom: 1rem;
+
+  h1 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .description {
+    margin-top: 0.4rem;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    opacity: 0.85;
+  }
+
+  .selection-hint {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    opacity: 0.75;
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  margin-top: 0.4rem;
+}
+
+.anon-badge {
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+}
+
+:host-context(.dark) .anon-badge {
+  background: rgba(251, 191, 36, 0.25);
+  color: #fde68a;
+}
+
+.vote-form {
+  max-width: 32rem;
+}
+
+.candidate-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  background: var(--surface-elevated);
+  border-radius: 0.75rem;
+  padding: 0.85rem 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 0.6rem;
+}
+
+.candidate-label {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.candidate-name {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.manifesto {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  opacity: 0.75;
+  margin-top: 0.15rem;
+}
+
+.vote-actions {
+  margin-top: 1rem;
+}

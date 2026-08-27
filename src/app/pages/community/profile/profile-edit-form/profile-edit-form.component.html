@@ -11,6 +11,13 @@
 
   <div>
     <p-floatlabel variant="in">
+      <p-datepicker inputId="dateOfBirth" formControlName="dateOfBirth" dateFormat="dd-M-yy" [showIcon]="true" [maxDate]="today" [appendTo]="'body'" class="w-full" styleClass="w-full"></p-datepicker>
+      <label for="dateOfBirth">Date of Birth</label>
+    </p-floatlabel>
+  </div>
+
+  <div>
+    <p-floatlabel variant="in">
       <input pInputText inputId="skills" formControlName="skills" class="w-full" [class.ng-invalid]="hasError('skills')" />
       <label for="skills">Skills (comma separated)</label>
     </p-floatlabel>

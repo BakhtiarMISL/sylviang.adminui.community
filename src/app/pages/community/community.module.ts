@@ -21,6 +21,9 @@ import { MentionTextareaComponent } from './feed/mention-textarea/mention-textar
 import { PollWidgetComponent } from './feed/poll-widget/poll-widget.component';
 import { ReportContentDialogComponent } from './feed/report-content-dialog/report-content-dialog.component';
 import { GroupsSidebarComponent } from './feed/groups-sidebar/groups-sidebar.component';
+import { ProfileSummaryComponent } from './feed/profile-summary/profile-summary.component';
+import { TodayEventsCardComponent } from './feed/today-events-card/today-events-card.component';
+import { NewJoineesCardComponent } from './feed/new-joinees-card/new-joinees-card.component';
 import { ModerationQueueComponent } from './moderation/moderation-queue.component';
 import { CommunityProfileEditFormComponent } from './profile/profile-edit-form/profile-edit-form.component';
 import { CommunityProfileComponent } from './profile/profile.component';
@@ -54,6 +57,13 @@ import { SurveyBuilderComponent } from './surveys/survey-builder/survey-builder.
 import { SurveyAudienceTargetingComponent } from './surveys/survey-audience-targeting/survey-audience-targeting.component';
 import { SurveyTakeComponent } from './surveys/survey-take/survey-take.component';
 import { SurveyResultsComponent } from './surveys/survey-results/survey-results.component';
+import { ElectionsComponent } from './elections/elections.component';
+import { ElectionCardComponent } from './elections/election-card/election-card.component';
+import { ElectionBuilderComponent } from './elections/election-builder/election-builder.component';
+import { ElectionAudienceTargetingComponent } from './elections/election-audience-targeting/election-audience-targeting.component';
+import { ElectionCandidatesComponent } from './elections/election-candidates/election-candidates.component';
+import { ElectionVoteComponent } from './elections/election-vote/election-vote.component';
+import { ElectionResultsComponent } from './elections/election-results/election-results.component';
 import { TeamsListComponent } from './teams/teams-list/teams-list.component';
 import { TeamFormDialogComponent } from './teams/team-form-dialog/team-form-dialog.component';
 import { TeamDetailComponent } from './teams/team-detail/team-detail.component';
@@ -76,6 +86,9 @@ import { TaskDetailDialogComponent } from './tasks/task-detail-dialog/task-detai
     PollWidgetComponent,
     ReportContentDialogComponent,
     GroupsSidebarComponent,
+    ProfileSummaryComponent,
+    TodayEventsCardComponent,
+    NewJoineesCardComponent,
     ModerationQueueComponent,
     CommunityProfileComponent,
     CommunityProfileEditFormComponent,
@@ -109,6 +122,13 @@ import { TaskDetailDialogComponent } from './tasks/task-detail-dialog/task-detai
     SurveyAudienceTargetingComponent,
     SurveyTakeComponent,
     SurveyResultsComponent,
+    ElectionsComponent,
+    ElectionCardComponent,
+    ElectionBuilderComponent,
+    ElectionAudienceTargetingComponent,
+    ElectionCandidatesComponent,
+    ElectionVoteComponent,
+    ElectionResultsComponent,
     TeamsListComponent,
     TeamFormDialogComponent,
     TeamDetailComponent,

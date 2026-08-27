@@ -20,6 +20,11 @@
   </div>
 
   <div class="feed-layout">
+    <aside class="feed-sidebar">
+      <app-profile-summary></app-profile-summary>
+      <app-groups-sidebar></app-groups-sidebar>
+    </aside>
+
     <div class="feed-main">
       <div *ngIf="highlightedPost" class="highlighted-post-banner">
         <p>Viewing a reported post &mdash; <a [routerLink]="[]" (click)="clearHighlightedPost()">back to Feed</a></p>
@@ -50,8 +55,9 @@
       <div #scrollAnchor class="scroll-anchor"></div>
     </div>
 
-    <aside class="feed-sidebar">
-      <app-groups-sidebar></app-groups-sidebar>
+    <aside class="feed-sidebar feed-sidebar-right">
+      <app-today-events-card></app-today-events-card>
+      <app-new-joinees-card></app-new-joinees-card>
     </aside>
   </div>
 </section>

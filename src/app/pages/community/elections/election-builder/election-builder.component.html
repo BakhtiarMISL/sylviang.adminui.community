@@ -1,0 +1,132 @@
+<section class="page-container election-builder-page">
+  <div class="builder-header">
+    <h1>{{ isEditMode ? 'Edit Election' : 'Create Election' }}</h1>
+  </div>
+
+  <div *ngIf="loading" class="skeleton-list">
+    <p-skeleton width="100%" height="3rem" styleClass="mb-3"></p-skeleton>
+    <p-skeleton width="100%" height="8rem"></p-skeleton>
+  </div>
+
+  <form *ngIf="!loading" [formGroup]="electionForm" class="builder-form">
+    <section class="form-section">
+      <h2>Details</h2>
+
+      <div class="field">
+        <p-floatlabel variant="in">
+          <input
+            id="election-title"
+            pInputText
+            type="text"
+            formControlName="title"
+            class="w-full"
+            [class.ng-invalid]="hasError('title')"
+            (blur)="f['title'].markAsTouched()"
+          />
+          <label for="election-title">Title *</label>
+        </p-floatlabel>
+        <div *ngIf="hasError('title')" class="invalid">{{ getErrorMessage('title') }}</div>
+      </div>
+
+      <div class="field">
+        <p-floatlabel variant="in">
+          <textarea id="election-description" pTextarea rows="3" formControlName="description" class="w-full"></textarea>
+          <label for="election-description">Description</label>
+        </p-floatlabel>
+      </div>
+
+      <div class="date-row">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-datepicker id="election-start" formControlName="startDate" [showTime]="true" [appendTo]="'body'" styleClass="w-full"></p-datepicker>
+            <label for="election-start">Start Date *</label>
+          </p-floatlabel>
+          <div *ngIf="hasError('startDate')" class="invalid">{{ getErrorMessage('startDate') }}</div>
+        </div>
+
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-datepicker id="election-end" formControlName="endDate" [showTime]="true" [appendTo]="'body'" styleClass="w-full"></p-datepicker>
+            <label for="election-end">End Date (optional)</label>
+          </p-floatlabel>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h2>Voting Rules</h2>
+
+      <div class="field">
+        <label>Voting type</label>
+        <div class="radio-row">
+          <div class="radio-option" *ngFor="let option of votingTypeOptions">
+            <p-radioButton
+              name="electionType"
+              [value]="option.value"
+              [ngModel]="f['electionType'].value"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="onVotingTypeChange($event)"
+              [inputId]="'type-' + option.value"
+            ></p-radioButton>
+            <label [for]="'type-' + option.value">{{ option.label }}</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="minmax-row" *ngIf="isMultipleChoice">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <input id="min-selection" pInputText type="number" min="1" formControlName="minSelection" class="w-full" />
+            <label for="min-selection">Minimum Selectable *</label>
+          </p-floatlabel>
+          <div *ngIf="hasError('minSelection')" class="invalid">{{ getErrorMessage('minSelection') }}</div>
+        </div>
+        <div class="field">
+          <p-floatlabel variant="in">
+            <input id="max-selection" pInputText type="number" min="1" formControlName="maxSelection" class="w-full" />
+            <label for="max-selection">Maximum Selectable *</label>
+          </p-floatlabel>
+          <div *ngIf="hasError('maxSelection')" class="invalid">{{ getErrorMessage('maxSelection') }}</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Candidate type</label>
+        <div class="radio-row">
+          <div class="radio-option" *ngFor="let option of candidateTypeOptions">
+            <p-radioButton
+              name="candidateType"
+              [value]="option.value"
+              formControlName="candidateType"
+              [inputId]="'candidate-type-' + option.value"
+            ></p-radioButton>
+            <label [for]="'candidate-type-' + option.value">{{ option.label }}</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="toggle-row">
+        <p-checkbox formControlName="isAnonymous" [binary]="true" inputId="isAnonymous"></p-checkbox>
+        <label for="isAnonymous">Anonymous - only aggregated totals are shown, no voter identity in results</label>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h2>Voting Scope</h2>
+      <app-election-audience-targeting
+        [audienceScope]="audienceScope"
+        (audienceScopeChange)="audienceScope = $event"
+        [targetIds]="targetIds"
+        (targetIdsChange)="targetIds = $event"
+        [readonly]="hasExistingAudience"
+      ></app-election-audience-targeting>
+    </section>
+
+    <div class="builder-actions">
+      <button type="button" pButton severity="secondary" routerLink="/community/elections">Cancel</button>
+      <button type="button" pButton [disabled]="!canSubmit" (click)="save()">
+        {{ isEditMode ? 'Save Changes' : 'Save as Draft' }}
+      </button>
+    </div>
+  </form>
+</section>

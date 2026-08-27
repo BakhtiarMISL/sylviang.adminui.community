@@ -53,6 +53,7 @@ export class AuthService {
   logout(): void {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(TOKEN_EXPIRY_KEY);
+    this.currentUserService.clearCurrentUser();
     this.notificationHubService.stop();
   }
 

@@ -2,6 +2,7 @@ import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { DISABLE_TOAST } from '@core/constants/http-context';
 import { ApiResponse } from '@core/interfaces/ApiResponse';
+import { INewJoineeResponse, ITodayEventResponse } from '@core/interfaces/employee-directory/employee-feed-widgets.interface';
 import {
   IEmployeeCreateRequest,
   IEmployeeCredentialCreateRequest,
@@ -40,6 +41,14 @@ export class EmployeeService {
 
   getEmployeeById(employeeId: number) {
     return this.httpClient.get<ApiResponse<IEmployeeResponse>>(`${this.API_URL}/${employeeId}`);
+  }
+
+  getTodayEvents() {
+    return this.httpClient.get<ApiResponse<ITodayEventResponse[]>>(`${this.API_URL}/today-events`);
+  }
+
+  getNewJoinees() {
+    return this.httpClient.get<ApiResponse<INewJoineeResponse[]>>(`${this.API_URL}/new-joinees`);
   }
 
   addEmployee(employee: IEmployeeCreateRequest) {

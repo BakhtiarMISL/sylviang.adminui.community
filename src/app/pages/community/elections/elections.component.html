@@ -1,0 +1,55 @@
+<section class="page-container elections-page">
+  <div class="elections-header">
+    <h1>Elections</h1>
+
+    <div class="header-actions">
+      <button *ngIf="isHrOrAdmin" pButton routerLink="/community/elections/create">
+        <i class="fa-solid fa-plus"></i>
+        Create Election
+      </button>
+    </div>
+  </div>
+
+  <p-message *ngIf="!loading && loadError" severity="error" styleClass="w-full mb-4">
+    Couldn't load elections. Please try again.
+  </p-message>
+
+  <div *ngIf="loading" class="skeleton-list">
+    <p-skeleton width="100%" height="6rem" styleClass="mb-3"></p-skeleton>
+    <p-skeleton width="100%" height="6rem"></p-skeleton>
+  </div>
+
+  <p-tabView *ngIf="!loading" [activeIndex]="activeTabIndexForView" (onChange)="onTabChange($event.index)">
+    <p-tabPanel *ngIf="currentEmployeeId !== null" header="Open For Me">
+      <app-election-card
+        *ngFor="let election of eligibleElections"
+        [election]="election"
+        mode="eligible"
+        (changed)="onElectionChanged()"
+      ></app-election-card>
+      <div class="not-found" *ngIf="eligibleElections.length === 0">
+        <div><i class="fa-solid fa-square-poll-vertical"></i><p>No elections are currently open for you to vote in.</p></div>
+      </div>
+    </p-tabPanel>
+
+    <p-tabPanel *ngIf="isHrOrAdmin" header="All Elections">
+      <app-election-card
+        *ngFor="let election of pagedAllElections"
+        [election]="election"
+        mode="admin"
+        (changed)="onElectionChanged()"
+      ></app-election-card>
+      <div class="not-found" *ngIf="allElections.length === 0">
+        <div><i class="fa-solid fa-square-poll-vertical"></i><p>No elections created yet.</p></div>
+      </div>
+      <p-paginator
+        *ngIf="allElections.length > pageRows"
+        [rows]="pageRows"
+        [totalRecords]="allElections.length"
+        [first]="(currentPage - 1) * pageRows"
+        [rowsPerPageOptions]="UI_CONFIG.pageSizeOptions"
+        (onPageChange)="onPageChange($event)"
+      ></p-paginator>
+    </p-tabPanel>
+  </p-tabView>
+</section>

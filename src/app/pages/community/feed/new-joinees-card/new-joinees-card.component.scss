@@ -1,0 +1,55 @@
+:host {
+  display: block;
+}
+
+.new-joinees-card {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 0.75rem;
+}
+
+.card-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem 0.5rem;
+}
+
+.joinee-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+.joinee-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.joinee-label {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+.empty-joinees {
+  padding: 0.5rem;
+  font-size: 0.85rem;
+  opacity: 0.75;
+
+  p {
+    margin: 0;
+  }
+}

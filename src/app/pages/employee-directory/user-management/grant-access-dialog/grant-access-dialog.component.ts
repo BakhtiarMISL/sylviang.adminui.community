@@ -9,11 +9,13 @@ export type GrantAccessDialogMode = 'grant' | 'reset';
 
 /**
  * HR/Admin grants an existing employee real login access - creates a Keycloak account (username +
- * temporary password, forced change at first login) via EmployeeCredentialController. Also doubles
- * as the "reset password" dialog (mode="reset") for an employee who already has an account and
- * forgot their password - passwords can never be viewed once set (Keycloak only stores a one-way
- * hash), so the only way to help them is to set a new temporary one. Distinct from change-password,
- * which only manages this admin UI's own local-login accounts.
+ * password, usable to log in immediately) via EmployeeCredentialController. Not a forced-change
+ * temporary credential: this app authenticates via Keycloak's Direct Access Grant, which has no
+ * interactive UI to complete a forced password-change step, so the backend sets the password as
+ * non-temporary. Also doubles as the "reset password" dialog (mode="reset") for an employee who
+ * already has an account and forgot their password - passwords can never be viewed once set
+ * (Keycloak only stores a one-way hash), so the only way to help them is to set a new one.
+ * Distinct from change-password, which only manages this admin UI's own local-login accounts.
  */
 @Component({
   selector: 'app-grant-access-dialog',
@@ -49,7 +51,7 @@ export class GrantAccessDialogComponent implements OnChanges {
   }
 
   get introText(): string {
-    return this.isGrantMode ? 'Create login credentials for' : 'Set a new temporary password for';
+    return this.isGrantMode ? 'Create login credentials for' : 'Set a new password for';
   }
 
   get submitLabel(): string {
@@ -123,7 +125,7 @@ export class GrantAccessDialogComponent implements OnChanges {
       next: (response) => {
         this.submitting = false;
         if (!response.hasError) {
-          this.toastService.success({ detail: 'Password reset. Give the new temporary password to the employee.' });
+          this.toastService.success({ detail: 'Password reset. Give the new password to the employee.' });
           this.close();
         } else {
           this.toastService.error({ detail: response.decentMessage || 'Could not reset the password.' });

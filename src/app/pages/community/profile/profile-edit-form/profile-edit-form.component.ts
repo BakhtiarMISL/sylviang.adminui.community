@@ -33,7 +33,10 @@ export class CommunityProfileEditFormComponent implements OnChanges {
   platformOptions = ContactLinkPlatformOptions;
   readonly OTHER = CONTACT_LINK_OTHER_VALUE;
 
+  today = new Date();
+
   form: FormGroup = this.fb.group({
+    dateOfBirth: [null as Date | null],
     bio: [null as string | null, [Validators.maxLength(2000)]],
     skills: [null as string | null, [Validators.maxLength(1000)]],
     interests: [null as string | null, [Validators.maxLength(1000)]],
@@ -57,6 +60,7 @@ export class CommunityProfileEditFormComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['employee'] && this.employee) {
       this.form.patchValue({
+        dateOfBirth: this.employee.dateOfBirth ? new Date(this.employee.dateOfBirth) : null,
         bio: this.employee.bio,
         skills: this.employee.skills.join(', '),
         interests: this.employee.interests.join(', '),
@@ -122,6 +126,7 @@ export class CommunityProfileEditFormComponent implements OnChanges {
     const raw = this.form.value;
     const request: IEmployeeUpdateProfileRequest = {
       ...raw,
+      dateOfBirth: raw.dateOfBirth ? (raw.dateOfBirth as Date).toISOString() : null,
       contactLinks: raw.contactLinks.map((link: any) => ({
         id: link.id,
         platform: link.platform === this.OTHER ? link.customLabel : link.platform,

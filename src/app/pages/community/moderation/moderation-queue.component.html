@@ -38,7 +38,7 @@
             </tr>
           } @else {
             <tr>
-              <td class="content-cell">
+              <td class="content-cell clickable-cell" (click)="viewReportedContent(report)">
                 <span class="post-type-badge">{{ report.postType }}</span>
                 <p class="content-preview">{{ report.postContentPreview }}</p>
                 <span class="state-badges">
@@ -56,9 +56,6 @@
               </td>
               <td>
                 <div class="row-actions">
-                  <button pButton size="small" severity="secondary" pTooltip="View reported content" (click)="viewReportedContent(report)">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                  </button>
                   <button pButton size="small" severity="secondary" [pTooltip]="report.isPostLocked ? 'Unlock comments' : 'Lock comments'" (click)="toggleLocked(report)">
                     <i class="fa-solid" [ngClass]="report.isPostLocked ? 'fa-unlock' : 'fa-lock'"></i>
                   </button>
@@ -94,7 +91,7 @@
     </div>
 
     <div class="table-container marketplace-tab" *ngIf="activeTabIndex === 1">
-      <h3 class="subsection-header">Pending Listings</h3>
+      <h3 class="subsection-header"> Pending Listings</h3>
       <p-table [value]="marketplaceLoading ? skeletonItems : pendingListings" dataKey="listingId">
         <ng-template pTemplate="header">
           <tr>
@@ -116,7 +113,7 @@
               <td>{{ listing.title }}</td>
               <td>{{ listing.category }}</td>
               <td>{{ listing.price | number: '1.2-2' }} {{ listing.currency }}</td>
-              <td>#{{ listing.sellerId }}</td>
+              <td>{{ nameFor(listing.sellerId) }}</td>
               <td>
                 <div class="row-actions">
                   <button pButton size="small" severity="success" [disabled]="pendingActionListingId === listing.listingId" pTooltip="Approve" (click)="approveListing(listing)">
@@ -143,7 +140,7 @@
         </ng-template>
       </p-table>
 
-      <h3 class="subsection-header">Reported Listings</h3>
+      <h3 class="subsection-header"> Reported Listings</h3>
       <p-table [value]="marketplaceLoading ? [] : openListingReports" dataKey="reportId">
         <ng-template pTemplate="header">
           <tr>
@@ -156,8 +153,8 @@
 
         <ng-template pTemplate="body" let-report>
           <tr>
-            <td>#{{ report.listingId }}</td>
-            <td>#{{ report.reportedBy }}</td>
+            <td>{{ titleFor(report.listingId) }}</td>
+            <td>{{ nameFor(report.reportedBy) }}</td>
             <td>{{ report.reason }}</td>
             <td>
               <div class="row-actions">
