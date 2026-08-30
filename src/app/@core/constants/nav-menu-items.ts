@@ -78,6 +78,12 @@ export const webSidebarMenuItems: IMenuItem[] = [
         icon: 'fa-solid fa-stream',
       },
       {
+        href: '/messenger',
+        title: 'Messenger',
+        active: false,
+        icon: 'fa-solid fa-comment-dots',
+      },
+      {
         href: '/community/groups',
         title: 'Groups',
         active: false,

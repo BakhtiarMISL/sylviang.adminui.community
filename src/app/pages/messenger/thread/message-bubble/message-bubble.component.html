@@ -1,0 +1,174 @@
+<div class="flex items-end gap-2 mb-1" [class.justify-end]="isOwn" [class.justify-start]="!isOwn">
+  <span
+    *ngIf="!isOwn"
+    class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold bg-primary/15 text-primary shrink-0 overflow-hidden"
+    [class.invisible]="!showSenderInfo"
+  >
+    <img *ngIf="message.senderPhotoUrl" [src]="avatarUrl(message.senderPhotoUrl)" class="w-full h-full object-cover" alt="" />
+    <span *ngIf="!message.senderPhotoUrl">{{ initial(message.senderName) }}</span>
+  </span>
+
+  <div class="max-w-[70%] flex flex-col" [class.items-end]="isOwn" [class.items-start]="!isOwn">
+    <span *ngIf="!isOwn && showSenderInfo" class="text-xs text-neutral mb-0.5 ml-1">{{ message.senderName }}</span>
+
+    <div *ngIf="message.isDeleted" class="text-xs text-neutral italic px-2 py-1.5">
+      <i class="fas fa-ban mr-1"></i>{{ isOwn ? 'You removed a message' : 'This message was removed' }}
+    </div>
+
+    <div *ngIf="!message.isDeleted && message.messageType === 'System'" class="text-xs text-neutral italic px-2 py-1">
+      {{ message.body }}
+    </div>
+
+    <ng-container *ngIf="!message.isDeleted && message.messageType !== 'System'">
+      <p *ngIf="message.isForwarded" class="text-[11px] text-neutral italic mb-0.5" [class.text-right]="isOwn">
+        <i class="fas fa-share mr-1"></i>Forwarded
+      </p>
+
+      <div
+        *ngIf="message.replyTo as replyTo"
+        class="max-w-[70%] mb-1 rounded-lg border-l-2 border-primary/60 bg-gray-100 dark:bg-white/5 px-2 py-1"
+        [class.ml-auto]="isOwn"
+      >
+        <p class="text-[11px] font-semibold text-primary truncate">{{ replyTo.senderName }}</p>
+        <p class="text-[11px] text-neutral truncate">
+          <ng-container *ngIf="replyTo.isDeleted">Original message removed</ng-container>
+          <ng-container *ngIf="!replyTo.isDeleted">{{ replyTo.bodyPreview || (replyTo.hasAttachment ? 'Attachment' : '') }}</ng-container>
+        </p>
+      </div>
+
+      <div class="group/bubble relative flex items-center gap-1.5" [class.flex-row-reverse]="isOwn">
+        <div>
+          <!-- Image attachments -->
+          <div *ngFor="let attachment of message.attachments" class="mb-1">
+            <a *ngIf="attachment.attachmentType === 'Image'" [href]="fileUrl(attachment)" target="_blank" rel="noopener">
+              <img [src]="fileUrl(attachment)" [alt]="attachment.originalFileName" class="max-w-[16rem] max-h-[16rem] rounded-lg object-cover" />
+            </a>
+
+            <a
+              *ngIf="attachment.attachmentType === 'File'"
+              [href]="downloadUrl(attachment)"
+              class="flex items-center gap-2.5 rounded-xl px-3 py-2 bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 duration-150"
+            >
+              <span class="w-8 h-8 flex items-center justify-center rounded-full bg-primary/15 text-primary shrink-0">
+                <i class="fas fa-file"></i>
+              </span>
+              <span class="min-w-0">
+                <span class="block text-sm text-dark dark:text-borderLight truncate max-w-[10rem]">{{ attachment.originalFileName }}</span>
+                <span class="block text-xs text-neutral">{{ formatFileSize(attachment.fileSize) }}</span>
+              </span>
+            </a>
+
+            <div *ngIf="attachment.attachmentType === 'Voice'" class="flex items-center gap-2 rounded-full px-3 py-2 bg-gray-100 dark:bg-white/10">
+              <i class="fas fa-microphone text-primary"></i>
+              <audio [src]="fileUrl(attachment)" controls class="h-8 max-w-[12rem]"></audio>
+              <span class="text-xs text-neutral">{{ formatDuration(attachment.durationSeconds) }}</span>
+            </div>
+          </div>
+
+          <!-- Text (also doubles as an optional caption alongside attachments) -->
+          <div
+            *ngIf="message.body"
+            class="rounded-2xl px-3 py-2 text-sm break-words"
+            [ngClass]="isOwn ? 'bg-primary text-white rounded-br-sm' : 'bg-gray-100 dark:bg-white/10 text-dark dark:text-borderLight rounded-bl-sm'"
+          >
+            {{ message.body }}
+          </div>
+        </div>
+
+        <!-- Fixed internal order (⋯ then react), independent of the outer row's flex-row-reverse -
+             so the "more actions" menu is always immediately before the reaction button, for both
+             my own and others' messages, not swapped depending on which side the bubble is on. -->
+        <div class="flex items-center gap-1.5 shrink-0">
+          <div class="relative shrink-0">
+            <button
+              type="button"
+              (click)="toggleActionsMenu()"
+              class="h-6 w-6 flex items-center justify-center rounded-full text-neutral opacity-0 group-hover/bubble:opacity-100 hover:bg-gray-100 dark:hover:bg-white/10 duration-150"
+              [attr.aria-label]="'More actions'"
+            >
+              <i class="fas fa-ellipsis text-xs"></i>
+            </button>
+
+            <div
+              *ngIf="actionsMenuOpen"
+              class="absolute z-10 bottom-full mb-1 flex flex-col rounded-lg border border-borderLight dark:border-borderDark bg-light dark:bg-dark shadow-lg py-1 min-w-[9rem]"
+              [ngClass]="isOwn ? 'right-0' : 'left-0'"
+            >
+              <button
+                type="button"
+                (click)="onReply()"
+                class="flex items-center gap-2 px-3 py-1.5 text-xs text-dark dark:text-borderLight hover:bg-gray-100 dark:hover:bg-white/10 duration-150 text-left"
+              >
+                <i class="fas fa-reply w-4 text-neutral"></i>Reply
+              </button>
+              <button
+                type="button"
+                (click)="onForward()"
+                class="flex items-center gap-2 px-3 py-1.5 text-xs text-dark dark:text-borderLight hover:bg-gray-100 dark:hover:bg-white/10 duration-150 text-left"
+              >
+                <i class="fas fa-share w-4 text-neutral"></i>Forward
+              </button>
+              <button
+                *ngIf="isOwn"
+                type="button"
+                (click)="onDelete()"
+                class="flex items-center gap-2 px-3 py-1.5 text-xs text-red-600 hover:bg-gray-100 dark:hover:bg-white/10 duration-150 text-left"
+              >
+                <i class="fas fa-trash w-4"></i>Delete
+              </button>
+              <button
+                *ngIf="!isOwn"
+                type="button"
+                (click)="onReport()"
+                class="flex items-center gap-2 px-3 py-1.5 text-xs text-red-600 hover:bg-gray-100 dark:hover:bg-white/10 duration-150 text-left"
+              >
+                <i class="fas fa-flag w-4"></i>Report
+              </button>
+            </div>
+          </div>
+
+          <div class="relative shrink-0">
+            <button
+              type="button"
+              (click)="togglePicker()"
+              class="h-6 w-6 flex items-center justify-center rounded-full text-neutral opacity-0 group-hover/bubble:opacity-100 hover:bg-gray-100 dark:hover:bg-white/10 duration-150"
+              [attr.aria-label]="'React'"
+            >
+              <i class="fa-regular fa-face-smile text-xs"></i>
+            </button>
+
+            <div
+              *ngIf="pickerOpen"
+              class="absolute z-10 bottom-full mb-1 flex items-center gap-1 rounded-full border border-borderLight dark:border-borderDark bg-light dark:bg-dark shadow-lg px-2 py-1"
+              [ngClass]="isOwn ? 'right-0' : 'left-0'"
+            >
+              <button
+                *ngFor="let option of reactionTypes"
+                type="button"
+                (click)="react(option.value)"
+                class="w-7 h-7 flex items-center justify-center rounded-full hover:scale-125 duration-150"
+                [pTooltip]="option.label"
+                tooltipPosition="top"
+              >
+                <i [class]="option.icon" [style.color]="option.color"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="reactionSummary.length > 0" class="flex flex-wrap gap-1 mt-1">
+        <span
+          *ngFor="let summary of reactionSummary"
+          class="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[11px] bg-gray-100 dark:bg-white/10"
+          [ngClass]="{ 'ring-1 ring-primary': summary.reactedByMe }"
+        >
+          <i [class]="iconFor(summary.reactionType)" [style.color]="colorFor(summary.reactionType)"></i>
+          {{ summary.count }}
+        </span>
+      </div>
+
+      <span class="block text-right text-[10px] text-neutral mt-0.5">{{ message.sentAt | date: 'shortTime' }}</span>
+    </ng-container>
+  </div>
+</div>

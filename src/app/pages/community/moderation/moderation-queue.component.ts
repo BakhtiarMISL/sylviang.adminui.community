@@ -1,7 +1,11 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { UI_CONFIG } from '@core/constants';
+import { IChatReportQueueItem } from '@core/interfaces/community/chat-report.interface';
 import { IContentReportQueueItem } from '@core/interfaces/community/content-report.interface';
 import { IListingResponse, IMarketplaceReportResponse } from '@core/interfaces/community/marketplace.interface';
+import { IChatConversationResponse, IChatMessageResponse } from '@core/interfaces/messenger/messenger.interface';
+import { ChatReportService } from '@core/services/community/chat-report.service';
 import { ContentReportService } from '@core/services/community/content-report.service';
 import { ListingService } from '@core/services/community/listing.service';
 import { MarketplaceReportService } from '@core/services/community/marketplace-report.service';
@@ -20,7 +24,10 @@ import { catchError } from 'rxjs/operators';
  * itself. The Marketplace tab is a second, independent surface (US-6.7) combining pending listings
  * (ListingController) and open marketplace reports (MarketplaceReportController) - unlike the
  * Content Reports tab, ListingResponse/MarketplaceReportResponse aren't pre-joined with
- * seller/reporter names, so this tab shows raw ids for now.
+ * seller/reporter names, so this tab shows raw ids for now. The Chat Reports tab (index 2) is a
+ * third such surface for Messenger message reports (ChatReportController); it deep-links from the
+ * "ChatReport" notification via ?tab=chat&reportId=, and its "View thread" action calls HR/Admin-only
+ * endpoints that deliberately bypass the normal participant-only access check on chat reads.
  */
 @Component({
   selector: 'app-moderation-queue',
@@ -51,14 +58,27 @@ export class ModerationQueueComponent implements OnInit {
   employeeNames = new Map<number, string>();
   listingTitles = new Map<number, string>();
 
+  chatReports: IChatReportQueueItem[] = [];
+  chatReportsLoading = true;
+  chatReportsLoaded = false;
+  pendingActionChatReportId: number | null = null;
+  private pendingDeepLinkReportId: number | null = null;
+
+  viewingThread: IChatReportQueueItem | null = null;
+  threadConversation: IChatConversationResponse | null = null;
+  threadMessages: IChatMessageResponse[] = [];
+  threadLoading = false;
+
   constructor(
     private contentReportService: ContentReportService,
     private postService: PostService,
     private listingService: ListingService,
     private marketplaceReportService: MarketplaceReportService,
+    private chatReportService: ChatReportService,
     private currentUserService: CurrentUserService,
     private employeeService: EmployeeService,
     private toastService: ToastService,
+    private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
   ) {}
 
@@ -70,12 +90,23 @@ export class ModerationQueueComponent implements OnInit {
 
   ngOnInit(): void {
     this.load();
+
+    const queryParams = this.route.snapshot.queryParams;
+    if (queryParams['tab'] === 'chat') {
+      this.activeTabIndex = 2;
+      const reportId = Number(queryParams['reportId']);
+      this.pendingDeepLinkReportId = Number.isFinite(reportId) && reportId > 0 ? reportId : null;
+      this.loadChatReports();
+    }
   }
 
   onTabChange(index: number): void {
     this.activeTabIndex = index;
     if (index === 1 && !this.marketplaceLoaded) {
       this.loadMarketplace();
+    }
+    if (index === 2 && !this.chatReportsLoaded) {
+      this.loadChatReports();
     }
   }
 
@@ -180,6 +211,84 @@ export class ModerationQueueComponent implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  private loadChatReports(): void {
+    this.chatReportsLoading = true;
+    this.chatReportService.getPaged({ page: 1, pageSize: 50 }).subscribe({
+      next: (response) => {
+        this.chatReports = !response.hasError && response.content ? response.content.data || [] : [];
+        this.chatReportsLoading = false;
+        this.chatReportsLoaded = true;
+        this.cdr.detectChanges();
+
+        if (this.pendingDeepLinkReportId !== null) {
+          const report = this.chatReports.find((r) => r.reportId === this.pendingDeepLinkReportId);
+          this.pendingDeepLinkReportId = null;
+          if (report) this.viewThread(report);
+        }
+      },
+      error: () => {
+        this.chatReports = [];
+        this.chatReportsLoading = false;
+        this.chatReportsLoaded = true;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  resolveChatReport(report: IChatReportQueueItem, status: 'Resolved' | 'Dismissed'): void {
+    const employeeId = this.currentUserService.currentUser.employeeId;
+    if (employeeId === null) return;
+
+    this.pendingActionChatReportId = report.reportId;
+    this.chatReportService.resolve(report.reportId, { reviewedBy: employeeId, status }).subscribe({
+      next: (response) => {
+        this.pendingActionChatReportId = null;
+        if (!response.hasError) {
+          this.loadChatReports();
+        } else {
+          this.toastService.error({ detail: response.decentMessage || 'Could not update report.' });
+          this.cdr.detectChanges();
+        }
+      },
+      error: () => {
+        this.pendingActionChatReportId = null;
+        this.toastService.error({ detail: 'Could not update report.' });
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  /** Opens the full surrounding thread for a reported conversation - HR/Admin-only endpoints that bypass the normal participant-only access check. */
+  viewThread(report: IChatReportQueueItem): void {
+    this.viewingThread = report;
+    this.threadLoading = true;
+    this.threadConversation = null;
+    this.threadMessages = [];
+
+    forkJoin({
+      conversation: this.chatReportService.getConversationForModeration(report.chatConversationId),
+      messages: this.chatReportService.getMessagesForModeration(report.chatConversationId, { page: 1, pageSize: 100 }),
+    }).subscribe({
+      next: ({ conversation, messages }) => {
+        this.threadConversation = !conversation.hasError ? conversation.content : null;
+        this.threadMessages = !messages.hasError && messages.content ? messages.content.data || [] : [];
+        this.threadLoading = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.threadLoading = false;
+        this.toastService.error({ detail: 'Could not load the conversation thread.' });
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  closeThread(): void {
+    this.viewingThread = null;
+    this.threadConversation = null;
+    this.threadMessages = [];
   }
 
   /** Opens the reported post at its correct destination (main Feed, or its owning Group) in a new tab. */

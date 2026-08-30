@@ -1,4 +1,21 @@
 .actions-cell {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+
+  button {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+}
+
+// src/theme/_overrides.scss truncates every table <td> to max-width 150px with overflow
+// hidden (revealing full content only on :hover) - fine for text cells, but it clips this
+// cell's two side-by-side action buttons. Override it here, scoped to this cell only.
+::ng-deep .p-datatable-tbody > tr > td.actions-cell {
+  max-width: none !important;
+  overflow: visible !important;
+  white-space: nowrap !important;
+  text-overflow: unset !important;
 }

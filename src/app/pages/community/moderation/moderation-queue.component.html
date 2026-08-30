@@ -3,6 +3,7 @@
     <p-tabView [activeIndex]="activeTabIndex" (onChange)="onTabChange($event.index)">
       <p-tabPanel header="Content Reports"></p-tabPanel>
       <p-tabPanel header="Marketplace"></p-tabPanel>
+      <p-tabPanel header="Chat Reports"></p-tabPanel>
     </p-tabView>
 
     <div class="table-container" *ngIf="activeTabIndex === 0">
@@ -184,6 +185,67 @@
         </ng-template>
       </p-table>
     </div>
+
+    <div class="table-container" *ngIf="activeTabIndex === 2">
+      <p-table [value]="chatReportsLoading ? skeletonItems : chatReports" dataKey="reportId">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Conversation</th>
+            <th>Sender</th>
+            <th>Reported By</th>
+            <th>Reason</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-report>
+          @if (chatReportsLoading) {
+            <tr>
+              <td colspan="6" class="p-4"><p-skeleton width="100%" height="2.5rem"></p-skeleton></td>
+            </tr>
+          } @else {
+            <tr>
+              <td class="content-cell clickable-cell" (click)="viewThread(report)">
+                <span class="post-type-badge">{{ report.conversationType }}</span>
+                <p class="content-preview">{{ report.conversationTitle }}</p>
+                <p class="content-preview">{{ report.messageBodyPreview }}</p>
+              </td>
+              <td>{{ report.senderName }}</td>
+              <td>{{ report.reporterName }}</td>
+              <td>{{ report.reason }}</td>
+              <td>
+                <span class="badge status-badge" [ngClass]="'status-' + report.status.toLowerCase()">{{ report.status }}</span>
+              </td>
+              <td>
+                <div class="row-actions">
+                  <button pButton size="small" severity="secondary" pTooltip="View thread" (click)="viewThread(report)">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  </button>
+                  <button pButton size="small" severity="success" *ngIf="report.status === 'Pending'" [disabled]="pendingActionChatReportId === report.reportId" pTooltip="Resolve" (click)="resolveChatReport(report, 'Resolved')">
+                    <i class="fa-solid fa-check"></i>
+                  </button>
+                  <button pButton size="small" severity="secondary" *ngIf="report.status === 'Pending'" [disabled]="pendingActionChatReportId === report.reportId" pTooltip="Dismiss" (click)="resolveChatReport(report, 'Dismissed')">
+                    <i class="fa-solid fa-xmark"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="6" class="not-found">
+              <div>
+                <i class="fa fa-shield-halved"></i>
+                <p>No reported chat messages - the queue is clear.</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
   </p-panel>
 
   <p-dialog header="Reject listing" [visible]="!!rejectingListing" [modal]="true" [dismissableMask]="true" [style]="{ width: '28rem' }" (onHide)="closeRejectDialog()">
@@ -193,6 +255,42 @@
     <ng-template pTemplate="footer">
       <button pButton severity="secondary" (click)="closeRejectDialog()">Cancel</button>
       <button pButton [disabled]="!rejectReason.trim()" (click)="submitReject()">Reject Listing</button>
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog
+    [header]="threadConversation?.title || (threadConversation?.type === 'Direct' ? 'Direct message' : 'Conversation')"
+    [visible]="!!viewingThread"
+    [modal]="true"
+    [dismissableMask]="true"
+    [closable]="false"
+    [style]="{ width: '36rem' }"
+    (onHide)="closeThread()"
+  >
+    <p class="report-intro" *ngIf="viewingThread">Reported by {{ viewingThread.reporterName }}: "{{ viewingThread.reason }}"</p>
+
+    <div class="thread-container">
+      @if (threadLoading) {
+        <p-skeleton width="100%" height="2.5rem" *ngFor="let i of [1, 2, 3]" styleClass="mb-2"></p-skeleton>
+      } @else if (threadMessages.length === 0) {
+        <p class="not-found">No messages in this conversation.</p>
+      } @else {
+        <div
+          class="thread-message"
+          *ngFor="let message of threadMessages"
+          [ngClass]="{ 'thread-message-flagged': message.chatMessageId === viewingThread?.chatMessageId }"
+        >
+          <div class="thread-message-meta">
+            <strong>{{ message.senderName }}</strong>
+            <span>{{ message.sentAt | date: 'short' }}</span>
+          </div>
+          <p class="thread-message-body">{{ message.isDeleted ? '[message deleted]' : message.body }}</p>
+        </div>
+      }
+    </div>
+
+    <ng-template pTemplate="footer">
+      <button pButton severity="secondary" (click)="closeThread()">Close</button>
     </ng-template>
   </p-dialog>
 </section>

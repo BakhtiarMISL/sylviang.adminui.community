@@ -1,0 +1,35 @@
+<div class="flex h-[calc(100vh-8rem)] rounded-xl border border-borderLight dark:border-borderDark bg-light dark:bg-dark overflow-hidden">
+  <!-- Left pane: conversation list -->
+  <div class="w-80 shrink-0 border-r border-borderLight dark:border-borderDark">
+    <app-conversation-list
+      [selectedConversationId]="selectedConversationId"
+      (select)="onConversationSelected($event)"
+      (compose)="pickerVisible = true"
+    ></app-conversation-list>
+  </div>
+
+  <!-- Center pane: active thread -->
+  <div class="flex-1 min-w-0">
+    <app-thread-view
+      *ngIf="selectedConversationId !== null"
+      [conversationId]="selectedConversationId"
+      (conversationLoaded)="onConversationLoaded($event)"
+      (toggleDetails)="toggleDetailsPanel()"
+    ></app-thread-view>
+
+    <div *ngIf="selectedConversationId === null" class="flex flex-col items-center justify-center h-full text-neutral">
+      <i class="fas fa-comments text-4xl mb-3"></i>
+      <p class="text-sm">Select a conversation or start a new one.</p>
+    </div>
+  </div>
+
+  <!-- Right pane: conversation details -->
+  <div *ngIf="showDetailsPanel && selectedConversation" class="w-80 shrink-0 border-l border-borderLight dark:border-borderDark">
+    <app-chat-details-panel [conversation]="selectedConversation" (close)="toggleDetailsPanel()"></app-chat-details-panel>
+  </div>
+</div>
+
+<app-new-conversation-picker
+  [(visible)]="pickerVisible"
+  (created)="onConversationCreated($event)"
+></app-new-conversation-picker>

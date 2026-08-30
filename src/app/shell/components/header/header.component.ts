@@ -1,9 +1,10 @@
-import { Component, ChangeDetectorRef, ElementRef, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { BreadcrumbItem, BreadcrumbService } from '@core/services/breadcrumb.service';
 import { AuthService } from '@core/services/auth.service';
 import { CurrentUserService } from '@core/services/current-user.service';
 import { EmployeeService } from '@core/services/employee-directory/employee/employee.service';
+import { MessengerHubService } from '@core/services/messenger/messenger-hub.service';
 import { NotificationHubService } from '@core/services/notifications/notification-hub.service';
 import { Base_URL } from '@env/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
@@ -37,20 +38,24 @@ export class HeaderComponent implements OnInit {
     private currentUserService: CurrentUserService,
     private employeeService: EmployeeService,
     private notificationHubService: NotificationHubService,
+    private messengerHubService: MessengerHubService,
     private router: Router,
     private cdr: ChangeDetectorRef,
   ) {}
+
+  messengerUnreadCount$ = this.messengerHubService.unreadCount$;
 
   ngOnInit(): void {
     this.breadcrumbService.breadcrumbs$.pipe(untilDestroyed(this)).subscribe((breadcrumbs) => {
       this.breadcrumbs = breadcrumbs;
     });
 
-    // Resumes the SignalR connection on a hard page refresh (AuthService.login() only
+    // Resumes the SignalR connections on a hard page refresh (AuthService.login() only
     // fires on a fresh login, not when a valid token already sits in localStorage). The
     // header is only rendered inside the authenticated Shell layout, so this is safe.
     if (this.authService.isLoggedIn()) {
       this.notificationHubService.start();
+      this.messengerHubService.start();
     }
 
     this.loadEmployeeCode();
@@ -96,6 +101,15 @@ export class HeaderComponent implements OnInit {
         // Non-critical - the dropdown just shows no code if this fails.
       },
     });
+  }
+
+  displayMessengerUnreadCount(count: number | null): string {
+    if (!count) return '';
+    return count > 99 ? '99+' : String(count);
+  }
+
+  goToMessenger(): void {
+    this.router.navigateByUrl('/messenger');
   }
 
   toggleSidebar(): void {
