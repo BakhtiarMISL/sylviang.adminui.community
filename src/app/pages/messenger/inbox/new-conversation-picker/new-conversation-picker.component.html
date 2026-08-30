@@ -1,0 +1,68 @@
+<p-dialog
+  header="New Conversation"
+  [visible]="visible"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [style]="{ width: '28rem' }"
+  (onHide)="onHide()"
+>
+  <div class="flex flex-col gap-3">
+    <div *ngIf="selected.length > 0" class="flex flex-wrap gap-2">
+      <span
+        *ngFor="let employee of selected"
+        class="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary text-xs px-2.5 py-1"
+      >
+        {{ employee.employeeName }}
+        <button type="button" (click)="removeEmployee(employee)" [attr.aria-label]="'Remove ' + employee.employeeName">
+          <i class="fas fa-xmark"></i>
+        </button>
+      </span>
+    </div>
+
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="search()"
+      placeholder="Search colleagues by name, code, or email"
+      class="w-full rounded-lg border border-borderLight dark:border-borderDark bg-gray-50 dark:bg-white/5 text-dark dark:text-borderLight px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+    />
+
+    <div *ngIf="results.length > 0" class="max-h-48 overflow-y-auto border border-borderLight dark:border-borderDark rounded-lg">
+      <button
+        *ngFor="let employee of results"
+        type="button"
+        (click)="addEmployee(employee)"
+        class="w-full flex items-center gap-2.5 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-white/5 duration-150"
+      >
+        <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold bg-primary/15 text-primary shrink-0 overflow-hidden">
+          <img *ngIf="employee.photoUrl" [src]="avatarUrl(employee.photoUrl)" class="w-full h-full object-cover" alt="" />
+          <span *ngIf="!employee.photoUrl">{{ (employee.employeeName || '?').charAt(0).toUpperCase() }}</span>
+        </span>
+        <span class="min-w-0">
+          <span class="block text-sm text-dark dark:text-borderLight truncate">{{ employee.employeeName }}</span>
+          <span class="block text-xs text-neutral truncate" *ngIf="employee.designationName">{{ employee.designationName }}</span>
+        </span>
+      </button>
+    </div>
+
+    <div *ngIf="isGroup">
+      <label class="block text-xs font-medium text-neutral mb-1">Group name</label>
+      <input
+        type="text"
+        [(ngModel)]="groupTitle"
+        placeholder="e.g. Project Phoenix"
+        class="w-full rounded-lg border border-borderLight dark:border-borderDark bg-gray-50 dark:bg-white/5 text-dark dark:text-borderLight px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+      />
+    </div>
+
+    <button
+      pButton
+      type="button"
+      [disabled]="!canCreate() || creating"
+      (click)="create()"
+      class="w-full justify-center"
+    >
+      {{ isGroup ? 'Create Group' : 'Start Conversation' }}
+    </button>
+  </div>
+</p-dialog>

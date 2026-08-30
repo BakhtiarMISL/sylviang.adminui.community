@@ -4,6 +4,7 @@ import { Observable, tap } from 'rxjs';
 import { ApiResponse } from '@core/interfaces/ApiResponse';
 import { IChangePasswordRequest, ILoginRequest, ILoginResponse } from '@core/interfaces/auth/login.interface';
 import { CurrentUserService } from '@core/services/current-user.service';
+import { MessengerHubService } from '@core/services/messenger/messenger-hub.service';
 import { NotificationHubService } from '@core/services/notifications/notification-hub.service';
 import { UserRoleEnum } from '@core/enums/employee.enum';
 import { BASE_URL_Auth } from '@env/environment';
@@ -25,6 +26,7 @@ export class AuthService {
     private httpClient: HttpClient,
     private currentUserService: CurrentUserService,
     private notificationHubService: NotificationHubService,
+    private messengerHubService: MessengerHubService,
   ) {}
 
   login(username: string, password: string): Observable<ApiResponse<ILoginResponse>> {
@@ -42,6 +44,7 @@ export class AuthService {
         });
 
         this.notificationHubService.start();
+        this.messengerHubService.start();
       }),
     );
   }
@@ -55,6 +58,7 @@ export class AuthService {
     localStorage.removeItem(TOKEN_EXPIRY_KEY);
     this.currentUserService.clearCurrentUser();
     this.notificationHubService.stop();
+    this.messengerHubService.stop();
   }
 
   getToken(): string | null {

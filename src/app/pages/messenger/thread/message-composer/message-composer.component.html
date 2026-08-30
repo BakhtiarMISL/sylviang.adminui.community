@@ -1,0 +1,63 @@
+<div
+  *ngIf="replyTo as reply"
+  class="flex items-center gap-2 px-3 pt-2 border-t border-borderLight dark:border-borderDark"
+>
+  <div class="flex-1 min-w-0 rounded-lg border-l-2 border-primary/60 bg-gray-100 dark:bg-white/5 px-2 py-1">
+    <p class="text-[11px] font-semibold text-primary truncate">Replying to {{ reply.senderName }}</p>
+    <p class="text-[11px] text-neutral truncate">{{ reply.body || (reply.attachments.length > 0 ? 'Attachment' : '') }}</p>
+  </div>
+  <button
+    type="button"
+    (click)="onCancelReply()"
+    class="h-6 w-6 flex items-center justify-center rounded-full text-neutral hover:text-primary duration-150"
+    [attr.aria-label]="'Cancel reply'"
+  >
+    <i class="fas fa-xmark text-xs"></i>
+  </button>
+</div>
+
+<div class="flex items-center gap-2 px-3 py-2 border-t border-borderLight dark:border-borderDark" [class.!border-t-0]="replyTo">
+  <input #fileInput type="file" multiple hidden (change)="onFilesSelected($event)" />
+
+  <button
+    type="button"
+    [disabled]="uploading"
+    (click)="toggleRecording()"
+    class="h-8 w-8 flex items-center justify-center duration-150"
+    [ngClass]="recording ? 'text-danger animate-pulse' : 'text-neutral hover:text-primary'"
+    [pTooltip]="recording ? 'Stop recording' : 'Record a voice note'"
+    tooltipPosition="top"
+  >
+    <i class="fas fa-microphone"></i>
+  </button>
+  <button
+    type="button"
+    [disabled]="uploading || recording"
+    (click)="openFilePicker()"
+    class="h-8 w-8 flex items-center justify-center text-neutral hover:text-primary duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+    [pTooltip]="'Attach an image or file'"
+    tooltipPosition="top"
+  >
+    <i class="fas fa-image"></i>
+  </button>
+
+  <input
+    type="text"
+    [(ngModel)]="text"
+    (ngModelChange)="onInput()"
+    (keydown)="onKeydown($event)"
+    [disabled]="recording"
+    placeholder="Aa"
+    class="flex-1 rounded-full border border-borderLight dark:border-borderDark bg-gray-50 dark:bg-white/5 text-dark dark:text-borderLight px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
+  />
+
+  <button
+    type="button"
+    [disabled]="!text.trim()"
+    (click)="onSend()"
+    class="h-8 w-8 flex items-center justify-center rounded-full text-primary disabled:text-neutral disabled:opacity-50 hover:bg-primary/10 duration-150"
+    [attr.aria-label]="'Send'"
+  >
+    <i class="fas fa-paper-plane"></i>
+  </button>
+</div>

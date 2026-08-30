@@ -14,7 +14,8 @@ export interface INotificationNavigationTarget {
  * Maps a notification's relatedEntityType/relatedEntityId (see the backend's
  * NotificationCreateRequest usages - PostReactionService, PostCommentService,
  * CommentReactionService, MentionService, MarketplaceService, GroupService,
- * RecognitionService, TeamService, TaskService) to where clicking it should navigate. Comment-level types
+ * RecognitionService, TeamService, TaskService, ChatMessageService, ChatConversationService)
+ * to where clicking it should navigate. Comment-level types
  * ("PostComment") are intentionally resolved server-side to their parent Post before
  * they ever reach here, since there's no standalone comment page - see those services'
  * "points at the parent Post" comments.
@@ -31,6 +32,13 @@ export function getNotificationNavigationTarget(notification: INotificationRespo
       return { commands: ['/community/marketplace/listing', notification.relatedEntityId] };
     case 'Group':
       return { commands: ['/community/groups', notification.relatedEntityId] };
+    case 'ChatConversation':
+      return { commands: ['/messenger', notification.relatedEntityId] };
+    case 'ChatReport':
+      // HR/Admin isn't a Messenger participant, so this lands on the moderation queue's Chat
+      // Reports tab (which has its own HR/Admin-only read access into the thread) rather than
+      // the regular /messenger route.
+      return { commands: ['/community/moderation'], queryParams: { tab: 'chat', reportId: notification.relatedEntityId } };
     case 'Recognition':
       // No per-item recognition route exists yet - land on the wall itself.
       return { commands: ['/community/recognitions'] };
@@ -40,6 +48,8 @@ export function getNotificationNavigationTarget(notification: INotificationRespo
       // No per-task deep link exists yet (tasks open via dialog from the list) - land on
       // the tasks list, same as the Recognition case above.
       return { commands: ['/community/tasks'] };
+    case 'Election':
+      return { commands: ['/community/elections', notification.relatedEntityId, 'vote'] };
     default:
       return null;
   }

@@ -1,0 +1,79 @@
+<div class="flex flex-col h-full">
+  <!-- Thread header -->
+  <div class="flex items-center justify-between px-4 py-3 border-b border-borderLight dark:border-borderDark shrink-0">
+    <div class="flex items-center gap-3 min-w-0">
+      <span class="w-9 h-9 rounded-full flex items-center justify-center text-sm font-semibold bg-primary/15 text-primary shrink-0 overflow-hidden">
+        <img *ngIf="headerAvatarUrl" [src]="avatarUrl(headerAvatarUrl)" class="w-full h-full object-cover" alt="" />
+        <ng-container *ngIf="!headerAvatarUrl">
+          <i *ngIf="conversation?.type === 'Group'" class="fas fa-users"></i>
+          <span *ngIf="conversation?.type !== 'Group'">{{ headerTitle.charAt(0).toUpperCase() }}</span>
+        </ng-container>
+      </span>
+      <div class="min-w-0">
+        <p class="text-sm font-semibold text-dark dark:text-borderLight truncate">{{ headerTitle || 'Loading...' }}</p>
+        <p *ngIf="conversation?.type === 'Group'" class="text-xs text-neutral truncate">{{ conversation?.participants?.length }} members</p>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      (click)="toggleDetails.emit()"
+      class="h-8 w-8 flex items-center justify-center text-neutral hover:text-primary duration-150"
+      [pTooltip]="'Conversation info'"
+      tooltipPosition="bottom"
+    >
+      <i class="fas fa-circle-info"></i>
+    </button>
+  </div>
+
+  <!-- Message list -->
+  <div class="flex-1 overflow-y-auto px-4 py-3">
+    <!-- Bottom-anchors short conversations against the composer (like Messenger) instead of
+         leaving empty space below a top-clustered list. min-h-full + justify-end lives on this
+         inner wrapper, not the scrolling div itself, so scrolling stays plain block behavior and
+         never risks the flex/overflow "clipped top" quirk when the list grows past this height. -->
+    <div class="min-h-full flex flex-col justify-end">
+      <div *ngIf="loading" class="flex justify-center py-6">
+        <p-skeleton width="100%" height="8rem"></p-skeleton>
+      </div>
+
+      <ng-container *ngIf="!loading">
+        <p *ngIf="messages.length === 0" class="text-center text-sm text-neutral py-6">No messages yet - say hello!</p>
+
+        <app-message-bubble
+          *ngFor="let message of messages; let i = index"
+          [message]="message"
+          [isOwn]="isOwnMessage(message)"
+          [showSenderInfo]="showSenderInfo(i)"
+          (reply)="onReply($event)"
+          (forwardMessage)="onForwardRequested($event)"
+          (deleteMessage)="onDeleteMessage($event)"
+          (report)="onReportRequested($event)"
+        ></app-message-bubble>
+
+        <p *ngIf="isSeenByOthers(messages[messages.length - 1])" class="text-right text-xs text-neutral pr-1">Seen</p>
+      </ng-container>
+
+      <div #scrollAnchor></div>
+    </div>
+  </div>
+
+  <p *ngIf="typingEmployeeNames.length > 0" class="px-4 pb-1 text-xs text-neutral italic">
+    {{ typingEmployeeNames.join(', ') }} {{ typingEmployeeNames.length === 1 ? 'is' : 'are' }} typing...
+  </p>
+
+  <!-- Composer -->
+  <app-message-composer [replyTo]="replyingTo" (cancelReply)="onCancelReply()" (send)="onSend($event)" (typing)="onTyping()"></app-message-composer>
+
+  <app-forward-message-picker
+    *ngIf="forwardingMessage"
+    [messageId]="forwardingMessage.chatMessageId"
+    [(visible)]="forwardPickerVisible"
+  ></app-forward-message-picker>
+
+  <app-report-message-dialog
+    *ngIf="reportingMessage"
+    [messageId]="reportingMessage.chatMessageId"
+    [(visible)]="reportDialogVisible"
+  ></app-report-message-dialog>
+</div>

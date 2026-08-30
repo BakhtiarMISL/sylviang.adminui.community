@@ -1,0 +1,95 @@
+<div class="flex flex-col h-full">
+  <div class="flex items-center justify-between px-4 py-3 shrink-0">
+    <h2 class="text-lg font-semibold text-dark dark:text-borderLight">Chats</h2>
+    <button
+      type="button"
+      (click)="compose.emit()"
+      class="h-8 w-8 flex items-center justify-center rounded-full text-primary hover:bg-primary/10 duration-150"
+      [pTooltip]="'New conversation'"
+      tooltipPosition="bottom"
+    >
+      <i class="fas fa-pen-to-square"></i>
+    </button>
+  </div>
+
+  <div class="px-4 pb-3 shrink-0">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchChange()"
+      placeholder="Search Messenger"
+      class="w-full rounded-full border border-borderLight dark:border-borderDark bg-gray-50 dark:bg-white/5 text-dark dark:text-borderLight px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+    />
+  </div>
+
+  <div class="flex-1 overflow-y-auto">
+    <div *ngIf="loading" class="px-4 py-6">
+      <p-skeleton width="100%" height="3rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="100%" height="3rem" styleClass="mb-2"></p-skeleton>
+      <p-skeleton width="100%" height="3rem"></p-skeleton>
+    </div>
+
+    <ng-container *ngIf="!loading">
+      <button
+        *ngFor="let conversation of filteredConversations"
+        type="button"
+        (click)="onSelect(conversation.chatConversationId)"
+        class="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-white/5 duration-150"
+        [ngClass]="{ 'bg-primary/10': conversation.chatConversationId === selectedConversationId }"
+      >
+        <span class="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold bg-primary/15 text-primary shrink-0 overflow-hidden">
+          <img *ngIf="conversation.avatarUrl" [src]="avatarUrl(conversation.avatarUrl)" class="w-full h-full object-cover" alt="" />
+          <ng-container *ngIf="!conversation.avatarUrl">
+            <i *ngIf="conversation.type === 'Group'" class="fas fa-users"></i>
+            <span *ngIf="conversation.type !== 'Group'">{{ initial(conversation.displayName) }}</span>
+          </ng-container>
+        </span>
+
+        <span class="flex-1 min-w-0">
+          <span class="flex items-center gap-1.5">
+            <span
+              class="block text-sm truncate text-dark dark:text-borderLight"
+              [class.font-semibold]="conversation.unreadCount > 0"
+              >{{ conversation.displayName }}</span
+            >
+            <i *ngIf="conversation.isPinned" class="fas fa-thumbtack text-[10px] text-neutral"></i>
+            <i *ngIf="conversation.isMuted" class="fas fa-volume-xmark text-[10px] text-neutral"></i>
+          </span>
+          <span class="block text-xs text-neutral truncate" [class.font-semibold]="conversation.unreadCount > 0">
+            {{ conversation.lastMessagePreview || 'No messages yet' }}
+          </span>
+        </span>
+
+        <span *ngIf="conversation.unreadCount > 0" class="min-w-[1.25rem] h-5 px-1 rounded-full bg-primary text-white text-[11px] flex items-center justify-center shrink-0">
+          {{ conversation.unreadCount > 99 ? '99+' : conversation.unreadCount }}
+        </span>
+      </button>
+
+      <ng-container *ngIf="filteredConversations.length === 0 && searchTerm">
+        <div *ngIf="searchingMessages" class="px-4 py-4 text-center text-sm text-neutral">Searching messages...</div>
+
+        <ng-container *ngIf="!searchingMessages">
+          <p *ngIf="messageResults.length > 0" class="px-4 pt-2 pb-1 text-xs font-semibold text-neutral uppercase">Messages</p>
+          <button
+            *ngFor="let message of messageResults"
+            type="button"
+            (click)="onSelect(message.chatConversationId)"
+            class="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 dark:hover:bg-white/5 duration-150"
+          >
+            <span class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold bg-primary/15 text-primary shrink-0">
+              {{ initial(message.senderName) }}
+            </span>
+            <span class="flex-1 min-w-0">
+              <span class="block text-sm text-dark dark:text-borderLight truncate">{{ message.senderName }}</span>
+              <span class="block text-xs text-neutral truncate">{{ message.body }}</span>
+            </span>
+          </button>
+
+          <p *ngIf="messageResults.length === 0" class="text-center text-sm text-neutral py-6 px-4">Nothing found for "{{ searchTerm }}".</p>
+        </ng-container>
+      </ng-container>
+
+      <p *ngIf="filteredConversations.length === 0 && !searchTerm" class="text-center text-sm text-neutral py-6 px-4">No conversations yet - start one!</p>
+    </ng-container>
+  </div>
+</div>

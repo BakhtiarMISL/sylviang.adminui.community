@@ -32,6 +32,10 @@ const routes: Routes = [
       loadChildren: () => import('./notifications/notifications.module').then((m) => m.NotificationsModule),
     },
     {
+      path: 'messenger',
+      loadChildren: () => import('./messenger/messenger.module').then((m) => m.MessengerModule),
+    },
+    {
       path: 'community',
       loadChildren: () => import('./community/community.module').then((m) => m.CommunityModule),
     },

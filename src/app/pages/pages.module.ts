@@ -10,7 +10,16 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { PagesRoutingModule } from './pages-routing.module';
 
 @NgModule({
-  imports: [CommonModule, PagesRoutingModule, TranslateModule, ReactiveFormsModule, FormsModule, RouterModule, SharedModule, PanelModule],
+  imports: [
+    CommonModule,
+    PagesRoutingModule,
+    TranslateModule,
+    ReactiveFormsModule,
+    FormsModule,
+    RouterModule,
+    SharedModule,
+    PanelModule,
+  ],
   declarations: [DashboardComponent, ChangePasswordComponent],
 })
 export class PagesModule {}

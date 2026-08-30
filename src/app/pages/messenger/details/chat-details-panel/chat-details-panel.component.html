@@ -1,0 +1,92 @@
+<div class="flex flex-col h-full" *ngIf="conversation">
+  <div class="flex items-center justify-end px-3 py-2 shrink-0">
+    <button
+      type="button"
+      (click)="close.emit()"
+      class="h-8 w-8 flex items-center justify-center text-neutral hover:text-primary duration-150"
+      [attr.aria-label]="'Close panel'"
+    >
+      <i class="fas fa-xmark"></i>
+    </button>
+  </div>
+
+  <div class="flex flex-col items-center px-4 pb-4 shrink-0">
+    <div class="relative mb-2">
+      <span class="w-16 h-16 rounded-full flex items-center justify-center text-xl font-semibold bg-primary/15 text-primary overflow-hidden">
+        <img *ngIf="conversation.type === 'Group' && conversation.groupAvatarUrl" [src]="avatarUrl(conversation.groupAvatarUrl)" class="w-full h-full object-cover" alt="" />
+        <ng-container *ngIf="!(conversation.type === 'Group' && conversation.groupAvatarUrl)">
+          <i *ngIf="conversation.type === 'Group'" class="fas fa-users"></i>
+          <span *ngIf="conversation.type !== 'Group'">{{ initial(headerName) }}</span>
+        </ng-container>
+      </span>
+      <div *ngIf="isGroupAdmin" class="absolute bottom-0 right-0" title="Change group photo">
+        <app-attachment-upload
+          [module]="groupPhotoModule"
+          [entityId]="conversation.chatConversationId"
+          [multiple]="false"
+          [compact]="true"
+          chooseLabel=""
+          chooseIcon="fa-solid fa-camera"
+          accept="image/*"
+          (uploaded)="onGroupPhotoUploaded($event)"
+        ></app-attachment-upload>
+      </div>
+    </div>
+    <p class="text-sm font-semibold text-dark dark:text-borderLight text-center">{{ headerName }}</p>
+
+    <div class="flex items-center gap-4 mt-3">
+      <button
+        type="button"
+        (click)="toggleMute()"
+        class="flex flex-col items-center gap-1 duration-150"
+        [ngClass]="myParticipant?.isMuted ? 'text-primary' : 'text-neutral hover:text-primary'"
+        [pTooltip]="myParticipant?.isMuted ? 'Unmute' : 'Mute'"
+      >
+        <span class="w-9 h-9 rounded-full flex items-center justify-center" [ngClass]="myParticipant?.isMuted ? 'bg-primary/10' : 'bg-gray-100 dark:bg-white/10'">
+          <i [class]="myParticipant?.isMuted ? 'fas fa-volume-xmark' : 'fas fa-volume-high'"></i>
+        </span>
+        <span class="text-[11px]">{{ myParticipant?.isMuted ? 'Muted' : 'Mute' }}</span>
+      </button>
+      <button
+        type="button"
+        (click)="togglePin()"
+        class="flex flex-col items-center gap-1 duration-150"
+        [ngClass]="myParticipant?.isPinned ? 'text-primary' : 'text-neutral hover:text-primary'"
+        [pTooltip]="myParticipant?.isPinned ? 'Unpin' : 'Pin'"
+      >
+        <span class="w-9 h-9 rounded-full flex items-center justify-center" [ngClass]="myParticipant?.isPinned ? 'bg-primary/10' : 'bg-gray-100 dark:bg-white/10'">
+          <i class="fas fa-thumbtack"></i>
+        </span>
+        <span class="text-[11px]">{{ myParticipant?.isPinned ? 'Pinned' : 'Pin' }}</span>
+      </button>
+      <button type="button" disabled class="flex flex-col items-center gap-1 text-neutral opacity-50 cursor-not-allowed" [pTooltip]="'Coming soon'">
+        <span class="w-9 h-9 rounded-full flex items-center justify-center bg-gray-100 dark:bg-white/10"><i class="fas fa-magnifying-glass"></i></span>
+        <span class="text-[11px]">Search</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="flex-1 overflow-y-auto border-t border-borderLight dark:border-borderDark">
+    <div *ngIf="conversation.type === 'Group'" class="px-4 py-3 border-b border-borderLight dark:border-borderDark">
+      <p class="text-xs font-semibold text-neutral uppercase mb-2">Members ({{ conversation.participants.length }})</p>
+      <div class="flex items-center gap-2.5 py-1.5" *ngFor="let participant of conversation.participants">
+        <span class="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold bg-primary/15 text-primary shrink-0 overflow-hidden">
+          <img *ngIf="participant.employeePhotoUrl" [src]="avatarUrl(participant.employeePhotoUrl)" class="w-full h-full object-cover" alt="" />
+          <span *ngIf="!participant.employeePhotoUrl">{{ initial(participant.employeeName) }}</span>
+        </span>
+        <span class="text-sm text-dark dark:text-borderLight truncate flex-1">{{ participant.employeeName }}</span>
+        <span *ngIf="participant.isAdmin" class="text-[10px] uppercase tracking-wide text-primary font-semibold">Admin</span>
+      </div>
+    </div>
+
+    <div class="px-4 py-3 border-b border-borderLight dark:border-borderDark">
+      <p class="text-xs font-semibold text-neutral uppercase mb-1">Pinned Messages</p>
+      <p class="text-xs text-neutral">Coming soon.</p>
+    </div>
+
+    <div class="px-4 py-3">
+      <p class="text-xs font-semibold text-neutral uppercase mb-1">Media and Files</p>
+      <p class="text-xs text-neutral">Coming soon.</p>
+    </div>
+  </div>
+</div>

@@ -55,6 +55,22 @@
 
   <!-- Right side controls -->
   <div class="flex items-center space-x-4">
+    <button
+      (click)="goToMessenger()"
+      class="relative h-8 flex items-center text-black dark:text-borderLight hover:text-primary dark:hover:text-primary duration-300"
+      [attr.aria-label]="'Messenger'"
+      [pTooltip]="'Messenger'"
+      tooltipPosition="bottom"
+    >
+      <i class="fas fa-comment-dots"></i>
+      <p-badge
+        *ngIf="(messengerUnreadCount$ | async) as messengerUnreadCount"
+        [value]="displayMessengerUnreadCount(messengerUnreadCount)"
+        severity="danger"
+        [style]="{ position: 'absolute', top: '-6px', right: '-10px' }"
+      ></p-badge>
+    </button>
+
     <app-notification-bell></app-notification-bell>
 
     <app-theme-toggle></app-theme-toggle>
