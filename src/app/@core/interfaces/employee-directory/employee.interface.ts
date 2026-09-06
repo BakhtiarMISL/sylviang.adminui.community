@@ -7,6 +7,7 @@ export interface IEmployeeCreateRequest {
   departmentId: number;
   siteId: number;
   dateOfJoining: string;
+  dateOfBirth: string | null;
 }
 
 export interface IEmployeeContactLinkRequest {
@@ -41,6 +42,12 @@ export interface IEmployeeUpdateProfileRequest {
 
 export interface IEmployeeUpdatePhotoRequest {
   storagePath: string;
+}
+
+export interface IEmployeeUpdateRequest {
+  email: string;
+  dateOfBirth: string | null;
+  dateOfJoining: string;
 }
 
 export interface IEmployeeUpdateCoverPhotoRequest {
@@ -101,6 +108,7 @@ export interface IEmployeeResponse {
   isActive: boolean;
 
   dateOfBirth: string | null;
+  dateOfJoining: string | null;
 
   phone: string | null;
   email: string | null;

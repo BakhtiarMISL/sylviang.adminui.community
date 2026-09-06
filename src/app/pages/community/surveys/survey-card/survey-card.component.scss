@@ -75,6 +75,12 @@
   color: #0369a1;
 }
 
+.not-eligible-badge {
+  background: rgba(148, 163, 184, 0.2);
+  color: #475569;
+  cursor: help;
+}
+
 // Badge text colors above are tuned for a light --surface-elevated card background;
 // re-tune to lighter tones so they stay legible once the card goes dark (see
 // theme.service.ts's _darkThemeColors, --surface-elevated: #374151).
@@ -109,6 +115,11 @@
   .external-badge {
     background: rgba(56, 189, 248, 0.25);
     color: #bae6fd;
+  }
+
+  .not-eligible-badge {
+    background: rgba(148, 163, 184, 0.3);
+    color: #e2e8f0;
   }
 }
 

@@ -69,7 +69,7 @@
                   <button pButton size="small" severity="success" *ngIf="report.status === 'Pending'" pTooltip="Resolve" (click)="resolveReport(report, 'Resolved')">
                     <i class="fa-solid fa-check"></i>
                   </button>
-                  <button pButton size="small" severity="secondary" *ngIf="report.status === 'Pending'" pTooltip="Dismiss" (click)="resolveReport(report, 'Dismissed')">
+                  <button pButton size="small" severity="danger" *ngIf="report.status === 'Pending'" pTooltip="Dismiss" (click)="resolveReport(report, 'Dismissed')">
                     <i class="fa-solid fa-xmark"></i>
                   </button>
                 </div>
@@ -165,7 +165,7 @@
                 <button pButton size="small" severity="success" [disabled]="pendingActionReportId === report.reportId" pTooltip="Resolve" (click)="resolveListingReport(report, 'Resolved')">
                   <i class="fa-solid fa-check"></i>
                 </button>
-                <button pButton size="small" severity="secondary" [disabled]="pendingActionReportId === report.reportId" pTooltip="Dismiss" (click)="resolveListingReport(report, 'Dismissed')">
+                <button pButton size="small" severity="danger" [disabled]="pendingActionReportId === report.reportId" pTooltip="Dismiss" (click)="resolveListingReport(report, 'Dismissed')">
                   <i class="fa-solid fa-xmark"></i>
                 </button>
               </div>
@@ -225,7 +225,7 @@
                   <button pButton size="small" severity="success" *ngIf="report.status === 'Pending'" [disabled]="pendingActionChatReportId === report.reportId" pTooltip="Resolve" (click)="resolveChatReport(report, 'Resolved')">
                     <i class="fa-solid fa-check"></i>
                   </button>
-                  <button pButton size="small" severity="secondary" *ngIf="report.status === 'Pending'" [disabled]="pendingActionChatReportId === report.reportId" pTooltip="Dismiss" (click)="resolveChatReport(report, 'Dismissed')">
+                  <button pButton size="small" severity="danger" *ngIf="report.status === 'Pending'" [disabled]="pendingActionChatReportId === report.reportId" pTooltip="Dismiss" (click)="resolveChatReport(report, 'Dismissed')">
                     <i class="fa-solid fa-xmark"></i>
                   </button>
                 </div>
@@ -253,7 +253,7 @@
     <textarea pInputTextarea rows="4" class="w-full" placeholder="Rejection reason..." [(ngModel)]="rejectReason"></textarea>
 
     <ng-template pTemplate="footer">
-      <button pButton severity="secondary" (click)="closeRejectDialog()">Cancel</button>
+      <button pButton severity="danger" (click)="closeRejectDialog()">Cancel</button>
       <button pButton [disabled]="!rejectReason.trim()" (click)="submitReject()">Reject Listing</button>
     </ng-template>
   </p-dialog>
@@ -290,7 +290,7 @@
     </div>
 
     <ng-template pTemplate="footer">
-      <button pButton severity="secondary" (click)="closeThread()">Close</button>
+      <button pButton severity="danger" (click)="closeThread()">Close</button>
     </ng-template>
   </p-dialog>
 </section>

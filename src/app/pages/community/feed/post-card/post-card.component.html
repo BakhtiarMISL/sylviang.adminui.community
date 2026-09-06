@@ -21,6 +21,9 @@
     </div>
 
     <div class="post-actions" *ngIf="!editing">
+      <button type="button" class="icon-btn" (click)="openSharePicker()" pTooltip="Share">
+        <i class="fa-solid fa-share"></i>
+      </button>
       <button type="button" class="icon-btn" *ngIf="isOwnPost" (click)="startEdit()" pTooltip="Edit"><i class="fa-solid fa-pen"></i></button>
       <button type="button" class="icon-btn" *ngIf="canModerate" (click)="toggleLocked()" [pTooltip]="post.isLocked ? 'Unlock comments' : 'Lock comments'">
         <i class="fa-solid" [ngClass]="post.isLocked ? 'fa-unlock' : 'fa-lock'"></i>
@@ -39,7 +42,7 @@
 
   <div class="post-body" *ngIf="!editing" [innerHTML]="renderedContent()" (click)="onContentClick($event)"></div>
 
-  <div class="attachment-gallery" *ngIf="!editing && attachments.length > 0">
+  <div class="attachment-gallery" [class.single-attachment]="attachments.length === 1" *ngIf="!editing && attachments.length > 0">
     <div class="attachment-tile" *ngFor="let attachment of attachments">
       <img
         *ngIf="isImageAttachment(attachment)"
@@ -49,7 +52,11 @@
       />
       <video
         *ngIf="isVideoAttachment(attachment)"
+        #videoEl
         [src]="servedUrl(attachment.filePath)"
+        muted
+        loop
+        playsinline
         (click)="openLightbox(attachment, $event)"
       ></video>
       <a
@@ -86,7 +93,7 @@
     ></p-select>
     <div class="edit-actions">
       <button pButton size="small" [disabled]="!editContent.trim()" (click)="saveEdit()">Save</button>
-      <button pButton size="small" severity="secondary" (click)="cancelEdit()">Cancel</button>
+      <button pButton size="small" severity="danger" (click)="cancelEdit()">Cancel</button>
     </div>
   </div>
 
@@ -107,6 +114,8 @@
   ></app-comment-thread>
 
   <app-report-content-dialog [postId]="post.postId" [(visible)]="showReportDialog"></app-report-content-dialog>
+
+  <app-share-post-picker [postId]="post.postId" [(visible)]="showSharePicker"></app-share-post-picker>
 
   <p-dialog
     header="Attachment"

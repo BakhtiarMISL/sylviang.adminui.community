@@ -125,20 +125,18 @@
 
     <!-- Description -->
     <div class="sm:col-span-2">
-      <p-floatlabel variant="in">
-        <textarea
-          pInputText
-          inputId="description"
-          formControlName="description"
-          class="w-full"
-          rows="3"
-          maxlength="500"
-          [class.ng-invalid]="hasError('description')"
-          [class.ng-dirty]="hasError('description')"
-          (blur)="f['description'].markAsTouched()"
-        ></textarea>
-        <label for="description">Description</label>
-      </p-floatlabel>
+      <label for="description" class="block mb-1">Description</label>
+      <textarea
+        pTextarea
+        inputId="description"
+        formControlName="description"
+        class="w-full"
+        rows="3"
+        maxlength="500"
+        [class.ng-invalid]="hasError('description')"
+        [class.ng-dirty]="hasError('description')"
+        (blur)="f['description'].markAsTouched()"
+      ></textarea>
       <div *ngIf="hasError('description')" class="invalid">{{ getErrorMessage('description') }}</div>
     </div>
 

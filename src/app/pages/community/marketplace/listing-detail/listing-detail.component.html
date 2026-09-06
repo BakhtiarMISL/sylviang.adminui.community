@@ -47,11 +47,6 @@
       <h1 class="title">{{ listing.title }}</h1>
       <p class="price">{{ listing.price | number: '1.2-2' }} {{ listing.currency }}</p>
 
-      <div class="rating-summary" *ngIf="listing.reviewCount > 0">
-        <p-rating [ngModel]="roundedAverageRating" [readonly]="true" [stars]="5"></p-rating>
-        <span class="review-count">({{ listing.reviewCount }} review{{ listing.reviewCount === 1 ? '' : 's' }})</span>
-      </div>
-
       <p class="meta-line">
         <span class="badge category-badge">{{ listing.category }}</span>
         <span class="badge condition-badge" *ngIf="listing.condition">{{ listing.condition }}</span>
@@ -69,13 +64,6 @@
       <div class="seller-card" *ngIf="seller">
         <span class="seller-label">Seller</span>
         <p class="seller-name"><i class="fa-solid fa-user"></i> {{ seller.employeeName }}</p>
-      </div>
-
-      <div class="buy-row" *ngIf="canBuy">
-        <input pInputText type="number" [(ngModel)]="buyQuantity" name="buyQuantity" min="1" [max]="listing.quantity" class="qty-input" />
-        <button pButton [disabled]="buying || buyQuantity < 1 || buyQuantity > listing.quantity" (click)="buyNow()">
-          <i class="fa-solid fa-cart-shopping"></i> Buy
-        </button>
       </div>
 
       <div class="action-row">
@@ -111,8 +99,6 @@
       </div>
     </div>
   </div>
-
-  <app-listing-reviews *ngIf="!loading && !notFound && listing" [listingId]="listing.listingId"></app-listing-reviews>
 
   <app-related-listings *ngIf="!loading && !notFound && listing" [category]="listing.category" [excludeListingId]="listing.listingId"></app-related-listings>
 

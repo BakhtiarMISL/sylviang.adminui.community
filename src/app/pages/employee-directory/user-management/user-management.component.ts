@@ -65,6 +65,9 @@ export class UserManagementComponent implements OnInit {
   selectedEmployeeForAccess: IEmployeeManagementRowResponse | null = null;
   grantAccessDialogMode: GrantAccessDialogMode = 'grant';
 
+  showEditDialog = false;
+  selectedEmployeeForEdit: IEmployeeManagementRowResponse | null = null;
+
   get skeletonItems() {
     return Array(this.rows)
       .fill({})
@@ -192,13 +195,25 @@ export class UserManagementComponent implements OnInit {
     }
   }
 
+  openEditDialog(employee: IEmployeeManagementRowResponse): void {
+    this.selectedEmployeeForEdit = employee;
+    this.showEditDialog = true;
+  }
+
+  onEditDialogVisibilityChange(visible: boolean): void {
+    this.showEditDialog = visible;
+    if (!visible) {
+      this.loadEmployees();
+    }
+  }
+
   deactivateEmployee(employee: IEmployeeManagementRowResponse, event: Event): void {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: `Are you sure you want to deactivate ${employee.employeeName}?`,
       header: 'Deactivate Confirmation',
       acceptButtonStyleClass: 'p-button-danger',
-      rejectButtonStyleClass: 'p-button-secondary',
+      rejectButtonStyleClass: 'p-button-danger',
       acceptIcon: 'fa fa-check',
       rejectIcon: 'fa fa-times',
       accept: () => {
@@ -206,6 +221,28 @@ export class UserManagementComponent implements OnInit {
           next: (response) => {
             if (!response.hasError) {
               this.toast.success({ detail: `${employee.employeeName} deactivated.` });
+              this.loadEmployees();
+            }
+          },
+        });
+      },
+    });
+  }
+
+  activateEmployee(employee: IEmployeeManagementRowResponse, event: Event): void {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: `Are you sure you want to activate ${employee.employeeName}?`,
+      header: 'Activate Confirmation',
+      acceptButtonStyleClass: 'p-button-success',
+      rejectButtonStyleClass: 'p-button-danger',
+      acceptIcon: 'fa fa-check',
+      rejectIcon: 'fa fa-times',
+      accept: () => {
+        this.employeeService.activateEmployee(employee.employeeId).subscribe({
+          next: (response) => {
+            if (!response.hasError) {
+              this.toast.success({ detail: `${employee.employeeName} activated.` });
               this.loadEmployees();
             }
           },

@@ -25,7 +25,11 @@
 
   <!-- Right pane: conversation details -->
   <div *ngIf="showDetailsPanel && selectedConversation" class="w-80 shrink-0 border-l border-borderLight dark:border-borderDark">
-    <app-chat-details-panel [conversation]="selectedConversation" (close)="toggleDetailsPanel()"></app-chat-details-panel>
+    <app-chat-details-panel
+      [conversation]="selectedConversation"
+      (close)="toggleDetailsPanel()"
+      (jumpToMessage)="onJumpToMessage($event)"
+    ></app-chat-details-panel>
   </div>
 </div>
 

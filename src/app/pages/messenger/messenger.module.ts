@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { SharedModule } from '@app/shared/shared.module';
 import { DialogModule } from 'primeng/dialog';
 import { SkeletonModule } from 'primeng/skeleton';
+import { AddGroupMemberPickerComponent } from './details/add-group-member-picker/add-group-member-picker.component';
 import { ChatDetailsPanelComponent } from './details/chat-details-panel/chat-details-panel.component';
 import { ConversationListComponent } from './inbox/conversation-list/conversation-list.component';
 import { NewConversationPickerComponent } from './inbox/new-conversation-picker/new-conversation-picker.component';
@@ -27,6 +28,7 @@ import { ThreadViewComponent } from './thread/thread-view.component';
     ChatDetailsPanelComponent,
     ReportMessageDialogComponent,
     ForwardMessagePickerComponent,
+    AddGroupMemberPickerComponent,
   ],
   imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, SharedModule, MessengerRoutingModule, DialogModule, SkeletonModule],
 })

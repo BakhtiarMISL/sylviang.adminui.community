@@ -132,16 +132,20 @@
 
 .attachment-gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 0.5rem;
   margin-top: 0.6rem;
+
+  &.single-attachment {
+    grid-template-columns: 1fr;
+  }
 }
 
 .attachment-tile {
   border-radius: 0.5rem;
   overflow: hidden;
   background: rgba(0, 0, 0, 0.03);
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 3;
 
   img,
   video {
@@ -149,6 +153,16 @@
     height: 100%;
     object-fit: cover;
     cursor: pointer;
+  }
+}
+
+.single-attachment .attachment-tile {
+  aspect-ratio: auto;
+
+  img,
+  video {
+    height: auto;
+    max-height: 28rem;
   }
 }
 

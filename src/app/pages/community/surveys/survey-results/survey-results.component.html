@@ -138,8 +138,15 @@
             <ng-template pTemplate="body" let-response>
               <tr>
                 <td>
-                  <span *ngIf="survey.isAnonymous" class="anon-respondent"><i class="fa-solid fa-user-secret"></i> Anonymous</span>
-                  <span *ngIf="!survey.isAnonymous">{{ response.employeeId !== null ? ('Employee #' + response.employeeId) : 'Anonymous' }}</span>
+                  <span *ngIf="!canViewResponseDetail(response)" class="anon-respondent"><i class="fa-solid fa-user-secret"></i> Anonymous</span>
+                  <a
+                    *ngIf="canViewResponseDetail(response)"
+                    href="javascript:void(0)"
+                    class="respondent-link"
+                    pTooltip="View this respondent's answers"
+                    tooltipPosition="top"
+                    (click)="viewResponseDetail(response)"
+                  >{{ respondentDisplayName(response) }}</a>
                 </td>
                 <td>{{ response.submittedAt | date: 'dd-MMM-yyyy HH:mm' }}</td>
                 <td>{{ response.completionStatus }}</td>
@@ -161,5 +168,27 @@
         </div>
       </p-tabPanel>
     </p-tabView>
+
+    <p-dialog
+      [(visible)]="showResponseDetailDialog"
+      [header]="selectedResponse ? (respondentDisplayName(selectedResponse) + '\'s Answers') : 'Respondent Answers'"
+      [modal]="true"
+      [style]="{ width: '32rem' }"
+      [dismissableMask]="true"
+    >
+      <div class="answer-detail-meta" *ngIf="selectedResponse">
+        <span>Submitted {{ selectedResponse.submittedAt | date: 'medium' }}</span>
+        <span>Status: {{ selectedResponse.completionStatus }}</span>
+      </div>
+
+      <div class="answer-detail-item" *ngFor="let row of selectedResponseAnswers; let i = index">
+        <div class="answer-detail-question">{{ i + 1 }}. {{ row.questionText }}</div>
+        <div class="answer-detail-value">{{ row.displayValue }}</div>
+      </div>
+
+      <div class="not-found" *ngIf="selectedResponseAnswers.length === 0">
+        <div><p>No answers submitted.</p></div>
+      </div>
+    </p-dialog>
   </ng-container>
 </section>

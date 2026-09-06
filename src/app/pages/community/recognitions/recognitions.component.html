@@ -8,8 +8,16 @@
     </button>
   </div>
 
+  <div *ngIf="recipientFilterId" class="filter-banner">
+    <p>Viewing recognitions for <strong>{{ recipientFilterName || 'this employee' }}</strong> &mdash; <a [routerLink]="[]" (click)="clearRecipientFilter()">Show all recognitions</a></p>
+  </div>
+
+  <div *ngIf="senderFilterId" class="filter-banner">
+    <p>Showing recognitions given by <strong>{{ senderFilterName || 'this employee' }}</strong> &mdash; <a [routerLink]="[]" (click)="clearSenderFilter()">Show all recognitions</a></p>
+  </div>
+
   <p-panel
-    header="Recognition Filters"
+    header="Give Recognition"
     [toggleable]="true"
     [toggler]="'header'"
     [collapsed]="filtersCollapsed"
@@ -19,6 +27,76 @@
     styleClass="mb-4"
   >
     <app-recognition-composer (created)="onRecognitionCreated()"></app-recognition-composer>
+  </p-panel>
+
+  <p-panel
+    header="Filter Recognitions"
+    [toggleable]="true"
+    [toggler]="'header'"
+    [collapsed]="searchFiltersCollapsed"
+    (collapsedChange)="onSearchFiltersCollapsedChange($event)"
+    expandIcon="fas fa-chevron-down"
+    collapseIcon="fas fa-chevron-down"
+    styleClass="mb-4"
+  >
+    <div class="recognition-filter-row">
+      <div class="filter-field">
+        <label class="field-label">Recognized By</label>
+        <p-autocomplete
+          [(ngModel)]="senderFilterQuery"
+          [suggestions]="senderSuggestions"
+          (completeMethod)="searchSenderFilter($event)"
+          (onSelect)="onSenderFilterSelect($event.value)"
+          optionLabel="employeeName"
+          placeholder="Any sender"
+          [minLength]="1"
+          [appendTo]="'body'"
+          styleClass="w-full"
+        >
+          <ng-template let-employee pTemplate="item">
+            <div class="suggestion-item">
+              <i class="fa-solid fa-user"></i>
+              <span>{{ employee.employeeName }}</span>
+            </div>
+          </ng-template>
+        </p-autocomplete>
+      </div>
+
+      <div class="filter-field">
+        <label class="field-label">Recognized To</label>
+        <p-autocomplete
+          [(ngModel)]="recipientFilterQuery"
+          [suggestions]="recipientSuggestions"
+          (completeMethod)="searchRecipientFilter($event)"
+          (onSelect)="onRecipientFilterSelect($event.value)"
+          optionLabel="employeeName"
+          placeholder="Any recipient"
+          [minLength]="1"
+          [appendTo]="'body'"
+          styleClass="w-full"
+        >
+          <ng-template let-employee pTemplate="item">
+            <div class="suggestion-item">
+              <i class="fa-solid fa-user"></i>
+              <span>{{ employee.employeeName }}</span>
+            </div>
+          </ng-template>
+        </p-autocomplete>
+      </div>
+
+      <div class="filter-field">
+        <label class="field-label">Type</label>
+        <p-select
+          [options]="typeFilterOptions"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="typeFilter"
+          (onChange)="onTypeFilterChange()"
+          [appendTo]="'body'"
+          styleClass="w-full"
+        ></p-select>
+      </div>
+    </div>
   </p-panel>
 
   <div *ngIf="loading" class="skeleton-list">
@@ -33,7 +111,8 @@
     <div class="not-found" *ngIf="recognitions.length === 0">
       <div>
         <i class="fa-solid fa-award"></i>
-        <p>No recognitions yet. Be the first to give someone kudos!</p>
+        <p *ngIf="!recipientFilterId">No recognitions yet. Be the first to give someone kudos!</p>
+        <p *ngIf="recipientFilterId">{{ recipientFilterName || 'This employee' }} hasn't received any recognitions yet.</p>
       </div>
     </div>
 

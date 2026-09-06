@@ -1,0 +1,37 @@
+<p-dialog header="Edit Employee" [(visible)]="visible" [modal]="true" [dismissableMask]="true" [style]="{ width: '32rem' }" (onHide)="close()">
+  <p class="edit-employee-intro" *ngIf="employeeName">Editing <strong>{{ employeeName }}</strong>.</p>
+
+  <div class="edit-employee-form">
+    <label for="editEmail">Email</label>
+    <input pInputText type="email" id="editEmail" [(ngModel)]="email" [disabled]="loading" />
+
+    <label for="editDob">Date of Birth</label>
+    <p-datepicker
+      inputId="editDob"
+      [(ngModel)]="dateOfBirth"
+      dateFormat="dd-M-yy"
+      [showIcon]="true"
+      [maxDate]="maxDateOfBirth"
+      [appendTo]="'body'"
+      [disabled]="loading"
+      styleClass="w-full"
+    ></p-datepicker>
+
+    <label for="editDoj">Date of Joining</label>
+    <p-datepicker
+      inputId="editDoj"
+      [(ngModel)]="dateOfJoining"
+      dateFormat="dd-M-yy"
+      [showIcon]="true"
+      [maxDate]="today"
+      [appendTo]="'body'"
+      [disabled]="loading"
+      styleClass="w-full"
+    ></p-datepicker>
+
+    <div class="form-actions">
+      <button pButton [disabled]="!canSubmit" (click)="submit()">Save</button>
+      <button pButton severity="danger" (click)="close()">Cancel</button>
+    </div>
+  </div>
+</p-dialog>

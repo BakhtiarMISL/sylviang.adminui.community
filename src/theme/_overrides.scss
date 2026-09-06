@@ -44,7 +44,10 @@
 .p-multiselect-overlay,
 .p-multiselect-list-container,
 .p-multiselect-list {
-  @apply bg-light dark:bg-dark w-full border-borderLight dark:border-borderDark rounded z-50 !important;
+  // No z-50 here either - same reasoning as .p-datepicker-panel above: it would override
+  // PrimeNG's own runtime z-index and can leave a p-select/p-multiselect dropdown rendering
+  // behind an open p-dialog.
+  @apply bg-light dark:bg-dark w-full border-borderLight dark:border-borderDark rounded !important;
   overflow-x: auto !important;
 }
 .p-select-option,
@@ -171,6 +174,9 @@
   .p-datatable-thead > tr > th {
     @apply bg-light dark:bg-dark text-black dark:text-white border-b border-b-borderLight dark:border-b-borderDark p-[0.75rem_1rem];
   }
+  .p-datatable-header {
+    @apply bg-light dark:bg-dark text-black dark:text-white border-b border-b-borderLight dark:border-b-borderDark p-[0.75rem_1rem] !important;
+  }
 }
 .p-datatable-sortable-column:not(.p-datatable-column-sorted):hover {
   @apply bg-borderLight dark:bg-borderDark text-black dark:text-white !important;
@@ -194,7 +200,11 @@
   width: 100% !important;
 }
 .p-datepicker-panel {
-  @apply bg-light dark:bg-dark text-black dark:text-white z-50 !important;
+  // No z-50 here: PrimeNG assigns each overlay's z-index at runtime from a shared, incrementing
+  // counter, so a panel opened after a p-dialog already gets placed above it automatically - a
+  // hardcoded z-index here would fight that and can leave the calendar rendering behind an open
+  // dialog (e.g. Edit Employee's Date of Birth picker).
+  @apply bg-light dark:bg-dark text-black dark:text-white !important;
   min-width: auto !important;
 }
 .p-datepicker .p-datepicker-dropdown
@@ -285,7 +295,7 @@
     @apply bg-light dark:bg-dark text-black dark:text-white rounded-t-xl px-5 pt-3 pb-0 z-20;
   }
   .p-dialog-content {
-    @apply bg-light dark:bg-dark text-black dark:text-white px-5 py-0;
+    @apply bg-light dark:bg-dark text-black dark:text-white px-5 pt-3 pb-5;
     overflow: auto !important;
   }
   .p-dialog-footer {
@@ -295,6 +305,12 @@
   .p-confirmdialog-accept-button {
     @apply w-14 h-6 text-sm rounded text-white hover:text-white !important;
   }
+}
+
+// Attachment lightbox is a fullscreen-ish image/video viewer - keep it edge-to-edge rather
+// than inheriting the padding meant for form/text dialog content above.
+.lightbox-dialog .p-dialog-content {
+  padding: 0 !important;
 }
 
 // --------------------------------------------TabView CSS Override--------------------------------------------

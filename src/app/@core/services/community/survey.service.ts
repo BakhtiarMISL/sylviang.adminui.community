@@ -29,6 +29,11 @@ export class SurveyService {
     return this.httpClient.get<ApiResponse<ISurveyResponse>>(`${this.API_URL}/${surveyId}`);
   }
 
+  /** Employee-facing "surveys I can see" list, scoped server-side to Published/Closed surveys the caller is eligible for by audience (Entire Company / their Department / their Branch). */
+  getEligible() {
+    return this.httpClient.get<ApiResponse<ISurveyResponse[]>>(`${this.API_URL}/eligible`);
+  }
+
   create(request: ISurveyCreateRequest) {
     return this.httpClient.post<ApiResponse<number>>(`${this.API_URL}`, request);
   }

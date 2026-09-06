@@ -1,0 +1,18 @@
+<p-dialog
+  [header]="fileName"
+  [(visible)]="visible"
+  [modal]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '90vw', height: '90vh' }"
+  [contentStyle]="{ display: 'flex', flexDirection: 'column', padding: '0', height: '100%' }"
+  (onHide)="onHide()"
+>
+  <div class="flex-1 min-h-0 flex items-center justify-center bg-black/5 dark:bg-black/40 p-4">
+    <video *ngIf="isVideo" [src]="fileUrl" controls class="max-w-full max-h-full"></video>
+    <img *ngIf="!isVideo" [src]="fileUrl" [alt]="fileName" class="max-w-full max-h-full object-contain" />
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton (click)="download()"><i class="fas fa-download mr-2"></i>Download</button>
+  </ng-template>
+</p-dialog>

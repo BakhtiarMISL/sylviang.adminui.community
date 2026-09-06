@@ -1,10 +1,18 @@
 import { AfterViewChecked, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { IChatConversationResponse, IChatMessageResponse, IChatMessageSendRequest } from '@core/interfaces/messenger/messenger.interface';
+import {
+  IChatConversationResponse,
+  IChatMessageAttachmentResponse,
+  IChatMessageResponse,
+  IChatMessageSendRequest,
+} from '@core/interfaces/messenger/messenger.interface';
 import { CurrentUserService } from '@core/services/current-user.service';
 import { MessengerHubService } from '@core/services/messenger/messenger-hub.service';
 import { MessengerService } from '@core/services/messenger/messenger.service';
+import { ToastService } from '@core/services/misc/toast.service';
 import { Base_URL } from '@env/environment';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+
+const HIGHLIGHT_DURATION_MS = 2000;
 
 const PAGE_SIZE = 30;
 const TYPING_INDICATOR_TIMEOUT_MS = 3000;
@@ -34,9 +42,15 @@ export class ThreadViewComponent implements OnInit, OnChanges, OnDestroy, AfterV
   reportingMessage: IChatMessageResponse | null = null;
   reportDialogVisible = false;
 
+  mediaViewerVisible = false;
+  mediaViewerAttachment: IChatMessageAttachmentResponse | null = null;
+
+  highlightedMessageId: number | null = null;
+
   private previousConversationId: number | null = null;
   private shouldScrollToBottom = false;
   private typingTimeouts = new Map<number, ReturnType<typeof setTimeout>>();
+  private highlightTimeout: ReturnType<typeof setTimeout> | null = null;
 
   get currentEmployeeId(): number | null {
     return this.currentUserService.currentUser.employeeId;
@@ -62,6 +76,7 @@ export class ThreadViewComponent implements OnInit, OnChanges, OnDestroy, AfterV
     private messengerService: MessengerService,
     private messengerHubService: MessengerHubService,
     private currentUserService: CurrentUserService,
+    private toastService: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -98,7 +113,14 @@ export class ThreadViewComponent implements OnInit, OnChanges, OnDestroy, AfterV
       if (updated.chatConversationId !== this.conversationId) return;
 
       this.conversation = this.conversation
-        ? { ...this.conversation, title: updated.title, groupAvatarUrl: updated.groupAvatarUrl, groupAvatarFileId: updated.groupAvatarFileId }
+        ? {
+            ...this.conversation,
+            title: updated.title,
+            groupAvatarUrl: updated.groupAvatarUrl,
+            groupAvatarFileId: updated.groupAvatarFileId,
+            onlyAdminsCanAddMembers: updated.onlyAdminsCanAddMembers,
+            participants: updated.participants,
+          }
         : updated;
     });
 
@@ -107,6 +129,14 @@ export class ThreadViewComponent implements OnInit, OnChanges, OnDestroy, AfterV
 
       this.messages = this.messages.map((m) => (m.chatMessageId === chatMessageId ? { ...m, isDeleted: true, body: null, attachments: [] } : m));
       if (this.replyingTo?.chatMessageId === chatMessageId) this.replyingTo = null;
+    });
+
+    this.messengerHubService.messagePinned$.pipe(untilDestroyed(this)).subscribe(({ conversationId, chatMessageId, isPinned, pinnedByEmployeeId }) => {
+      if (conversationId !== this.conversationId) return;
+
+      this.messages = this.messages.map((m) =>
+        m.chatMessageId === chatMessageId ? { ...m, isPinned, pinnedByEmployeeId, pinnedAt: isPinned ? new Date().toISOString() : null } : m,
+      );
     });
 
     this.messengerHubService.userTyping$.pipe(untilDestroyed(this)).subscribe(({ conversationId, employeeId }) => {
@@ -143,9 +173,27 @@ export class ThreadViewComponent implements OnInit, OnChanges, OnDestroy, AfterV
       this.messengerHubService.leaveConversation(this.previousConversationId);
     }
     this.typingTimeouts.forEach((timeout) => clearTimeout(timeout));
+    if (this.highlightTimeout) clearTimeout(this.highlightTimeout);
 
     document.removeEventListener('visibilitychange', this.handleVisibilityRegained);
     window.removeEventListener('focus', this.handleVisibilityRegained);
+  }
+
+  /** Scrolls to and briefly highlights a message already loaded in this thread (e.g. from the Pinned Messages panel). */
+  scrollToMessage(chatMessageId: number): void {
+    const element = document.getElementById(`message-${chatMessageId}`);
+    if (!element) {
+      this.toastService.info({ detail: "That message is too far back in the thread to jump to right now." });
+      return;
+    }
+
+    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    if (this.highlightTimeout) clearTimeout(this.highlightTimeout);
+    this.highlightedMessageId = chatMessageId;
+    this.highlightTimeout = setTimeout(() => {
+      this.highlightedMessageId = null;
+    }, HIGHLIGHT_DURATION_MS);
   }
 
   ngAfterViewChecked(): void {
@@ -159,8 +207,8 @@ export class ThreadViewComponent implements OnInit, OnChanges, OnDestroy, AfterV
     return path ? `${Base_URL}/${path}` : '';
   }
 
-  isOwnMessage(message: IChatMessageResponse): boolean {
-    return message.senderEmployeeId === this.currentEmployeeId;
+  isOwnMessage(message: IChatMessageResponse | undefined): boolean {
+    return !!message && message.senderEmployeeId === this.currentEmployeeId;
   }
 
   /** Only the last bubble in a consecutive run from the same sender shows the avatar/name. */
@@ -170,8 +218,8 @@ export class ThreadViewComponent implements OnInit, OnChanges, OnDestroy, AfterV
   }
 
   /** True for the last message I sent, once at least one other participant has read up to it (US-12.7). */
-  isSeenByOthers(message: IChatMessageResponse): boolean {
-    if (!this.conversation || !this.isOwnMessage(message)) return false;
+  isSeenByOthers(message: IChatMessageResponse | undefined): boolean {
+    if (!message || !this.conversation || !this.isOwnMessage(message)) return false;
 
     const lastOwnMessage = [...this.messages].reverse().find((m) => this.isOwnMessage(m));
     if (lastOwnMessage?.chatMessageId !== message.chatMessageId) return false;
@@ -218,6 +266,23 @@ export class ThreadViewComponent implements OnInit, OnChanges, OnDestroy, AfterV
   onReportRequested(message: IChatMessageResponse): void {
     this.reportingMessage = message;
     this.reportDialogVisible = true;
+  }
+
+  onViewMedia(attachment: IChatMessageAttachmentResponse): void {
+    this.mediaViewerAttachment = attachment;
+    this.mediaViewerVisible = true;
+  }
+
+  /** Optimistically flips the bubble's pin state locally; the hub's MessagePinned event (see ngOnInit) is the source of truth for every viewer, including me. */
+  onPinToggle(message: IChatMessageResponse): void {
+    const isPinned = !message.isPinned;
+    this.messengerService.setMessagePinned(message.chatMessageId, { isPinned }).subscribe({
+      next: (response) => {
+        if (!response.hasError) {
+          this.messages = this.messages.map((m) => (m.chatMessageId === message.chatMessageId ? { ...m, isPinned } : m));
+        }
+      },
+    });
   }
 
   onDeleteMessage(message: IChatMessageResponse): void {

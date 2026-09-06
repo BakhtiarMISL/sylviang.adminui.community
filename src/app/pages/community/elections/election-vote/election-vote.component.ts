@@ -9,11 +9,11 @@ import { CurrentUserService } from '@core/services/current-user.service';
 import { ToastService } from '@core/services/misc/toast.service';
 
 /**
- * US-9.9/9.10: cast a ballot. Only approved candidates are shown (unapproved ones can't
- * receive votes - ElectionService.CastVoteAsync rejects them). Eligibility, the voting
- * window, and one-ballot-per-employee are all enforced server-side; this page just surfaces
- * whatever error message comes back (ineligible, already voted, outside window, wrong
- * selection count) rather than duplicating that logic client-side.
+ * US-9.9/9.10: cast a ballot. Every nominated candidate is ballot-eligible immediately -
+ * there's no separate approval step. Eligibility, the voting window, and one-ballot-per-employee
+ * are all enforced server-side; this page just surfaces whatever error message comes back
+ * (ineligible, already voted, outside window, wrong selection count) rather than duplicating
+ * that logic client-side.
  */
 @Component({
   selector: 'app-election-vote',
@@ -47,8 +47,25 @@ export class ElectionVoteComponent implements OnInit {
     return this.currentUserService.currentUser.employeeId;
   }
 
-  get approvedCandidates(): IElectionCandidateResponse[] {
-    return this.candidates.filter((c) => c.isApproved);
+  /**
+   * A notification link (or a stale tab) can point at an election that's no longer votable -
+   * the ballot itself was already protected server-side (CastVoteAsync's window/status check),
+   * but nothing stopped the candidate list/manifestos from still rendering client-side. Mirrors
+   * the server's own Votable-status + EndDate check so this shows the same verdict without
+   * waiting for a failed submit attempt.
+   */
+  get isExpired(): boolean {
+    if (!this.election) return false;
+    if (this.election.status !== 'Open' && this.election.status !== 'Active') return true;
+    return !!this.election.endDate && new Date(this.election.endDate).getTime() <= Date.now();
+  }
+
+  get isNotYetOpen(): boolean {
+    return !!this.election && !this.isExpired && new Date(this.election.startDate).getTime() > Date.now();
+  }
+
+  get isVotable(): boolean {
+    return !this.isExpired && !this.isNotYetOpen;
   }
 
   get selectedCount(): number {
@@ -73,8 +90,17 @@ export class ElectionVoteComponent implements OnInit {
     return this.election?.allowMultipleChoice ? this.selectedCandidateIds.has(candidateId) : this.selectedCandidateId === candidateId;
   }
 
+  /** Disables not-yet-checked checkboxes once maxSelection is reached, so the cap is enforced up front instead of just silently disabling Submit. */
+  isSelectionCapped(candidateId: number): boolean {
+    return !!this.election && !this.isSelected(candidateId) && this.selectedCandidateIds.size >= this.election.maxSelection;
+  }
+
   toggleSelection(candidateId: number, checked: boolean): void {
     if (checked) {
+      if (this.election && this.selectedCandidateIds.size >= this.election.maxSelection) {
+        this.toastService.info({ detail: `You can select up to ${this.election.maxSelection} candidate(s).` });
+        return;
+      }
       this.selectedCandidateIds.add(candidateId);
     } else {
       this.selectedCandidateIds.delete(candidateId);

@@ -16,8 +16,46 @@
   }
 }
 
+.filter-banner {
+  @apply mb-4 pb-4 border-b border-borderLight dark:border-borderDark;
+
+  p {
+    @apply text-sm text-neutral dark:text-white/60;
+  }
+
+  a {
+    @apply text-primary hover:underline cursor-pointer;
+  }
+}
+
 .skeleton-list {
   margin-top: 1rem;
+}
+
+.recognition-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.filter-field {
+  flex: 1 1 200px;
+  min-width: 180px;
+}
+
+.field-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0.75;
+  margin-bottom: 0.3rem;
+}
+
+.suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-primary);
 }
 
 .load-more-spinner {

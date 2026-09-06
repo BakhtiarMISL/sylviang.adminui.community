@@ -1,4 +1,4 @@
-<p-dialog [header]="task?.title || 'Task'" [(visible)]="visible" [modal]="true" [style]="{ width: '40rem' }" (onHide)="close()">
+<p-dialog [header]="task?.title || 'Task'" [(visible)]="visible" [modal]="true" [dismissableMask]="true" [style]="{ width: '40rem' }" (onHide)="close()">
   <div *ngIf="loading" class="skeleton-list">
     <p-skeleton width="100%" height="2rem" styleClass="mb-2"></p-skeleton>
     <p-skeleton width="100%" height="6rem"></p-skeleton>

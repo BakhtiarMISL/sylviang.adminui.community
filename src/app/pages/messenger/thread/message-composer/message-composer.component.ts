@@ -1,6 +1,7 @@
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { isImageFile, isVideoFile } from '@core/constants/community/attachment.constants';
 import {
   ChatAttachmentType,
   IChatMessageAttachmentRequest,
@@ -44,7 +45,14 @@ export class MessageComposerComponent {
     const trimmed = this.text.trim();
     if (!trimmed) return;
 
-    this.send.emit({ body: trimmed, messageType: 'Text', attachments: [], replyToMessageId: this.replyTo?.chatMessageId ?? null });
+    this.send.emit({
+      body: trimmed,
+      messageType: 'Text',
+      attachments: [],
+      replyToMessageId: this.replyTo?.chatMessageId ?? null,
+      sharedContentType: null,
+      sharedContentId: null,
+    });
     this.text = '';
   }
 
@@ -74,7 +82,10 @@ export class MessageComposerComponent {
       this.attachmentService.upload(file, MESSENGER_UPLOAD_MODULE).pipe(
         map((response) => {
           if (response.hasError || !response.content) return null;
-          const attachmentType: ChatAttachmentType = file.type.startsWith('image/') ? 'Image' : 'File';
+          // Extension-based, not File.type MIME sniffing - matches Posts' isImageAttachment/
+          // isVideoAttachment, since the browser-reported MIME type is unreliable/empty for
+          // several video formats (.mkv, .wmv, .m4v, .3gp, inconsistently .mov/.avi).
+          const attachmentType: ChatAttachmentType = isImageFile(file.name) ? 'Image' : isVideoFile(file.name) ? 'Video' : 'File';
           return { fileStorageId: response.content.fileId, attachmentType, durationSeconds: null } as IChatMessageAttachmentRequest;
         }),
         catchError(() => of(null)),
@@ -85,7 +96,14 @@ export class MessageComposerComponent {
       this.uploading = false;
       const attachments = results.filter((r): r is IChatMessageAttachmentRequest => r !== null);
       if (attachments.length > 0) {
-        this.send.emit({ body: null, messageType: 'Attachment', attachments, replyToMessageId: this.replyTo?.chatMessageId ?? null });
+        this.send.emit({
+          body: null,
+          messageType: 'Attachment',
+          attachments,
+          replyToMessageId: this.replyTo?.chatMessageId ?? null,
+          sharedContentType: null,
+          sharedContentId: null,
+        });
       }
     });
   }
@@ -137,6 +155,8 @@ export class MessageComposerComponent {
             messageType: 'Voice',
             attachments: [{ fileStorageId: response.content.fileId, attachmentType: 'Voice', durationSeconds }],
             replyToMessageId: this.replyTo?.chatMessageId ?? null,
+            sharedContentType: null,
+            sharedContentId: null,
           });
         }
       },

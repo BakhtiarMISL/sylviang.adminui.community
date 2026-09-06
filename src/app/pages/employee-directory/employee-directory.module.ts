@@ -13,6 +13,7 @@ import { DirectoryComponent } from './directory/directory.component';
 import { ManageEmployeeComponent } from './manage-employee/manage-employee.component';
 import { ProfileEditFormComponent } from './profile/profile-edit-form/profile-edit-form.component';
 import { ProfileComponent } from './profile/profile.component';
+import { EditEmployeeDialogComponent } from './user-management/edit-employee-dialog/edit-employee-dialog.component';
 import { GrantAccessDialogComponent } from './user-management/grant-access-dialog/grant-access-dialog.component';
 import { UserManagementComponent } from './user-management/user-management.component';
 
@@ -24,6 +25,7 @@ import { UserManagementComponent } from './user-management/user-management.compo
     ManageEmployeeComponent,
     UserManagementComponent,
     GrantAccessDialogComponent,
+    EditEmployeeDialogComponent,
   ],
   imports: [
     CommonModule,

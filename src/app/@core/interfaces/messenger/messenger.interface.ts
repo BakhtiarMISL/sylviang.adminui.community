@@ -3,7 +3,7 @@ import { ReactionType } from '@core/interfaces/community/reaction.interface';
 export type ConversationType = 'Direct' | 'Group';
 export type MessageType = 'Text' | 'Attachment' | 'Voice' | 'Shared' | 'System';
 export type SharedContentType = 'Post' | 'Listing' | 'Event';
-export type ChatAttachmentType = 'Image' | 'File' | 'Voice';
+export type ChatAttachmentType = 'Image' | 'File' | 'Voice' | 'Video';
 
 export interface IChatParticipantResponse {
   chatParticipantId: number;
@@ -24,6 +24,7 @@ export interface IChatConversationResponse {
   groupAvatarFileId: number | null;
   groupAvatarUrl: string | null;
   createdByEmployeeId: number;
+  onlyAdminsCanAddMembers: boolean;
   lastMessageAt: string | null;
   lastMessagePreview: string | null;
   participants: IChatParticipantResponse[];
@@ -105,6 +106,29 @@ export interface IChatMessageResponse {
   isDeleted: boolean;
   isForwarded: boolean;
   replyTo: IChatMessageReplyPreview | null;
+  isPinned: boolean;
+  pinnedAt: string | null;
+  pinnedByEmployeeId: number | null;
+}
+
+export interface IChatMessagePinRequest {
+  isPinned: boolean;
+}
+
+/** One row of the "Media and Files" panel - an attachment annotated with sender/timing. */
+export interface IChatMessageAttachmentGalleryItemResponse {
+  chatMessageAttachmentId: number;
+  chatMessageId: number;
+  fileStorageId: number;
+  originalFileName: string;
+  storagePath: string;
+  mimeType: string | null;
+  fileSize: number;
+  attachmentType: ChatAttachmentType;
+  durationSeconds: number | null;
+  senderEmployeeId: number;
+  senderName: string;
+  sentAt: string;
 }
 
 export interface IChatMessageSendRequest {
@@ -112,6 +136,8 @@ export interface IChatMessageSendRequest {
   messageType: MessageType;
   attachments: IChatMessageAttachmentRequest[];
   replyToMessageId: number | null;
+  sharedContentType: SharedContentType | null;
+  sharedContentId: number | null;
 }
 
 export interface IChatMessageForwardRequest {
@@ -134,6 +160,20 @@ export interface IChatConversationPinRequest {
 export interface IChatConversationUpdateGroupRequest {
   title: string | null;
   groupAvatarFileId: number | null;
+}
+
+export interface IChatConversationAddParticipantsRequest {
+  employeeIds: number[];
+}
+
+/** Creator-only. */
+export interface IChatConversationSetAddMemberPermissionRequest {
+  onlyAdminsCanAddMembers: boolean;
+}
+
+/** Creator-only. */
+export interface IChatConversationSetParticipantAdminRequest {
+  isAdmin: boolean;
 }
 
 export interface IChatConversationFilterParams {

@@ -22,17 +22,62 @@
       </div>
     </div>
 
-    <div class="candidate-result" *ngFor="let tally of results.candidateTallies">
-      <div class="option-row">
-        <span class="option-text">{{ candidateName(tally.electionCandidateId) }}</span>
-        <span class="option-count">{{ tally.voteCount }} ({{ percentage(tally) | number: '1.0-1' }}%)</span>
-      </div>
-      <p-progressBar [value]="percentage(tally)" [showValue]="false"></p-progressBar>
+    <div class="table-container" *ngIf="resultsView.length > 0">
+      <p-table #dt [value]="resultsView" dataKey="electionCandidateId" [globalFilterFields]="['candidateName']" [responsiveLayout]="'scroll'">
+        <ng-template pTemplate="caption">
+          <div class="table-caption">
+            <input
+              pInputText
+              type="text"
+              placeholder="Filter candidates..."
+              (input)="dt.filterGlobal($any($event.target).value, 'contains')"
+            />
+          </div>
+        </ng-template>
+
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="candidateName">Candidate <p-sortIcon field="candidateName"></p-sortIcon></th>
+            <th pSortableColumn="voteCount">Votes <p-sortIcon field="voteCount"></p-sortIcon></th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-tally>
+          <tr
+            class="tally-row"
+            [class.clickable]="canDrilldown"
+            (click)="openVoterDrilldown(tally)"
+          >
+            <td>
+              <div class="option-row">
+                <span class="option-text">{{ tally.candidateName }}</span>
+                <i class="fa-solid fa-circle-info" *ngIf="canDrilldown" title="View voters"></i>
+              </div>
+            </td>
+            <td>
+              <span class="option-count">{{ tally.voteCount }} ({{ tally.percentage | number: '1.0-1' }}%)</span>
+              <p-progressBar [value]="tally.percentage" [showValue]="false"></p-progressBar>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
     </div>
 
     <div class="not-found" *ngIf="results.candidateTallies.length === 0">
       <div><i class="fa-solid fa-chart-column"></i><p>No candidates to report on.</p></div>
     </div>
+
+    <p-dialog [(visible)]="showVoterDialog" [header]="'Voters for ' + (selectedTally ? candidateName(selectedTally.electionCandidateId) : '')" [modal]="true" [style]="{ width: '28rem' }">
+      <ul class="voter-list" *ngIf="votersForSelected.length > 0">
+        <li *ngFor="let voter of votersForSelected">
+          <span class="voter-name">{{ voterName(voter.voterId) }}</span>
+          <span class="voter-date">{{ voter.votedAt | date: 'dd-MMM-yyyy HH:mm' }}</span>
+        </li>
+      </ul>
+      <div class="not-found" *ngIf="votersForSelected.length === 0">
+        <div><i class="fa-solid fa-inbox"></i><p>No votes for this candidate yet.</p></div>
+      </div>
+    </p-dialog>
 
     <section class="voters-section" *ngIf="!results.isAnonymous && results.voterDetails">
       <h2>Individual Votes</h2>

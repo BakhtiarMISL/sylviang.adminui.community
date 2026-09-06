@@ -52,11 +52,24 @@
     </ng-container>
 
     <ng-container *ngIf="currentEmployeeId !== null">
-      <button *ngIf="survey.status === 'Published' && !alreadyResponded" pButton size="small" [routerLink]="['/community/surveys', survey.surveyId, 'take']">
+      <button
+        *ngIf="survey.status === 'Published' && !alreadyResponded && survey.isEligible"
+        pButton
+        size="small"
+        [routerLink]="['/community/surveys', survey.surveyId, 'take']"
+      >
         <i class="fa-solid fa-square-poll-vertical"></i> Take Survey
       </button>
       <span class="badge submitted-badge" *ngIf="survey.status === 'Published' && alreadyResponded">
         <i class="fa-solid fa-check"></i> Already Submitted
+      </span>
+      <span
+        class="badge not-eligible-badge"
+        *ngIf="survey.status === 'Published' && !alreadyResponded && !survey.isEligible"
+        pTooltip="This survey is targeted at a different department/branch than yours."
+        tooltipPosition="top"
+      >
+        <i class="fa-solid fa-circle-info"></i> Not in your audience
       </span>
     </ng-container>
   </div>

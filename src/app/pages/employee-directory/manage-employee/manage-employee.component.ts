@@ -3,6 +3,7 @@ import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators }
 import { Router } from '@angular/router';
 import { BreadcrumbService } from '@core/services/breadcrumb.service';
 import { BranchOptions } from '@core/constants/employee-master-data';
+import { toDateOnlyString } from '@core/helpers/date-only.helper';
 import { IDepartmentResponse } from '@core/interfaces/community/department.interface';
 import { IDesignationResponse } from '@core/interfaces/community/designation.interface';
 import { IEmployeeCreateRequest } from '@core/interfaces/employee-directory/employee.interface';
@@ -12,12 +13,12 @@ import { EmployeeService } from '@core/services/employee-directory/employee/empl
 import { ToastService } from '@core/services/misc/toast.service';
 
 /**
- * HR/Admin "Add Employee" (US-1.6). No edit-existing-employee form exists - no user story
- * asks for one (HR/Admin's only other action on an employee is Deactivate, from
- * user-management). Department/Designation are loaded live from this backend's own
- * Department/Designation CRUD (same source Survey/Election audience targeting already uses),
- * so what gets picked here is exactly what the Employee Table displays afterward. Branch still
- * uses a static demo option list - the backend has no equivalent local Branch/Site CRUD yet.
+ * HR/Admin "Add Employee" (US-1.6). Date of Birth is optional here - it can be left blank and
+ * filled in later via the Edit Employee dialog (user-management). Department/Designation are
+ * loaded live from this backend's own Department/Designation CRUD (same source Survey/Election
+ * audience targeting already uses), so what gets picked here is exactly what the Employee Table
+ * displays afterward. Branch still uses a static demo option list - the backend has no
+ * equivalent local Branch/Site CRUD yet.
  */
 @Component({
   selector: 'app-manage-employee',
@@ -44,6 +45,7 @@ export class ManageEmployeeComponent implements OnInit {
   designationOptions: IDesignationResponse[] = [];
   branchOptions = BranchOptions;
   today = new Date();
+  maxDateOfBirth = new Date(this.today.getFullYear() - 13, this.today.getMonth(), this.today.getDate());
 
   ngOnInit(): void {
     this.initForm();
@@ -73,6 +75,7 @@ export class ManageEmployeeComponent implements OnInit {
       departmentId: [null, [Validators.required, Validators.min(1)]],
       siteId: [null, [Validators.required, Validators.min(1)]],
       dateOfJoining: [new Date(), [Validators.required]],
+      dateOfBirth: [null as Date | null],
     });
   }
 
@@ -101,6 +104,7 @@ export class ManageEmployeeComponent implements OnInit {
       departmentId: 'Department',
       siteId: 'Branch',
       dateOfJoining: 'Date of Joining',
+      dateOfBirth: 'Date of Birth',
     };
     const displayName = displayNames[fieldName] || fieldName;
 
@@ -125,7 +129,8 @@ export class ManageEmployeeComponent implements OnInit {
     const raw = this.employeeForm.value;
     const request: IEmployeeCreateRequest = {
       ...raw,
-      dateOfJoining: (raw.dateOfJoining as Date).toISOString(),
+      dateOfJoining: toDateOnlyString(raw.dateOfJoining as Date),
+      dateOfBirth: raw.dateOfBirth ? toDateOnlyString(raw.dateOfBirth as Date) : null,
     };
 
     this.saving = true;

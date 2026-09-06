@@ -2,15 +2,20 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { ApiResponse } from '@core/interfaces/ApiResponse';
 import {
+  IChatConversationAddParticipantsRequest,
   IChatConversationCreateRequest,
   IChatConversationFilterParams,
   IChatConversationMuteRequest,
   IChatConversationPinRequest,
   IChatConversationResponse,
+  IChatConversationSetAddMemberPermissionRequest,
+  IChatConversationSetParticipantAdminRequest,
   IChatConversationSummaryResponse,
   IChatConversationUpdateGroupRequest,
+  IChatMessageAttachmentGalleryItemResponse,
   IChatMessageFilterParams,
   IChatMessageForwardRequest,
+  IChatMessagePinRequest,
   IChatMessageReactionRequest,
   IChatMessageReactionResponse,
   IChatMessageReportRequest,
@@ -97,5 +102,38 @@ export class MessengerService {
   /** Files a moderation report against this message. */
   reportMessage(messageId: number, request: IChatMessageReportRequest) {
     return this.httpClient.post<ApiResponse<void>>(`${this.API_URL}/messages/${messageId}/report`, request);
+  }
+
+  /** Pins/unpins this message to the conversation's "Pinned Messages" panel - any active participant may do this. */
+  setMessagePinned(messageId: number, request: IChatMessagePinRequest) {
+    return this.httpClient.put<ApiResponse<void>>(`${this.API_URL}/messages/${messageId}/pin`, request);
+  }
+
+  /** Every currently-pinned message in a conversation, for the Pinned Messages panel. */
+  getPinnedMessages(conversationId: number) {
+    return this.httpClient.get<ApiResponse<IChatMessageResponse[]>>(`${this.API_URL}/${conversationId}/messages/pinned`);
+  }
+
+  /** Every attachment ever sent in a conversation, newest first - backs the Media and Files panel. */
+  getMediaAndFiles(conversationId: number, params: IChatMessageFilterParams) {
+    return this.httpClient.get<ApiResponse<PaginatedResponse<IChatMessageAttachmentGalleryItemResponse[]>>>(
+      `${this.API_URL}/${conversationId}/attachments/paged`,
+      { params: params as any },
+    );
+  }
+
+  /** Adds one or more employees to a group - any active participant may call this unless the group restricts it to admins. */
+  addParticipants(conversationId: number, request: IChatConversationAddParticipantsRequest) {
+    return this.httpClient.post<ApiResponse<void>>(`${this.API_URL}/${conversationId}/participants`, request);
+  }
+
+  /** Creator-only: flips whether adding members is restricted to admins. */
+  setAddMemberPermission(conversationId: number, request: IChatConversationSetAddMemberPermissionRequest) {
+    return this.httpClient.put<ApiResponse<void>>(`${this.API_URL}/${conversationId}/settings`, request);
+  }
+
+  /** Creator-only: promotes/demotes another active participant's admin status. */
+  setParticipantAdmin(conversationId: number, employeeId: number, request: IChatConversationSetParticipantAdminRequest) {
+    return this.httpClient.put<ApiResponse<void>>(`${this.API_URL}/${conversationId}/participants/${employeeId}/admin`, request);
   }
 }

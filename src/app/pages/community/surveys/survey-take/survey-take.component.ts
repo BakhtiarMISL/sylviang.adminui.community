@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ApiResponse } from '@core/interfaces/ApiResponse';
 import { RATING_SCALE } from '@core/constants/community/survey-types';
@@ -114,9 +115,9 @@ export class SurveyTakeComponent implements OnInit {
     this.submitting = true;
     this.surveyResponseService.submit(this.surveyId, { answers }).subscribe({
       next: (response) => this.handleSubmitResponse(response, employeeId, 'Could not submit your response.'),
-      error: () => {
+      error: (error: HttpErrorResponse) => {
         this.submitting = false;
-        this.toastService.error({ detail: 'Could not submit your response.' });
+        this.toastService.error({ detail: error.error?.decentMessage || 'Could not submit your response.' });
       },
     });
   }
@@ -134,9 +135,9 @@ export class SurveyTakeComponent implements OnInit {
     this.submitting = true;
     this.surveyResponseService.submit(this.surveyId, { answers: [] }).subscribe({
       next: (response) => this.handleSubmitResponse(response, employeeId, 'Could not mark this survey as completed.'),
-      error: () => {
+      error: (error: HttpErrorResponse) => {
         this.submitting = false;
-        this.toastService.error({ detail: 'Could not mark this survey as completed.' });
+        this.toastService.error({ detail: error.error?.decentMessage || 'Could not mark this survey as completed.' });
       },
     });
   }

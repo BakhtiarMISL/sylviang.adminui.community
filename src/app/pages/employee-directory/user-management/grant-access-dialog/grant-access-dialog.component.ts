@@ -34,6 +34,7 @@ export class GrantAccessDialogComponent implements OnChanges {
   temporaryPassword = '';
   role = 'Employee';
   submitting = false;
+  showPassword = false;
 
   roleOptions = GrantAccessRoleOptions;
 
@@ -148,5 +149,6 @@ export class GrantAccessDialogComponent implements OnChanges {
     this.username = '';
     this.temporaryPassword = '';
     this.role = 'Employee';
+    this.showPassword = false;
   }
 }

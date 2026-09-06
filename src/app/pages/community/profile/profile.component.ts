@@ -1,13 +1,13 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { UI_CONFIG } from '@core/constants';
 import { BreadcrumbService } from '@core/services/breadcrumb.service';
 import { CurrentUserService } from '@core/services/current-user.service';
 import { IEmployeeResponse, IEmployeeUpdateProfileRequest } from '@core/interfaces/employee-directory/employee.interface';
 import { IUploadedAttachment } from '@core/interfaces/community/attachment.interface';
-import { IPostFilterParams, IPostResponse } from '@core/interfaces/community/post.interface';
-import { IRecognitionFilterParams, IRecognitionResponse } from '@core/interfaces/community/recognition.interface';
+import { IPostFilterParams } from '@core/interfaces/community/post.interface';
+import { IRecognitionFilterParams } from '@core/interfaces/community/recognition.interface';
 import { EmployeeService } from '@core/services/employee-directory/employee/employee.service';
+import { MessengerService } from '@core/services/messenger/messenger.service';
 import { PostService } from '@core/services/community/post.service';
 import { RecognitionService } from '@core/services/community/recognition.service';
 import { ToastService } from '@core/services/misc/toast.service';
@@ -34,6 +34,7 @@ export class CommunityProfileComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private employeeService: EmployeeService,
+    private messengerService: MessengerService,
     private postService: PostService,
     private recognitionService: RecognitionService,
     private currentUserService: CurrentUserService,
@@ -47,20 +48,13 @@ export class CommunityProfileComponent implements OnInit {
   notFound = false;
   isEditMode = false;
   saving = false;
+  messaging = false;
 
-  posts: IPostResponse[] = [];
   postsLoading = true;
   postsTotalRecords = 0;
-  postsRows: number = UI_CONFIG.defaultPageSize;
-  postsCurrentPage = 1;
 
-  recognitions: IRecognitionResponse[] = [];
   recognitionsLoading = true;
   recognitionsTotalRecords = 0;
-  recognitionsRows: number = UI_CONFIG.defaultPageSize;
-  recognitionsCurrentPage = 1;
-
-  UI_CONFIG = UI_CONFIG;
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
@@ -95,9 +89,7 @@ export class CommunityProfileComponent implements OnInit {
             { title: 'Directory', icon: 'fa-solid fa-id-badge', href: '/community/directory' },
             { title: this.employee.isOwnProfile ? 'My Profile' : this.employee.employeeName || 'Profile', icon: 'fa-solid fa-user', href: this.router.url },
           ]);
-          this.postsCurrentPage = 1;
           this.loadEmployeePosts(this.employee.employeeId);
-          this.recognitionsCurrentPage = 1;
           this.loadEmployeeRecognitions(this.employee.employeeId);
         } else {
           this.employee = null;
@@ -184,35 +176,44 @@ export class CommunityProfileComponent implements OnInit {
     });
   }
 
-  onPostsPageChange(event: { first: number; rows: number }): void {
-    if (!this.employee) return;
+  messageEmployee(): void {
+    if (!this.employee || this.messaging) return;
 
-    this.postsCurrentPage = Math.floor(event.first / event.rows) + 1;
-    this.postsRows = event.rows;
-    this.loadEmployeePosts(this.employee.employeeId);
+    this.messaging = true;
+    this.messengerService.createConversation({ type: 'Direct', title: null, participantEmployeeIds: [this.employee.employeeId] }).subscribe({
+      next: (response) => {
+        this.messaging = false;
+        if (!response.hasError && response.content) {
+          this.router.navigate(['/messenger', response.content]);
+        } else {
+          this.toast.error({ detail: response.decentMessage || 'Could not start a conversation.' });
+        }
+      },
+      error: () => {
+        this.messaging = false;
+        this.toast.error({ detail: 'Could not start a conversation.' });
+      },
+    });
   }
 
-  onPostDeleted(postId: number): void {
-    this.posts = this.posts.filter((p) => p.postId !== postId);
-    this.postsTotalRecords = Math.max(0, this.postsTotalRecords - 1);
+  viewPosts(): void {
+    if (!this.employee) return;
+    this.router.navigate(['/community/feed'], { queryParams: { employeeId: this.employee.employeeId, employeeName: this.employee.employeeName } });
   }
 
-  onRecognitionsPageChange(event: { first: number; rows: number }): void {
+  viewRecognitions(): void {
     if (!this.employee) return;
-
-    this.recognitionsCurrentPage = Math.floor(event.first / event.rows) + 1;
-    this.recognitionsRows = event.rows;
-    this.loadEmployeeRecognitions(this.employee.employeeId);
+    this.router.navigate(['/community/recognitions'], { queryParams: { recipientId: this.employee.employeeId, recipientName: this.employee.employeeName } });
   }
 
   private loadEmployeeRecognitions(employeeId: number): void {
     this.recognitionsLoading = true;
 
+    // pageSize: 1 - the profile page only needs the total count for its summary box, not the
+    // recognition rows themselves (those render on the Recognitions wall, via viewRecognitions()).
     const params: IRecognitionFilterParams = {
-      page: this.recognitionsCurrentPage,
-      pageSize: this.recognitionsRows,
-      sortBy: 'CreatedAt',
-      sortDirection: 'desc',
+      page: 1,
+      pageSize: 1,
       recipientId: employeeId,
     };
 
@@ -221,18 +222,11 @@ export class CommunityProfileComponent implements OnInit {
       .pipe(untilDestroyed(this))
       .subscribe({
         next: (response) => {
-          if (!response.hasError && response.content) {
-            this.recognitions = response.content.data || [];
-            this.recognitionsTotalRecords = response.content.totalCount || 0;
-          } else {
-            this.recognitions = [];
-            this.recognitionsTotalRecords = 0;
-          }
+          this.recognitionsTotalRecords = !response.hasError && response.content ? response.content.totalCount || 0 : 0;
           this.recognitionsLoading = false;
           this.cdr.detectChanges();
         },
         error: () => {
-          this.recognitions = [];
           this.recognitionsTotalRecords = 0;
           this.recognitionsLoading = false;
           this.cdr.detectChanges();
@@ -243,11 +237,11 @@ export class CommunityProfileComponent implements OnInit {
   private loadEmployeePosts(employeeId: number): void {
     this.postsLoading = true;
 
+    // pageSize: 1 - the profile page only needs the total count for its summary box, not the
+    // post rows themselves (those render on the Feed, via viewPosts()).
     const params: IPostFilterParams = {
-      page: this.postsCurrentPage,
-      pageSize: this.postsRows,
-      sortBy: 'CreatedAt',
-      sortDirection: 'desc',
+      page: 1,
+      pageSize: 1,
       employeeId,
     };
 
@@ -256,18 +250,11 @@ export class CommunityProfileComponent implements OnInit {
       .pipe(untilDestroyed(this))
       .subscribe({
         next: (response) => {
-          if (!response.hasError && response.content) {
-            this.posts = response.content.data || [];
-            this.postsTotalRecords = response.content.totalCount || 0;
-          } else {
-            this.posts = [];
-            this.postsTotalRecords = 0;
-          }
+          this.postsTotalRecords = !response.hasError && response.content ? response.content.totalCount || 0 : 0;
           this.postsLoading = false;
           this.cdr.detectChanges();
         },
         error: () => {
-          this.posts = [];
           this.postsTotalRecords = 0;
           this.postsLoading = false;
           this.cdr.detectChanges();

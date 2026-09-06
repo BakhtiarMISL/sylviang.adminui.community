@@ -36,6 +36,10 @@ export class FeedComponent implements OnInit, AfterViewInit, OnDestroy {
   /** Set when the page is opened via a `?postId=` deep link (e.g. from the Moderation Queue) - renders separately from the normal paginated list and auto-opens its detail modal. */
   highlightedPost: IPostResponse | null = null;
 
+  /** Set when the page is opened via a `?employeeId=` deep link (e.g. from a profile's Posts box) - restricts the feed to that employee's posts until cleared. */
+  authorFilterEmployeeId: number | null = null;
+  authorFilterEmployeeName: string | null = null;
+
   private observer?: IntersectionObserver;
 
   constructor(
@@ -46,6 +50,12 @@ export class FeedComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    const employeeId = Number(this.route.snapshot.queryParamMap.get('employeeId'));
+    if (employeeId) {
+      this.authorFilterEmployeeId = employeeId;
+      this.authorFilterEmployeeName = this.route.snapshot.queryParamMap.get('employeeName');
+    }
+
     this.loadFeed(true);
 
     const postId = Number(this.route.snapshot.queryParamMap.get('postId'));
@@ -66,6 +76,13 @@ export class FeedComponent implements OnInit, AfterViewInit, OnDestroy {
   clearHighlightedPost(): void {
     this.highlightedPost = null;
     this.router.navigate([], { relativeTo: this.route, queryParams: {} });
+  }
+
+  clearAuthorFilter(): void {
+    this.authorFilterEmployeeId = null;
+    this.authorFilterEmployeeName = null;
+    this.router.navigate([], { relativeTo: this.route, queryParams: {} });
+    this.loadFeed(true);
   }
 
   ngAfterViewInit(): void {
@@ -118,6 +135,7 @@ export class FeedComponent implements OnInit, AfterViewInit, OnDestroy {
       sortDirection: 'desc',
       ...(this.typeFilter === 'announcements' && { isAnnouncement: true }),
       ...(this.typeFilter === 'polls' && { isPoll: true }),
+      ...(this.authorFilterEmployeeId && { employeeId: this.authorFilterEmployeeId }),
     };
 
     this.postService

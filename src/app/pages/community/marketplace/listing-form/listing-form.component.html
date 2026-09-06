@@ -78,10 +78,10 @@
         <label for="location">Location</label>
       </p-floatlabel>
 
-      <p-floatlabel variant="in" class="sm:col-span-2">
+      <div class="sm:col-span-2">
+        <label for="description" class="block mb-1">Description</label>
         <textarea pInputTextarea id="description" rows="4" [(ngModel)]="description" name="description" class="w-full"></textarea>
-        <label for="description">Description</label>
-      </p-floatlabel>
+      </div>
     </div>
 
     <div class="photos-section">
@@ -98,7 +98,7 @@
     </div>
 
     <div class="form-actions">
-      <a pButton severity="secondary" [routerLink]="isEditMode ? ['/community/marketplace/listing', listingId] : ['/community/marketplace']">Cancel</a>
+      <a pButton severity="danger" [routerLink]="isEditMode ? ['/community/marketplace/listing', listingId] : ['/community/marketplace']">Cancel</a>
 
       <ng-container *ngIf="!isEditMode">
         <button pButton *ngIf="!isHrOrAdmin" type="button" severity="secondary" [disabled]="!canSubmit || submitting" (click)="saveAsDraft()">

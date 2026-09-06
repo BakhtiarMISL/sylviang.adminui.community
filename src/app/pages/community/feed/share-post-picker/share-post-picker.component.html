@@ -1,0 +1,31 @@
+<p-dialog header="Share post" [(visible)]="visible" [modal]="true" [dismissableMask]="true" [style]="{ width: '28rem' }" (onHide)="close()">
+  <div class="flex flex-col gap-3">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="search()"
+      placeholder="Search colleagues by name, code, or email"
+      class="w-full rounded-lg border border-borderLight dark:border-borderDark bg-gray-50 dark:bg-white/5 text-dark dark:text-borderLight px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary"
+    />
+
+    <div *ngIf="results.length > 0" class="max-h-64 overflow-y-auto flex flex-col">
+      <button
+        *ngFor="let employee of results"
+        type="button"
+        [disabled]="sharingToEmployeeId !== null"
+        (click)="shareTo(employee)"
+        class="w-full flex items-center gap-2.5 px-3 py-2 text-left rounded-lg hover:bg-gray-50 dark:hover:bg-white/5 duration-150 disabled:opacity-50"
+      >
+        <span class="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold bg-primary/15 text-primary shrink-0 overflow-hidden">
+          <img *ngIf="employee.photoUrl" [src]="avatarUrl(employee.photoUrl)" class="w-full h-full object-cover" alt="" />
+          <span *ngIf="!employee.photoUrl">{{ (employee.employeeName || '?').charAt(0).toUpperCase() }}</span>
+        </span>
+        <span class="min-w-0 flex-1">
+          <span class="block text-sm text-dark dark:text-borderLight truncate">{{ employee.employeeName }}</span>
+          <span class="block text-xs text-neutral truncate" *ngIf="employee.designationName">{{ employee.designationName }}</span>
+        </span>
+        <i *ngIf="sharingToEmployeeId === employee.employeeId" class="fas fa-spinner fa-spin text-primary"></i>
+      </button>
+    </div>
+  </div>
+</p-dialog>

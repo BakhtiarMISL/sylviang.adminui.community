@@ -8,7 +8,7 @@
 
   <ul class="joinee-list" *ngIf="!loading && joinees.length > 0">
     <li *ngFor="let joinee of joinees">
-      <span class="joinee-name">{{ joinee.employeeName }}</span>
+      <a class="joinee-name" [routerLink]="['/community/profile', joinee.employeeId]">{{ joinee.employeeName }}</a>
       <span class="joinee-label">{{ joinedLabel(joinee.dateOfJoining) }}</span>
     </li>
   </ul>

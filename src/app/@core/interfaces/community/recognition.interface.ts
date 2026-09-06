@@ -32,4 +32,5 @@ export interface IRecognitionFilterParams {
   sortDirection?: 'asc' | 'desc';
   senderId?: number;
   recipientId?: number;
+  isHrIssued?: boolean;
 }

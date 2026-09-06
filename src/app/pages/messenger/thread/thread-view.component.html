@@ -42,6 +42,9 @@
 
         <app-message-bubble
           *ngFor="let message of messages; let i = index"
+          [id]="'message-' + message.chatMessageId"
+          class="block rounded-lg transition-colors duration-700 px-1 -mx-1"
+          [ngClass]="{ 'bg-primary/10': highlightedMessageId === message.chatMessageId }"
           [message]="message"
           [isOwn]="isOwnMessage(message)"
           [showSenderInfo]="showSenderInfo(i)"
@@ -49,9 +52,11 @@
           (forwardMessage)="onForwardRequested($event)"
           (deleteMessage)="onDeleteMessage($event)"
           (report)="onReportRequested($event)"
+          (pinToggle)="onPinToggle($event)"
+          (viewMedia)="onViewMedia($event)"
         ></app-message-bubble>
 
-        <p *ngIf="isSeenByOthers(messages[messages.length - 1])" class="text-right text-xs text-neutral pr-1">Seen</p>
+        <p *ngIf="messages.length > 0 && isSeenByOthers(messages[messages.length - 1])" class="text-right text-xs text-neutral pr-1">Seen</p>
       </ng-container>
 
       <div #scrollAnchor></div>
@@ -76,4 +81,11 @@
     [messageId]="reportingMessage.chatMessageId"
     [(visible)]="reportDialogVisible"
   ></app-report-message-dialog>
+
+  <app-media-viewer
+    [(visible)]="mediaViewerVisible"
+    [storagePath]="mediaViewerAttachment?.storagePath ?? null"
+    [fileName]="mediaViewerAttachment?.originalFileName ?? ''"
+    [isVideo]="mediaViewerAttachment?.attachmentType === 'Video'"
+  ></app-media-viewer>
 </div>

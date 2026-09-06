@@ -18,12 +18,20 @@
       </p>
     </div>
 
-    <div class="not-found" *ngIf="currentEmployeeId === null">
+    <div class="not-found" *ngIf="isExpired">
+      <div><i class="fa-solid fa-calendar-xmark"></i><p>This election has ended and is no longer accepting votes.</p></div>
+    </div>
+
+    <div class="not-found" *ngIf="!isExpired && isNotYetOpen">
+      <div><i class="fa-solid fa-clock"></i><p>This election hasn't opened for voting yet.</p></div>
+    </div>
+
+    <div class="not-found" *ngIf="isVotable && currentEmployeeId === null">
       <div><i class="fa-solid fa-circle-exclamation"></i><p>This account can't vote in elections.</p></div>
     </div>
 
-    <form *ngIf="currentEmployeeId !== null" class="vote-form">
-      <div class="candidate-row" *ngFor="let candidate of approvedCandidates">
+    <form *ngIf="isVotable && currentEmployeeId !== null" class="vote-form">
+      <div class="candidate-row" *ngFor="let candidate of candidates">
         <ng-container *ngIf="!election.allowMultipleChoice">
           <p-radioButton
             name="candidate"
@@ -41,6 +49,7 @@
             [ngModel]="isSelected(candidate.electionCandidateId)"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="toggleSelection(candidate.electionCandidateId, $event)"
+            [disabled]="isSelectionCapped(candidate.electionCandidateId)"
             [inputId]="'candidate-' + candidate.electionCandidateId"
           ></p-checkbox>
         </ng-container>
@@ -51,11 +60,11 @@
         </label>
       </div>
 
-      <div class="not-found" *ngIf="approvedCandidates.length === 0">
-        <div><i class="fa-solid fa-user-group"></i><p>No approved candidates yet - check back once HR has finalized the ballot.</p></div>
+      <div class="not-found" *ngIf="candidates.length === 0">
+        <div><i class="fa-solid fa-user-group"></i><p>No candidates nominated yet.</p></div>
       </div>
 
-      <div class="vote-actions" *ngIf="approvedCandidates.length > 0">
+      <div class="vote-actions" *ngIf="candidates.length > 0">
         <button type="button" pButton [disabled]="!canSubmit" (click)="submit()">Submit Vote</button>
       </div>
     </form>

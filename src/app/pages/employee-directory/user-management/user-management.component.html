@@ -142,6 +142,9 @@
                 <button [routerLink]="['/employee-directory/profile', employee.employeeId]" class="text-primary mr-2">
                   <i class="fa fa-eye"></i>
                 </button>
+                <button class="text-primary mr-2" title="Edit" (click)="openEditDialog(employee)">
+                  <i class="fa fa-pen"></i>
+                </button>
                 <button
                   class="text-success mr-2"
                   *ngIf="employee.isActive && !employee.hasCredential"
@@ -160,6 +163,9 @@
                 </button>
                 <button class="text-danger" *ngIf="employee.isActive" (click)="deactivateEmployee(employee, $event)">
                   <i class="fa fa-user-slash"></i>
+                </button>
+                <button class="text-success" *ngIf="!employee.isActive" title="Activate" (click)="activateEmployee(employee, $event)">
+                  <i class="fa fa-user-check"></i>
                 </button>
               </td>
             </tr>
@@ -189,4 +195,12 @@
     [visible]="showGrantAccessDialog"
     (visibleChange)="onGrantAccessDialogVisibilityChange($event)"
   ></app-grant-access-dialog>
+
+  <app-edit-employee-dialog
+    *ngIf="selectedEmployeeForEdit as emp"
+    [employeeId]="emp.employeeId"
+    [employeeName]="emp.employeeName"
+    [visible]="showEditDialog"
+    (visibleChange)="onEditDialogVisibilityChange($event)"
+  ></app-edit-employee-dialog>
 </section>

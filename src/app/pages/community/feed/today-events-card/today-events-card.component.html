@@ -8,7 +8,7 @@
 
   <ul class="event-list" *ngIf="!loading && events.length > 0">
     <li *ngFor="let event of events">
-      <span class="event-name">{{ event.employeeName }}</span>
+      <a class="event-name" [routerLink]="['/community/profile', event.employeeId]">{{ event.employeeName }}</a>
       <span class="event-badge" [class.anniversary]="event.eventType === EventType.Anniversary" [class.text-primary]="event.eventType === EventType.Anniversary">
         {{ event.eventType === EventType.Birthday ? 'Birthday' : event.yearsOfService + ' yr Anniversary' }}
       </span>

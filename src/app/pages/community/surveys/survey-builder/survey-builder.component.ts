@@ -103,7 +103,14 @@ export class SurveyBuilderComponent implements OnInit {
   }
 
   get canSubmit(): boolean {
-    return !this.submitting && this.surveyForm.valid;
+    return !this.submitting && this.surveyForm.valid && this.isAudienceValid;
+  }
+
+  /** audienceType/departmentId/branchId aren't reactive FormControls (see class doc comment above), so this mirrors what surveyForm.valid would enforce if they were. */
+  get isAudienceValid(): boolean {
+    if (this.audienceType === 'Department') return this.departmentId !== null;
+    if (this.audienceType === 'Branch') return this.branchId !== null;
+    return true;
   }
 
   ngOnInit(): void {
@@ -134,6 +141,16 @@ export class SurveyBuilderComponent implements OnInit {
     if (field?.errors) {
       if (field.errors['required']) return `${displayName} is required`;
     }
+    return '';
+  }
+
+  hasAudienceError(): boolean {
+    return !this.isAudienceValid && this.formSubmitted;
+  }
+
+  getAudienceErrorMessage(): string {
+    if (this.audienceType === 'Department') return 'Department is required';
+    if (this.audienceType === 'Branch') return 'Branch is required';
     return '';
   }
 

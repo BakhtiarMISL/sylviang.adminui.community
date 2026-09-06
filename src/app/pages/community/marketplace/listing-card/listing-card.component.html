@@ -21,11 +21,6 @@
     <p class="listing-title">{{ listing.title }}</p>
     <p class="listing-price">{{ listing.price | number: '1.2-2' }} {{ listing.currency }}</p>
 
-    <div class="rating-summary" *ngIf="listing.reviewCount > 0">
-      <p-rating [ngModel]="roundedAverageRating" [readonly]="true" [stars]="5"></p-rating>
-      <span class="review-count">({{ listing.reviewCount }})</span>
-    </div>
-
     <div class="listing-meta">
       <span
         *ngIf="listing.status === 'Active'"

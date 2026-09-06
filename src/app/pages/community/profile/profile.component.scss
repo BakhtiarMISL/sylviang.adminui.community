@@ -76,6 +76,39 @@
   }
 }
 
+.profile-link-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.15s;
+
+  &:hover {
+    @apply bg-gray-50 dark:bg-white/5;
+  }
+
+  h3 {
+    @apply mb-0;
+  }
+}
+
+.profile-link-card-icon {
+  @apply text-primary text-lg w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0;
+}
+
+.profile-link-card-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.profile-link-card-count {
+  @apply text-sm text-neutral dark:text-white/70 mt-0.5;
+}
+
+.profile-link-card-arrow {
+  @apply text-neutral dark:text-white/40 shrink-0;
+}
+
 .profile-fields {
   @apply grid grid-cols-2 gap-x-2 gap-y-1 text-sm;
 

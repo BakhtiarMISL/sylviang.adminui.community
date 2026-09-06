@@ -24,7 +24,7 @@
   </div>
 
   <ng-template pTemplate="footer">
-    <button pButton severity="secondary" (click)="close()">Cancel</button>
+    <button pButton severity="danger" (click)="close()">Cancel</button>
     <button pButton [disabled]="selectedIds.length === 0 || sending" (click)="send()">
       Send{{ selectedIds.length > 0 ? ' (' + selectedIds.length + ')' : '' }}
     </button>

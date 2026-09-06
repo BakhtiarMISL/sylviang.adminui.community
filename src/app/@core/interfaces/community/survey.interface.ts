@@ -20,6 +20,13 @@ export interface ISurveyResponse {
   closedAt: string | null;
   /** When set, this survey has no CES-native questions - it links out to an external survey (e.g. a Google Form) instead. */
   externalUrl: string | null;
+  /**
+   * Whether the caller's own department/branch actually matches this survey's audience -
+   * independent of HR/Admin being able to see/manage every survey regardless of audience.
+   * Drives whether "Take Survey" shows: HR/Admin can browse a Department-scoped survey they
+   * don't manage without being a member of that department's target audience.
+   */
+  isEligible: boolean;
 }
 
 export interface ISurveyCreateRequest {

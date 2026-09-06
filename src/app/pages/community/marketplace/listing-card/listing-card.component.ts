@@ -21,11 +21,6 @@ export class ListingCardComponent implements OnInit {
   seller: IEmployeeResponse | null = null;
   thumbnailUrl: string | null = null;
 
-  /** p-rating only renders whole stars - round the average for display. */
-  get roundedAverageRating(): number {
-    return this.listing.averageRating ? Math.round(this.listing.averageRating) : 0;
-  }
-
   constructor(
     private employeeLookupService: EmployeeLookupService,
     private listingService: ListingService,

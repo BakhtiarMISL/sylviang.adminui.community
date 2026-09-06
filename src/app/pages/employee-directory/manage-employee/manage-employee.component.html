@@ -115,6 +115,25 @@
       </p-floatlabel>
       <div *ngIf="hasError('dateOfJoining')" class="invalid">{{ getErrorMessage('dateOfJoining') }}</div>
     </div>
+
+    <div>
+      <p-floatlabel variant="in">
+        <p-datepicker
+          inputId="dateOfBirth"
+          formControlName="dateOfBirth"
+          dateFormat="dd-M-yy"
+          [showIcon]="true"
+          [maxDate]="maxDateOfBirth"
+          [appendTo]="'body'"
+          class="w-full"
+          styleClass="w-full"
+          [class.ng-invalid]="hasError('dateOfBirth')"
+          (onBlur)="f['dateOfBirth'].markAsTouched()"
+        ></p-datepicker>
+        <label for="dateOfBirth">Date of Birth</label>
+      </p-floatlabel>
+      <div *ngIf="hasError('dateOfBirth')" class="invalid">{{ getErrorMessage('dateOfBirth') }}</div>
+    </div>
   </section>
 
   <div class="flex justify-end gap-3">
