@@ -30,7 +30,7 @@
         <textarea pInputTextarea rows="2" placeholder="Write a reply..." [(ngModel)]="replyContent"></textarea>
         <div class="edit-actions">
           <button pButton size="small" [disabled]="!replyContent.trim()" (click)="submitReply(comment.commentId)">Reply</button>
-          <button pButton size="small" severity="secondary" (click)="cancelReply()">Cancel</button>
+          <button pButton size="small" severity="danger" (click)="cancelReply()">Cancel</button>
         </div>
       </div>
 

@@ -20,6 +20,15 @@
     border-color: transparent;
     color: #000000;
   }
+
+  // Same Aura/dark-mode-token issue as the tab list above, but for the standalone <p-paginator>
+  // under each tab's card list. The app-wide fix in _overrides.scss only covers a paginator
+  // nested inside a p-table (.p-datatable .p-paginator), which doesn't apply here since this
+  // one isn't part of a table - same fix as surveys.component.scss.
+  ::ng-deep .p-paginator {
+    background: #ffffff;
+    color: #000000;
+  }
 }
 
 :host-context(.dark) {
@@ -32,6 +41,11 @@
   }
 
   ::ng-deep .p-tab:not(.p-tab-active):not(.p-disabled):hover {
+    color: #e5e7eb;
+  }
+
+  ::ng-deep .p-paginator {
+    background: #1f2937;
     color: #e5e7eb;
   }
 }

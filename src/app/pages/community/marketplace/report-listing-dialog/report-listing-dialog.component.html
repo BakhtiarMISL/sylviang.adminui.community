@@ -3,7 +3,7 @@
   <textarea pInputTextarea rows="4" class="w-full" placeholder="Reason for reporting..." [(ngModel)]="reason"></textarea>
 
   <ng-template pTemplate="footer">
-    <button pButton severity="secondary" (click)="close()">Cancel</button>
+    <button pButton severity="danger" (click)="close()">Cancel</button>
     <button pButton [disabled]="!reason.trim() || submitting" (click)="submit()">Submit Report</button>
   </ng-template>
 </p-dialog>

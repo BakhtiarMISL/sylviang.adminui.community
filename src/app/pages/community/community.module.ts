@@ -7,7 +7,6 @@ import { PaginatorModule } from 'primeng/paginator';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TextareaModule } from 'primeng/textarea';
 import { TabViewModule } from 'primeng/tabview';
-import { RatingModule } from 'primeng/rating';
 import { MessageModule } from 'primeng/message';
 import { SharedModule } from '@shared/shared.module';
 import { CommunityRoutingModule } from './community-routing.module';
@@ -20,6 +19,7 @@ import { ReactionSummaryComponent } from './feed/reaction-summary/reaction-summa
 import { MentionTextareaComponent } from './feed/mention-textarea/mention-textarea.component';
 import { PollWidgetComponent } from './feed/poll-widget/poll-widget.component';
 import { ReportContentDialogComponent } from './feed/report-content-dialog/report-content-dialog.component';
+import { SharePostPickerComponent } from './feed/share-post-picker/share-post-picker.component';
 import { GroupsSidebarComponent } from './feed/groups-sidebar/groups-sidebar.component';
 import { ProfileSummaryComponent } from './feed/profile-summary/profile-summary.component';
 import { TodayEventsCardComponent } from './feed/today-events-card/today-events-card.component';
@@ -43,7 +43,6 @@ import { FavoritesComponent } from './marketplace/favorites/favorites.component'
 import { ConversationsInboxComponent } from './marketplace/conversations/conversations-inbox.component';
 import { ConversationThreadComponent } from './marketplace/conversations/conversation-thread/conversation-thread.component';
 import { ReportListingDialogComponent } from './marketplace/report-listing-dialog/report-listing-dialog.component';
-import { ListingReviewsComponent } from './marketplace/listing-reviews/listing-reviews.component';
 import { RelatedListingsComponent } from './marketplace/related-listings/related-listings.component';
 import { GroupsListComponent } from './groups/groups-list/groups-list.component';
 import { GroupFormDialogComponent } from './groups/group-form-dialog/group-form-dialog.component';
@@ -85,6 +84,7 @@ import { TaskDetailDialogComponent } from './tasks/task-detail-dialog/task-detai
     MentionTextareaComponent,
     PollWidgetComponent,
     ReportContentDialogComponent,
+    SharePostPickerComponent,
     GroupsSidebarComponent,
     ProfileSummaryComponent,
     TodayEventsCardComponent,
@@ -108,7 +108,6 @@ import { TaskDetailDialogComponent } from './tasks/task-detail-dialog/task-detai
     ConversationsInboxComponent,
     ConversationThreadComponent,
     ReportListingDialogComponent,
-    ListingReviewsComponent,
     RelatedListingsComponent,
     GroupsListComponent,
     GroupFormDialogComponent,
@@ -148,7 +147,6 @@ import { TaskDetailDialogComponent } from './tasks/task-detail-dialog/task-detai
     TextareaModule,
     ProgressBarModule,
     TabViewModule,
-    RatingModule,
     MessageModule,
     DragDropModule,
     CommunityRoutingModule,

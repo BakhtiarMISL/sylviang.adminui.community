@@ -7,7 +7,6 @@ import { ConversationService } from '@core/services/community/conversation.servi
 import { EmployeeLookupService } from '@core/services/community/employee-lookup.service';
 import { FavoriteService } from '@core/services/community/favorite.service';
 import { ListingService } from '@core/services/community/listing.service';
-import { PurchaseService } from '@core/services/community/purchase.service';
 import { CurrentUserService } from '@core/services/current-user.service';
 import { ToastService } from '@core/services/misc/toast.service';
 import { Base_URL } from '@env/environment';
@@ -32,8 +31,6 @@ export class ListingDetailComponent implements OnInit {
   messaging = false;
   deleting = false;
   updatingStatus = false;
-  buyQuantity = 1;
-  buying = false;
 
   showReportDialog = false;
 
@@ -43,7 +40,6 @@ export class ListingDetailComponent implements OnInit {
     private listingService: ListingService,
     private favoriteService: FavoriteService,
     private conversationService: ConversationService,
-    private purchaseService: PurchaseService,
     private employeeLookupService: EmployeeLookupService,
     private currentUserService: CurrentUserService,
     private toastService: ToastService,
@@ -66,24 +62,11 @@ export class ListingDetailComponent implements OnInit {
     return this.isOwner || this.isHrOrAdmin;
   }
 
-  get canBuy(): boolean {
-    return (
-      !!this.listing &&
-      !this.isOwner &&
-      this.listing.status === 'Active' &&
-      this.listing.approvalStatus === 'Approved' &&
-      this.listing.quantity > 0
-    );
-  }
-
-  /** p-rating only renders whole stars - round the average for display. */
-  get roundedAverageRating(): number {
-    return this.listing?.averageRating ? Math.round(this.listing.averageRating) : 0;
-  }
-
   ngOnInit(): void {
-    this.load();
-    this.loadFavoriteState();
+    this.route.paramMap.subscribe(() => {
+      this.load();
+      this.loadFavoriteState();
+    });
   }
 
   servedUrl(path: string): string {
@@ -142,28 +125,6 @@ export class ListingDetailComponent implements OnInit {
       error: () => {
         this.messaging = false;
         this.toastService.error({ detail: 'Could not start conversation.' });
-      },
-    });
-  }
-
-  buyNow(): void {
-    if (!this.listing || !this.canBuy) return;
-
-    this.buying = true;
-    this.purchaseService.create({ listingId: this.listing.listingId, quantity: this.buyQuantity }).subscribe({
-      next: (response) => {
-        this.buying = false;
-        if (!response.hasError) {
-          this.toastService.success({ detail: `Purchased ${this.buyQuantity} x ${this.listing!.title}.` });
-          this.buyQuantity = 1;
-          this.load();
-        } else {
-          this.toastService.error({ detail: response.decentMessage || 'Could not complete purchase.' });
-        }
-      },
-      error: () => {
-        this.buying = false;
-        this.toastService.error({ detail: 'Could not complete purchase.' });
       },
     });
   }

@@ -8,7 +8,18 @@
     </ng-container>
 
     <label>Password</label>
-    <input pInputText type="password" placeholder="At least 8 characters" [(ngModel)]="temporaryPassword" />
+    <div class="relative">
+      <input pInputText [type]="showPassword ? 'text' : 'password'" placeholder="At least 8 characters" [(ngModel)]="temporaryPassword" class="w-full pr-10" />
+      <button
+        type="button"
+        (click)="showPassword = !showPassword"
+        class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral hover:text-primary transition-colors"
+        tabindex="-1"
+        [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+      >
+        <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+      </button>
+    </div>
 
     <ng-container *ngIf="isGrantMode">
       <label>Role</label>
@@ -25,7 +36,7 @@
 
     <div class="form-actions">
       <button pButton [disabled]="!canSubmit" (click)="submit()">{{ submitLabel }}</button>
-      <button pButton severity="secondary" (click)="close()">Cancel</button>
+      <button pButton severity="danger" (click)="close()">Cancel</button>
     </div>
   </div>
 </p-dialog>

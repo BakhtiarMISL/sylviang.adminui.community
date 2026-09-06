@@ -37,7 +37,7 @@
           ></app-mention-textarea>
           <div class="edit-actions">
             <button pButton size="small" (click)="saveEdit(comment.commentId)">Save</button>
-            <button pButton size="small" severity="secondary" (click)="cancelEdit()">Cancel</button>
+            <button pButton size="small" severity="danger" (click)="cancelEdit()">Cancel</button>
           </div>
         </div>
       </div>
@@ -61,7 +61,7 @@
         ></app-mention-textarea>
         <div class="edit-actions">
           <button pButton size="small" [disabled]="!replyContent.trim()" (click)="submitReply(comment.commentId)">Reply</button>
-          <button pButton size="small" severity="secondary" (click)="cancelReply()">Cancel</button>
+          <button pButton size="small" severity="danger" (click)="cancelReply()">Cancel</button>
         </div>
       </div>
 

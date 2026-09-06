@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IChatConversationResponse } from '@core/interfaces/messenger/messenger.interface';
 import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { ThreadViewComponent } from '../thread/thread-view.component';
 
 @UntilDestroy()
 @Component({
@@ -10,6 +11,8 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
   templateUrl: './messenger-home.component.html',
 })
 export class MessengerHomeComponent implements OnInit {
+  @ViewChild(ThreadViewComponent) threadView?: ThreadViewComponent;
+
   selectedConversationId: number | null = null;
   selectedConversation: IChatConversationResponse | null = null;
   showDetailsPanel = false;
@@ -44,5 +47,9 @@ export class MessengerHomeComponent implements OnInit {
 
   toggleDetailsPanel(): void {
     this.showDetailsPanel = !this.showDetailsPanel;
+  }
+
+  onJumpToMessage(chatMessageId: number): void {
+    this.threadView?.scrollToMessage(chatMessageId);
   }
 }

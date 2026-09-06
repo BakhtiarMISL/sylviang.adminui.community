@@ -100,6 +100,15 @@ export class ErrorHandlerInterceptor implements HttpInterceptor {
   private _extractDecentMessage(errorBody: unknown): string | null {
     if (!errorBody || typeof errorBody !== 'object') return null;
     const candidate = errorBody as Record<string, unknown>;
+
+    // FluentValidation failures carry the actual per-field reasons here (e.g. "You must be at
+    // least 13 years old.") while decentMessage is just the generic "Validation failed." -
+    // prefer the specific reasons so the user knows what to fix.
+    if (Array.isArray(candidate['errorDetails'])) {
+      const details = candidate['errorDetails'].filter((d): d is string => typeof d === 'string' && d.trim().length > 0);
+      if (details.length > 0) return details.join(' ');
+    }
+
     if (typeof candidate['decentMessage'] === 'string') {
       const msg = candidate['decentMessage'].trim();
       if (msg.length > 0) return msg;

@@ -10,7 +10,7 @@
 
   <div class="post-kind-tabs">
     <button type="button" class="kind-tab" [class.active]="postKind === 'Text'" (click)="postKind = 'Text'">
-      <i class="fa-regular fa-comment"></i> Update
+      <i class="fa-regular fa-comment"></i> Thoughts
     </button>
     <button type="button" class="kind-tab" [class.active]="postKind === 'Announcement'" (click)="postKind = 'Announcement'">
       <i class="fa-solid fa-bullhorn"></i> Announcement
@@ -19,7 +19,7 @@
       <i class="fa-solid fa-square-poll-vertical"></i> Poll
     </button>
 
-    <app-attachment-upload module="Post" (uploaded)="onAttachmentUploaded($event)" (removed)="onAttachmentRemoved($event)"></app-attachment-upload>
+    <app-attachment-upload #attachmentUpload module="Post" (uploaded)="onAttachmentUploaded($event)" (removed)="onAttachmentRemoved($event)"></app-attachment-upload>
   </div>
 
   <div class="poll-builder" *ngIf="postKind === 'Poll'">

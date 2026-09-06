@@ -17,8 +17,6 @@ export interface IListingResponse {
   rejectionReason: string | null;
   createdBy: number | null;
   createdAt: string | null;
-  averageRating: number | null;
-  reviewCount: number;
 }
 
 export interface IListingCreateRequest {
@@ -149,29 +147,3 @@ export interface IPurchaseCreateRequest {
   quantity: number;
 }
 
-export interface IReviewResponse {
-  reviewId: number;
-  listingId: number;
-  reviewerId: number;
-  rating: number;
-  comment: string | null;
-  createdAt: string | null;
-}
-
-export interface IReviewCreateRequest {
-  listingId: number;
-  rating: number;
-  comment: string | null;
-}
-
-export interface IReviewImageResponse {
-  imageId: number;
-  reviewId: number;
-  imageUrl: string;
-  displayOrder: number;
-}
-
-export interface IReviewImageAddRequest {
-  imageUrl: string;
-  displayOrder: number;
-}

@@ -123,7 +123,7 @@ export class ShiftListComponent implements OnInit, AfterViewInit {
       message: `Are you sure you want to delete shift: ${shift.shiftName}?`,
       header: 'Delete Confirmation',
       acceptButtonStyleClass: 'p-button-danger',
-      rejectButtonStyleClass: 'p-button-secondary',
+      rejectButtonStyleClass: 'p-button-danger',
       acceptIcon: 'fa fa-check',
       rejectIcon: 'fa fa-times',
       accept: () => {

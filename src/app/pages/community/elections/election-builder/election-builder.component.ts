@@ -105,6 +105,13 @@ export class ElectionBuilderComponent implements OnInit {
       this.electionForm.markAllAsTouched();
       return;
     }
+
+    const { startDate, endDate } = this.electionForm.getRawValue();
+    if (endDate && (endDate as Date).getTime() <= (startDate as Date).getTime()) {
+      this.toastService.error({ detail: 'End date must be after the start date.' });
+      return;
+    }
+
     this.submitting = true;
 
     try {

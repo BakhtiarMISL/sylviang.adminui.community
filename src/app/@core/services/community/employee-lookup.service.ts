@@ -21,7 +21,7 @@ export class EmployeeLookupService {
     const cached = this.cache.get(employeeId);
     if (cached) return cached;
 
-    const request$ = this.employeeService.getEmployeeById(employeeId).pipe(
+    const request$ = this.employeeService.getEmployeeById(employeeId, true).pipe(
       map((response) => (!response.hasError && response.content ? response.content : null)),
       catchError(() => of(null)),
       shareReplay(1),

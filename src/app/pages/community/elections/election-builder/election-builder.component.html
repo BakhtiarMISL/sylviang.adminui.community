@@ -29,10 +29,8 @@
       </div>
 
       <div class="field">
-        <p-floatlabel variant="in">
-          <textarea id="election-description" pTextarea rows="3" formControlName="description" class="w-full"></textarea>
-          <label for="election-description">Description</label>
-        </p-floatlabel>
+        <label for="election-description">Description</label>
+        <textarea id="election-description" pTextarea rows="3" formControlName="description" class="w-full"></textarea>
       </div>
 
       <div class="date-row">
@@ -123,7 +121,7 @@
     </section>
 
     <div class="builder-actions">
-      <button type="button" pButton severity="secondary" routerLink="/community/elections">Cancel</button>
+      <button type="button" pButton severity="danger" routerLink="/community/elections">Cancel</button>
       <button type="button" pButton [disabled]="!canSubmit" (click)="save()">
         {{ isEditMode ? 'Save Changes' : 'Save as Draft' }}
       </button>

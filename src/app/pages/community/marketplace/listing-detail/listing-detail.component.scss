@@ -34,7 +34,7 @@
 }
 
 .main-image {
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 1 / 1;
   max-height: 22rem;
   background: rgba(0, 0, 0, 0.04);
   border-radius: 0.75rem;
@@ -42,11 +42,6 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-
-  &.no-image {
-    aspect-ratio: auto;
-    height: 14rem;
-  }
 
   img {
     width: 100%;
@@ -110,39 +105,11 @@
   margin: 0 0 0.6rem;
 }
 
-.rating-summary {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-bottom: 0.6rem;
-
-  ::ng-deep .p-rating-icon {
-    font-size: 1rem;
-  }
-}
-
-.review-count {
-  font-size: 0.8rem;
-  opacity: 0.6;
-  color: var(--text-primary);
-}
-
 .meta-line {
   display: flex;
   gap: 0.4rem;
   flex-wrap: wrap;
   margin-bottom: 0.5rem;
-}
-
-.buy-row {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  margin-bottom: 0.75rem;
-
-  .qty-input {
-    width: 4.5rem;
-  }
 }
 
 .location {

@@ -3,7 +3,8 @@
   [visible]="visible"
   (visibleChange)="visibleChange.emit($event)"
   [modal]="true"
-  [style]="{ width: '28rem' }"
+  [dismissableMask]="true"
+  [style]="{ width: '32rem' }"
   (onHide)="onHide()"
 >
   <div class="flex flex-col gap-3">

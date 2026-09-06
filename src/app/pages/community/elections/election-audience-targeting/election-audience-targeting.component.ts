@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { ELECTION_AUDIENCE_SCOPE_OPTIONS } from '@core/constants/community/election-types';
 import { IBranchResponse } from '@core/interfaces/community/branch.interface';
 import { IDepartmentResponse } from '@core/interfaces/community/department.interface';
@@ -7,6 +7,7 @@ import { ITeamResponse } from '@core/interfaces/community/team.interface';
 import { IEmployeeDirectoryCardResponse } from '@core/interfaces/employee-directory/employee.interface';
 import { BranchService } from '@core/services/community/branch.service';
 import { DepartmentService } from '@core/services/community/department.service';
+import { EmployeeLookupService } from '@core/services/community/employee-lookup.service';
 import { TeamService } from '@core/services/community/team.service';
 import { EmployeeService } from '@core/services/employee-directory/employee/employee.service';
 
@@ -28,7 +29,7 @@ import { EmployeeService } from '@core/services/employee-directory/employee/empl
   templateUrl: './election-audience-targeting.component.html',
   styleUrl: './election-audience-targeting.component.scss',
 })
-export class ElectionAudienceTargetingComponent implements OnInit {
+export class ElectionAudienceTargetingComponent implements OnInit, OnChanges {
   @Input() audienceScope: ElectionAudienceScope | null = null;
   @Output() audienceScopeChange = new EventEmitter<ElectionAudienceScope | null>();
 
@@ -57,6 +58,7 @@ export class ElectionAudienceTargetingComponent implements OnInit {
     private branchService: BranchService,
     private teamService: TeamService,
     private employeeService: EmployeeService,
+    private employeeLookupService: EmployeeLookupService,
   ) {}
 
   ngOnInit(): void {
@@ -69,6 +71,38 @@ export class ElectionAudienceTargetingComponent implements OnInit {
     this.teamService.getPaged({ page: 1, pageSize: 100 }).subscribe((response) => {
       this.teams = !response.hasError && response.content ? response.content.data || [] : [];
     });
+  }
+
+  /**
+   * Editing an existing (readonly) election's scope previously showed a blank picker, even
+   * though the scope was already configured - targetIds/audienceScope only ever fed the emitted
+   * output, never the local selectedDepartmentIds/selectedBranchIds/selectedTeamIds/
+   * selectedEmployees the templates actually bind to. Only relevant in readonly mode: while
+   * interactive, those arrays are already the source of truth via the on*SelectionChange
+   * handlers, so re-deriving them from the (derived) targetIds input on every change would be
+   * circular and unnecessary.
+   */
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.readonly && (changes['targetIds'] || changes['audienceScope'])) {
+      this.syncSelectionsFromReadonlyTargetIds();
+    }
+  }
+
+  private syncSelectionsFromReadonlyTargetIds(): void {
+    const numericIds = this.targetIds.map(Number).filter((id) => !Number.isNaN(id));
+
+    this.selectedDepartmentIds = this.audienceScope === 'Department' ? numericIds : [];
+    this.selectedBranchIds = this.audienceScope === 'Branch' ? numericIds : [];
+    this.selectedTeamIds = this.audienceScope === 'Team' ? numericIds : [];
+
+    this.selectedEmployees = [];
+    if (this.audienceScope === 'SelectedEmployees') {
+      for (const employeeId of numericIds) {
+        this.employeeLookupService.getById(employeeId).subscribe((employee) => {
+          if (employee) this.selectedEmployees = [...this.selectedEmployees, employee];
+        });
+      }
+    }
   }
 
   onScopeChange(scope: ElectionAudienceScope): void {

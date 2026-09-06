@@ -89,7 +89,6 @@ export interface IElectionCandidateResponse {
   teamId: number | null;
   candidateType: ElectionCandidateType | string;
   manifesto: string | null;
-  isApproved: boolean;
   nominatedAt: string;
 }
 
@@ -98,6 +97,12 @@ export interface IElectionCandidateNominateRequest {
   teamId?: number | null;
   candidateType: ElectionCandidateType | string;
   manifesto?: string | null;
+}
+
+/** Bulk-nominates every active employee matching a scope at once; targetIds is ignored for Organization scope. */
+export interface IElectionCandidateNominateBulkRequest {
+  scope: ElectionAudienceScope | string;
+  targetIds: number[];
 }
 
 export interface IElectionVoteCastRequest {

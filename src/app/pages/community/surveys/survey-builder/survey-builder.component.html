@@ -29,10 +29,8 @@
       </div>
 
       <div class="field">
-        <p-floatlabel variant="in">
-          <textarea id="survey-description" pTextarea rows="3" formControlName="description" class="w-full"></textarea>
-          <label for="survey-description">Description</label>
-        </p-floatlabel>
+        <label for="survey-description">Description</label>
+        <textarea id="survey-description" pTextarea rows="3" formControlName="description" class="w-full"></textarea>
       </div>
 
       <div class="field">
@@ -102,6 +100,7 @@
         [(branchId)]="branchId"
         [readonly]="!!existingAudienceType"
       ></app-survey-audience-targeting>
+      <div *ngIf="hasAudienceError()" class="invalid">{{ getAudienceErrorMessage() }}</div>
     </section>
 
     <section class="form-section" *ngIf="!isExternal" formArrayName="questions">

@@ -17,3 +17,11 @@ export const ELECTION_AUDIENCE_SCOPE_OPTIONS: { label: string; value: ElectionAu
   { label: 'Team', value: 'Team' },
   { label: 'Selected Employees', value: 'SelectedEmployees' },
 ];
+
+/** Scopes bulk candidate nomination supports - no "Selected Employees" since the individual search+nominate form already covers that case. */
+export const ELECTION_BULK_NOMINATE_SCOPE_OPTIONS: { label: string; value: ElectionAudienceScope }[] = [
+  { label: 'Entire Organization', value: 'Organization' },
+  { label: 'Branch', value: 'Branch' },
+  { label: 'Department', value: 'Department' },
+  { label: 'Team', value: 'Team' },
+];

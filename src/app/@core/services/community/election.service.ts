@@ -4,6 +4,7 @@ import { ApiResponse } from '@core/interfaces/ApiResponse';
 import {
   IElectionAudienceTargetAddRequest,
   IElectionAudienceTargetResponse,
+  IElectionCandidateNominateBulkRequest,
   IElectionCandidateNominateRequest,
   IElectionCandidateResponse,
   IElectionCreateRequest,
@@ -81,8 +82,9 @@ export class ElectionService {
     return this.httpClient.post<ApiResponse<number>>(`${this.API_URL}/${electionId}/candidates`, request);
   }
 
-  approveCandidate(electionId: number, candidateId: number) {
-    return this.httpClient.put<ApiResponse<void>>(`${this.API_URL}/${electionId}/candidates/${candidateId}/approve`, {});
+  /** Bulk-nominates every active employee matching request.scope; returns the count newly nominated. */
+  nominateBulk(electionId: number, request: IElectionCandidateNominateBulkRequest) {
+    return this.httpClient.post<ApiResponse<number>>(`${this.API_URL}/${electionId}/candidates/bulk`, request);
   }
 
   /** Casts one ballot - request.candidateIds holds every candidate selected in this submission. */

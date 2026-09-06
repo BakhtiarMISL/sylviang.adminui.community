@@ -9,7 +9,6 @@
     >
       <i [class]="iconFor(myReaction()?.reactionType)"></i>
       <span>{{ myReaction()?.reactionType || 'React' }}</span>
-      <span *ngIf="totalCount() > 0" class="count">({{ totalCount() }})</span>
     </button>
 
     <div class="reaction-picker" *ngIf="pickerOpen">

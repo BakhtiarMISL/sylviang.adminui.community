@@ -12,6 +12,15 @@
     <div class="candidates-header">
       <h1>{{ election.title }} - Candidates</h1>
       <span class="badge status-badge" [ngClass]="'status-' + election.status.toLowerCase()">{{ election.status }}</span>
+      <button
+        type="button"
+        pButton
+        *ngIf="isHrOrAdmin && election.status === 'Draft'"
+        [disabled]="submitting"
+        (click)="publish()"
+      >
+        <i class="fa-solid fa-bullhorn"></i> Publish
+      </button>
     </div>
 
     <section class="nominate-section" *ngIf="election.status === 'Draft' || election.status === 'Open'">
@@ -48,19 +57,72 @@
       </div>
     </section>
 
+    <section
+      class="nominate-section bulk-nominate-section"
+      *ngIf="isHrOrAdmin && isEmployeeCandidateType && (election.status === 'Draft' || election.status === 'Open')"
+    >
+      <h2>Bulk Nominate</h2>
+
+      <div class="nominate-form">
+        <p-select
+          [options]="bulkScopeOptions"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="bulkScope"
+          (ngModelChange)="onBulkScopeChange()"
+          placeholder="Choose a scope"
+          [appendTo]="'body'"
+          styleClass="w-full"
+        ></p-select>
+
+        <p-multiSelect
+          *ngIf="bulkScope === 'Department'"
+          [options]="departments"
+          optionLabel="name"
+          optionValue="departmentId"
+          [(ngModel)]="bulkTargetIds"
+          placeholder="Choose one or more departments"
+          display="chip"
+          [appendTo]="'body'"
+          styleClass="w-full"
+        ></p-multiSelect>
+
+        <p-multiSelect
+          *ngIf="bulkScope === 'Branch'"
+          [options]="branches"
+          optionLabel="name"
+          optionValue="branchId"
+          [(ngModel)]="bulkTargetIds"
+          placeholder="Choose one or more branches"
+          display="chip"
+          [appendTo]="'body'"
+          styleClass="w-full"
+        ></p-multiSelect>
+
+        <p-multiSelect
+          *ngIf="bulkScope === 'Team'"
+          [options]="teams"
+          optionLabel="name"
+          optionValue="teamId"
+          [(ngModel)]="bulkTargetIds"
+          placeholder="Choose one or more teams"
+          display="chip"
+          [appendTo]="'body'"
+          styleClass="w-full"
+        ></p-multiSelect>
+
+        <button type="button" pButton [disabled]="!canBulkNominate" (click)="nominateBulk()">
+          <i class="fa-solid fa-users"></i> Nominate All
+        </button>
+      </div>
+    </section>
+
     <section class="candidates-list">
       <div class="candidate-row" *ngFor="let candidate of candidates">
         <div class="candidate-info">
           <span class="candidate-name">{{ displayName(candidate) }}</span>
-          <span class="badge approved-badge" *ngIf="candidate.isApproved"><i class="fa-solid fa-check"></i> Approved</span>
-          <span class="badge pending-badge" *ngIf="!candidate.isApproved"><i class="fa-solid fa-hourglass-half"></i> Pending Approval</span>
         </div>
         <p class="manifesto" *ngIf="candidate.manifesto">{{ candidate.manifesto }}</p>
-        <div class="candidate-actions" *ngIf="isHrOrAdmin && !candidate.isApproved">
-          <button type="button" pButton size="small" [disabled]="submitting" (click)="approve(candidate)">
-            <i class="fa-solid fa-check"></i> Approve
-          </button>
-        </div>
       </div>
 
       <div class="not-found" *ngIf="candidates.length === 0">

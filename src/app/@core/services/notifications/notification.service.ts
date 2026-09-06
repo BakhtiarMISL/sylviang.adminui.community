@@ -50,6 +50,8 @@ export function getNotificationNavigationTarget(notification: INotificationRespo
       return { commands: ['/community/tasks'] };
     case 'Election':
       return { commands: ['/community/elections', notification.relatedEntityId, 'vote'] };
+    case 'Survey':
+      return { commands: ['/community/surveys', notification.relatedEntityId, 'take'] };
     default:
       return null;
   }

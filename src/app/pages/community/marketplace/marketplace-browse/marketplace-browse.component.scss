@@ -1,3 +1,21 @@
+:host {
+  // Same Aura/dark-mode-token issue as elsewhere (surveys.component.scss, elections.component.scss)
+  // for the standalone <p-paginator> below the listing grid - the app-wide fix in _overrides.scss
+  // only covers a paginator nested inside a p-table (.p-datatable .p-paginator), which doesn't
+  // apply here since this one isn't part of a table.
+  ::ng-deep .p-paginator {
+    background: #ffffff;
+    color: #000000;
+  }
+}
+
+:host-context(.dark) {
+  ::ng-deep .p-paginator {
+    background: #1f2937;
+    color: #e5e7eb;
+  }
+}
+
 .browse-container {
   padding: 0.5rem 0;
 }

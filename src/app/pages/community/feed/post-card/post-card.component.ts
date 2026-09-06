@@ -1,4 +1,16 @@
-import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { IVisibilityOption, VISIBILITY_OPTIONS } from '@core/constants/community/visibility-options';
@@ -25,7 +37,9 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
   templateUrl: './post-card.component.html',
   styleUrl: './post-card.component.scss',
 })
-export class PostCardComponent implements OnInit {
+export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChildren('videoEl') videoEls!: QueryList<ElementRef<HTMLVideoElement>>;
+
   @Input({ required: true }) post!: IPostResponse;
   /** True only for the nested instance rendered inside the detail modal - prevents it from opening another modal on click. */
   @Input() isModalView = false;
@@ -45,10 +59,12 @@ export class PostCardComponent implements OnInit {
   editTags: IMentionTag[] = [];
   attachments: IPostAttachmentResponse[] = [];
   showReportDialog = false;
+  showSharePicker = false;
   showDetailModal = false;
   lightboxVisible = false;
   lightboxAttachment: IPostAttachmentResponse | null = null;
   private mentionLinks: IMentionTag[] = [];
+  private videoObservers: IntersectionObserver[] = [];
 
   visibilityOptions: IVisibilityOption[] = VISIBILITY_OPTIONS;
 
@@ -128,6 +144,40 @@ export class PostCardComponent implements OnInit {
           this.cdr.detectChanges();
         }
       });
+  }
+
+  ngAfterViewInit(): void {
+    this.setupVideoObservers();
+    this.videoEls.changes.pipe(untilDestroyed(this)).subscribe(() => this.setupVideoObservers());
+  }
+
+  ngOnDestroy(): void {
+    this.videoObservers.forEach((observer) => observer.disconnect());
+  }
+
+  /** Reels-style autoplay: play a video once it's substantially visible, pause it otherwise.
+   * Re-run whenever videoEls changes (attachments arrive async, edit mode toggles the gallery). */
+  private setupVideoObservers(): void {
+    this.videoObservers.forEach((observer) => observer.disconnect());
+    this.videoObservers = [];
+
+    this.videoEls.forEach((ref) => {
+      const video = ref.nativeElement;
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              video.play().catch(() => {});
+            } else {
+              video.pause();
+            }
+          });
+        },
+        { threshold: 0.5 },
+      );
+      observer.observe(video);
+      this.videoObservers.push(observer);
+    });
   }
 
   toggleComments(): void {
@@ -248,6 +298,10 @@ export class PostCardComponent implements OnInit {
 
   openReportDialog(): void {
     this.showReportDialog = true;
+  }
+
+  openSharePicker(): void {
+    this.showSharePicker = true;
   }
 
   toggleHidden(): void {

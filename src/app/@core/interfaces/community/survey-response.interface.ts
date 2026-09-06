@@ -23,6 +23,8 @@ export interface ISurveySubmissionResponse {
   surveyId: number;
   /** Null when the parent survey is anonymous - the backend never exposes identity for those. */
   employeeId: number | null;
+  /** Resolved server-side from the employee record - null when anonymous, or if the employee can't be found. */
+  employeeName: string | null;
   submittedAt: string;
   completionStatus: string;
   answers: ISurveyAnswerResponse[];

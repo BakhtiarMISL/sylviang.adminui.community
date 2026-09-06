@@ -39,7 +39,7 @@
         >
           Request to Join
         </button>
-        <button *ngIf="isMember && !isCreator" pButton size="small" severity="secondary" [disabled]="joinLeaveSubmitting" (click)="leave()">
+        <button *ngIf="isMember && !isCreator" pButton size="small" severity="danger" [disabled]="joinLeaveSubmitting" (click)="leave()">
           Leave Group
         </button>
         <button *ngIf="isManager" pButton size="small" severity="secondary" (click)="openEditDialog()"><i class="fa-solid fa-pen"></i> Edit</button>

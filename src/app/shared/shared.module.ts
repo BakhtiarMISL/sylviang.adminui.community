@@ -21,9 +21,10 @@ import { TooltipModule } from 'primeng/tooltip';
 import { RelativeTimePipe } from '@core/pipes/relative-time.pipe';
 import { AttachmentUploadComponent } from './attachment-upload/attachment-upload.component';
 import { ColleagueSearchComponent } from './colleague-search/colleague-search.component';
+import { MediaViewerComponent } from './media-viewer/media-viewer.component';
 
 @NgModule({
-  declarations: [AttachmentUploadComponent, ColleagueSearchComponent],
+  declarations: [AttachmentUploadComponent, ColleagueSearchComponent, MediaViewerComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,
@@ -66,6 +67,7 @@ import { ColleagueSearchComponent } from './colleague-search/colleague-search.co
     FileUploadModule,
     AttachmentUploadComponent,
     ColleagueSearchComponent,
+    MediaViewerComponent,
     RelativeTimePipe,
   ],
 })

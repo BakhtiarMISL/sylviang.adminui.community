@@ -79,6 +79,12 @@ export class AttachmentUploadComponent implements OnDestroy {
     this.removed.emit(item.uploadResponse);
   }
 
+  /** Clears every item from this widget's own list - called by the parent once the items it uploaded have been attached elsewhere (e.g. right after a post is submitted). */
+  clear(): void {
+    this.items.forEach((item) => this.revokePreview(item));
+    this.items = [];
+  }
+
   retry(item: IPendingAttachment): void {
     this.removeItem(item);
     this.uploadOne(item.file);

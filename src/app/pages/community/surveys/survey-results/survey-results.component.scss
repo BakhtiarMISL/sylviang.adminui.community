@@ -175,6 +175,48 @@
   font-style: italic;
 }
 
+.respondent-link {
+  color: var(--primary-color, #10b981);
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.answer-detail-meta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+}
+
+.answer-detail-item {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border-primary);
+
+  &:last-of-type {
+    border-bottom: none;
+  }
+}
+
+.answer-detail-question {
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+  color: var(--text-primary);
+}
+
+.answer-detail-value {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  opacity: 0.9;
+}
+
 .table-container {
   margin-top: 0.5rem;
 }

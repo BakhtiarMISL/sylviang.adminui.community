@@ -15,6 +15,7 @@ import {
   IEmployeeUpdateCoverPhotoRequest,
   IEmployeeUpdatePhotoRequest,
   IEmployeeUpdateProfileRequest,
+  IEmployeeUpdateRequest,
 } from '@core/interfaces/employee-directory/employee.interface';
 import { PaginatedResponse } from '@core/interfaces/PaginatedResponse';
 import { BASE_URL_Community } from '@env/environment';
@@ -39,8 +40,16 @@ export class EmployeeService {
     });
   }
 
-  getEmployeeById(employeeId: number) {
-    return this.httpClient.get<ApiResponse<IEmployeeResponse>>(`${this.API_URL}/${employeeId}`);
+  /**
+   * @param disableToast Pass true for best-effort lookups (e.g. EmployeeLookupService's feed
+   * author enrichment) where a 404 is expected/handled locally and shouldn't surface as a
+   * global error toast. Defaults to false for callers that want normal error handling (e.g. a
+   * profile page genuinely failing to load).
+   */
+  getEmployeeById(employeeId: number, disableToast = false) {
+    return this.httpClient.get<ApiResponse<IEmployeeResponse>>(`${this.API_URL}/${employeeId}`, {
+      context: new HttpContext().set(DISABLE_TOAST, disableToast),
+    });
   }
 
   getTodayEvents() {
@@ -59,6 +68,14 @@ export class EmployeeService {
     return this.httpClient.put<ApiResponse<void>>(`${this.API_URL}/${employeeId}/profile`, profile);
   }
 
+  /**
+   * HR/Admin edit of an employee's locally-owned details - Email, Date of Birth, Date of
+   * Joining (User Management). Distinct from updateMyProfile, which is self-service only.
+   */
+  updateEmployeeDetails(employeeId: number, request: IEmployeeUpdateRequest) {
+    return this.httpClient.put<ApiResponse<void>>(`${this.API_URL}/${employeeId}/details`, request);
+  }
+
   updatePhoto(employeeId: number, request: IEmployeeUpdatePhotoRequest) {
     return this.httpClient.put<ApiResponse<void>>(`${this.API_URL}/${employeeId}/photo`, request);
   }
@@ -69,6 +86,10 @@ export class EmployeeService {
 
   deactivateEmployee(employeeId: number) {
     return this.httpClient.put<ApiResponse<void>>(`${this.API_URL}/${employeeId}/deactivate`, {});
+  }
+
+  activateEmployee(employeeId: number) {
+    return this.httpClient.put<ApiResponse<void>>(`${this.API_URL}/${employeeId}/activate`, {});
   }
 
   /**

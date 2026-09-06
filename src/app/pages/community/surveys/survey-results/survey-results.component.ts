@@ -1,10 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { UI_CONFIG } from '@core/constants';
-import { ISurveyResponse, ISurveyResultsResponse } from '@core/interfaces/community/survey.interface';
-import { ISurveySubmissionResponse } from '@core/interfaces/community/survey-response.interface';
+import { ISurveyQuestionResultResponse, ISurveyResponse, ISurveyResultsResponse } from '@core/interfaces/community/survey.interface';
+import { ISurveyAnswerResponse, ISurveySubmissionResponse } from '@core/interfaces/community/survey-response.interface';
 import { SurveyService } from '@core/services/community/survey.service';
 import { SurveyResponseService } from '@core/services/community/survey-response.service';
+
+/** A response's answers to one question, resolved to human-readable text for the detail dialog. */
+interface AnswerDetailRow {
+  questionText: string;
+  displayValue: string;
+}
 
 /** How many free-text answers to show per question before collapsing behind "Show all (N)" - see B9. */
 const TEXT_ANSWERS_PREVIEW_COUNT = 10;
@@ -33,6 +39,9 @@ export class SurveyResultsComponent implements OnInit {
   responsesTotalRecords = 0;
   responsesRows = UI_CONFIG.defaultPageSize;
   responsesCurrentPage = 1;
+
+  selectedResponse: ISurveySubmissionResponse | null = null;
+  showResponseDetailDialog = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -64,6 +73,57 @@ export class SurveyResultsComponent implements OnInit {
     this.responsesCurrentPage = Math.floor(event.first / event.rows) + 1;
     this.responsesRows = event.rows;
     this.loadResponses();
+  }
+
+  /** Answer drill-down is only ever offered for a non-anonymous survey with a known respondent. */
+  canViewResponseDetail(response: ISurveySubmissionResponse): boolean {
+    return !!this.survey && !this.survey.isAnonymous && response.employeeId !== null;
+  }
+
+  respondentDisplayName(response: ISurveySubmissionResponse): string {
+    if (!this.canViewResponseDetail(response)) return 'Anonymous';
+    return response.employeeName || `Employee #${response.employeeId}`;
+  }
+
+  viewResponseDetail(response: ISurveySubmissionResponse): void {
+    if (!this.canViewResponseDetail(response)) return;
+    this.selectedResponse = response;
+    this.showResponseDetailDialog = true;
+  }
+
+  /**
+   * Groups a response's answers by question (a MultipleChoice question can have several answer
+   * rows for the same questionId, one per selected option) and resolves each to human-readable
+   * text against results.questions - the same question/option text already loaded for the
+   * Aggregate Results tab, so no extra request is needed for this dialog.
+   */
+  get selectedResponseAnswers(): AnswerDetailRow[] {
+    if (!this.selectedResponse || !this.results) return [];
+
+    const answersByQuestion = new Map<number, ISurveyAnswerResponse[]>();
+    for (const answer of this.selectedResponse.answers) {
+      const list = answersByQuestion.get(answer.questionId) ?? [];
+      list.push(answer);
+      answersByQuestion.set(answer.questionId, list);
+    }
+
+    return Array.from(answersByQuestion.entries()).map(([questionId, answers]) => {
+      const question = this.results!.questions.find((q) => q.questionId === questionId);
+      return {
+        questionText: question?.questionText ?? `Question #${questionId}`,
+        displayValue: answers.map((a) => this.formatAnswerValue(a, question)).join(', '),
+      };
+    });
+  }
+
+  private formatAnswerValue(answer: ISurveyAnswerResponse, question?: ISurveyQuestionResultResponse): string {
+    if (answer.optionId !== null) {
+      return question?.options.find((o) => o.optionId === answer.optionId)?.optionText ?? `Option #${answer.optionId}`;
+    }
+    if (answer.ratingValue !== null) {
+      return `${answer.ratingValue} / 5`;
+    }
+    return answer.answerText?.trim() || '—';
   }
 
   private load(): void {

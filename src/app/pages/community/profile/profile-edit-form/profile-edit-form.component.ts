@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CONTACT_LINK_OTHER_VALUE, ContactLinkPlatformOptions } from '@core/constants/contact-link-platforms';
 import { ContactVisibilityEnum } from '@core/enums/employee.enum';
+import { parseDateOnly, toDateOnlyString } from '@core/helpers/date-only.helper';
 import {
   IEmployeeContactLink,
   IEmployeeResponse,
@@ -60,7 +61,7 @@ export class CommunityProfileEditFormComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['employee'] && this.employee) {
       this.form.patchValue({
-        dateOfBirth: this.employee.dateOfBirth ? new Date(this.employee.dateOfBirth) : null,
+        dateOfBirth: this.employee.dateOfBirth ? parseDateOnly(this.employee.dateOfBirth) : null,
         bio: this.employee.bio,
         skills: this.employee.skills.join(', '),
         interests: this.employee.interests.join(', '),
@@ -126,7 +127,7 @@ export class CommunityProfileEditFormComponent implements OnChanges {
     const raw = this.form.value;
     const request: IEmployeeUpdateProfileRequest = {
       ...raw,
-      dateOfBirth: raw.dateOfBirth ? (raw.dateOfBirth as Date).toISOString() : null,
+      dateOfBirth: raw.dateOfBirth ? toDateOnlyString(raw.dateOfBirth as Date) : null,
       contactLinks: raw.contactLinks.map((link: any) => ({
         id: link.id,
         platform: link.platform === this.OTHER ? link.customLabel : link.platform,

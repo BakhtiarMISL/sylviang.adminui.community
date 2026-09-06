@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { IElectionCandidateTally, IElectionResponse, IElectionResultsResponse } from '@core/interfaces/community/election.interface';
+import {
+  IElectionCandidateTally,
+  IElectionResponse,
+  IElectionResultsResponse,
+  IElectionVoterDetail,
+} from '@core/interfaces/community/election.interface';
 import { ElectionService } from '@core/services/community/election.service';
 import { EmployeeLookupService } from '@core/services/community/employee-lookup.service';
 import { TeamService } from '@core/services/community/team.service';
@@ -9,7 +14,8 @@ import { TeamService } from '@core/services/community/team.service';
  * US-9.12: HR/Admin-only results view. Aggregated per-candidate totals are always shown; the
  * per-voter table only renders when the election isn't anonymous - ElectionResultsResponse.voterDetails
  * is null for anonymous elections (the backend never computes it in that case), so there's
- * nothing to leak even if this view were somehow reached for one.
+ * nothing to leak even if this view were somehow reached for one. The per-nominee voter
+ * drill-down dialog reuses that same null/anonymous guard.
  */
 @Component({
   selector: 'app-election-results',
@@ -25,6 +31,12 @@ export class ElectionResultsComponent implements OnInit {
   voterNames = new Map<number, string>();
   loading = true;
   loadError = false;
+
+  /** Table-friendly view of candidateTallies - PrimeNG sort/filter need real field values, not template function calls. */
+  resultsView: (IElectionCandidateTally & { candidateName: string; percentage: number })[] = [];
+
+  selectedTally: IElectionCandidateTally | null = null;
+  showVoterDialog = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -46,9 +58,37 @@ export class ElectionResultsComponent implements OnInit {
     return this.voterNames.get(voterId) ?? `Employee #${voterId}`;
   }
 
+  /** Voter drill-down is only ever offered when per-voter detail actually exists (non-anonymous elections). */
+  get canDrilldown(): boolean {
+    return !!this.results && !this.results.isAnonymous && !!this.results.voterDetails;
+  }
+
+  get votersForSelected(): IElectionVoterDetail[] {
+    if (!this.selectedTally || !this.results?.voterDetails) return [];
+    return this.results.voterDetails.filter((v) => v.candidateIds.includes(this.selectedTally!.electionCandidateId));
+  }
+
+  openVoterDrilldown(tally: IElectionCandidateTally): void {
+    if (!this.canDrilldown) return;
+    this.selectedTally = tally;
+    this.showVoterDialog = true;
+  }
+
   ngOnInit(): void {
     this.electionId = Number(this.route.snapshot.paramMap.get('id'));
     this.load();
+  }
+
+  private buildResultsView(): void {
+    if (!this.results) {
+      this.resultsView = [];
+      return;
+    }
+    this.resultsView = this.results.candidateTallies.map((tally) => ({
+      ...tally,
+      candidateName: this.candidateName(tally.electionCandidateId),
+      percentage: this.percentage(tally),
+    }));
   }
 
   private load(): void {
@@ -72,11 +112,13 @@ export class ElectionResultsComponent implements OnInit {
         if (candidate.employeeId !== null) {
           this.employeeLookupService.getById(candidate.employeeId).subscribe((employee) => {
             this.candidateNames.set(candidate.electionCandidateId, employee?.employeeName ?? `Employee #${candidate.employeeId}`);
+            this.buildResultsView();
           });
         } else if (candidate.teamId !== null) {
           this.teamService.getById(candidate.teamId).subscribe((teamResponse) => {
             const name = !teamResponse.hasError && teamResponse.content ? teamResponse.content.name : `Team #${candidate.teamId}`;
             this.candidateNames.set(candidate.electionCandidateId, name);
+            this.buildResultsView();
           });
         }
       }
@@ -87,6 +129,7 @@ export class ElectionResultsComponent implements OnInit {
         this.results = !response.hasError && response.content ? response.content : null;
         if (!this.results) this.loadError = true;
         this.loading = false;
+        this.buildResultsView();
         this.resolveVoterNames();
       },
       error: () => {

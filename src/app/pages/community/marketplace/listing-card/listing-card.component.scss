@@ -80,23 +80,6 @@
   margin-bottom: 0.4rem;
 }
 
-.rating-summary {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  margin-bottom: 0.4rem;
-
-  ::ng-deep .p-rating-icon {
-    font-size: 0.85rem;
-  }
-}
-
-.review-count {
-  font-size: 0.75rem;
-  opacity: 0.6;
-  color: var(--text-primary);
-}
-
 .listing-seller {
   font-size: 0.8rem;
   opacity: 0.7;

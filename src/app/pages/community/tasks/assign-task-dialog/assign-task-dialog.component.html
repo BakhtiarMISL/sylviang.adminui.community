@@ -2,7 +2,8 @@
   [header]="isTeamMode ? 'Assign Team Task' : 'Assign Individual Task'"
   [(visible)]="visible"
   [modal]="true"
-  [style]="{ width: '34rem' }"
+  [dismissableMask]="true"
+  [style]="{ width: '40rem' }"
   (onHide)="close()"
 >
   <div class="assign-form">
@@ -19,7 +20,7 @@
       </div>
       <div class="field">
         <label>Due Date</label>
-        <p-datepicker [(ngModel)]="dueDate" dateFormat="dd-M-yy" [showIcon]="true"></p-datepicker>
+        <p-datepicker [(ngModel)]="dueDate" dateFormat="dd-M-yy" [showIcon]="true" [appendTo]="'body'"></p-datepicker>
       </div>
       <div class="field">
         <label>Reminder (days before due)</label>
@@ -61,6 +62,7 @@
         placeholder="Select employees..."
         [(ngModel)]="selectedAssigneeIds"
         [filter]="true"
+        [appendTo]="'body'"
       ></p-multiSelect>
     </ng-container>
 
@@ -73,6 +75,7 @@
         placeholder="Select team members..."
         [(ngModel)]="selectedAssigneeIds"
         [filter]="true"
+        [appendTo]="'body'"
       ></p-multiSelect>
     </ng-container>
 
@@ -91,7 +94,7 @@
 
     <div class="form-actions">
       <button pButton size="small" [disabled]="!canSubmit" (click)="submit()">Assign</button>
-      <button pButton size="small" severity="secondary" (click)="close()">Cancel</button>
+      <button pButton size="small" severity="danger" (click)="close()">Cancel</button>
     </div>
   </div>
 </p-dialog>

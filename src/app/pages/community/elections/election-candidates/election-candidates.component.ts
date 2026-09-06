@@ -1,8 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { IElectionCandidateResponse, IElectionResponse } from '@core/interfaces/community/election.interface';
+import { ELECTION_BULK_NOMINATE_SCOPE_OPTIONS } from '@core/constants/community/election-types';
+import { IBranchResponse } from '@core/interfaces/community/branch.interface';
+import { IDepartmentResponse } from '@core/interfaces/community/department.interface';
+import { ElectionAudienceScope, IElectionCandidateResponse, IElectionResponse } from '@core/interfaces/community/election.interface';
 import { IEmployeeDirectoryCardResponse } from '@core/interfaces/employee-directory/employee.interface';
 import { ITeamResponse } from '@core/interfaces/community/team.interface';
+import { BranchService } from '@core/services/community/branch.service';
+import { DepartmentService } from '@core/services/community/department.service';
 import { ElectionService } from '@core/services/community/election.service';
 import { TeamService } from '@core/services/community/team.service';
 import { EmployeeLookupService } from '@core/services/community/employee-lookup.service';
@@ -11,10 +16,10 @@ import { CurrentUserService } from '@core/services/current-user.service';
 import { ToastService } from '@core/services/misc/toast.service';
 
 /**
- * US-9.5: candidate nomination + HR approval. Nominating stays open to any authenticated
- * employee (self or colleague nomination); only an approved candidate can appear on the ballot
- * (CastVoteAsync rejects unapproved candidate ids) - HR effectively controls the ballot via the
- * Approve action, per the "keep nominate + approve" decision.
+ * US-9.5: candidate nomination. Nominating stays open to any authenticated employee (self or
+ * colleague nomination, company-wide) - a nominee is immediately ballot-eligible, with no
+ * separate HR approval step. HR can publish the election directly from this page once enough
+ * candidates are nominated.
  */
 @Component({
   selector: 'app-election-candidates',
@@ -37,10 +42,20 @@ export class ElectionCandidatesComponent implements OnInit {
   selectedEmployee: IEmployeeDirectoryCardResponse | null = null;
   manifesto = '';
 
+  /** Bulk-nominate every employee in a branch/department/team/the whole company at once (HR/Admin only). */
+  bulkScopeOptions = ELECTION_BULK_NOMINATE_SCOPE_OPTIONS;
+  departments: IDepartmentResponse[] = [];
+  branches: IBranchResponse[] = [];
+  bulkScope: ElectionAudienceScope | null = null;
+  bulkTargetIds: number[] = [];
+  bulkSubmitting = false;
+
   constructor(
     private route: ActivatedRoute,
     private electionService: ElectionService,
     private teamService: TeamService,
+    private departmentService: DepartmentService,
+    private branchService: BranchService,
     private employeeLookupService: EmployeeLookupService,
     private employeeService: EmployeeService,
     private currentUserService: CurrentUserService,
@@ -60,10 +75,21 @@ export class ElectionCandidatesComponent implements OnInit {
     return this.isEmployeeCandidateType ? this.selectedEmployee !== null : this.selectedTeamId !== null;
   }
 
+  get canBulkNominate(): boolean {
+    if (this.bulkSubmitting || this.bulkScope === null) return false;
+    return this.bulkScope === 'Organization' || this.bulkTargetIds.length > 0;
+  }
+
   ngOnInit(): void {
     this.electionId = Number(this.route.snapshot.paramMap.get('id'));
     this.teamService.getPaged({ page: 1, pageSize: 100 }).subscribe((response) => {
       this.teams = !response.hasError && response.content ? response.content.data || [] : [];
+    });
+    this.departmentService.getPaged().subscribe((response) => {
+      this.departments = !response.hasError && response.content ? response.content.data || [] : [];
+    });
+    this.branchService.getPaged().subscribe((response) => {
+      this.branches = !response.hasError && response.content ? response.content.data || [] : [];
     });
     this.load();
   }
@@ -107,21 +133,54 @@ export class ElectionCandidatesComponent implements OnInit {
     });
   }
 
-  approve(candidate: IElectionCandidateResponse): void {
+  onBulkScopeChange(): void {
+    this.bulkTargetIds = [];
+  }
+
+  nominateBulk(): void {
+    if (!this.canBulkNominate) return;
+    this.bulkSubmitting = true;
+
+    const request = { scope: this.bulkScope!, targetIds: this.bulkTargetIds };
+
+    this.electionService.nominateBulk(this.electionId, request).subscribe({
+      next: (response) => {
+        this.bulkSubmitting = false;
+        if (!response.hasError) {
+          const count = response.content ?? 0;
+          this.toastService.success({
+            detail: count > 0 ? `${count} candidate(s) nominated.` : 'Everyone matching that scope was already nominated.',
+          });
+          this.bulkScope = null;
+          this.bulkTargetIds = [];
+          this.load();
+        } else {
+          this.toastService.error({ detail: response.decentMessage || 'Could not bulk-nominate candidates.' });
+        }
+      },
+      error: () => {
+        this.bulkSubmitting = false;
+        this.toastService.error({ detail: 'Could not bulk-nominate candidates.' });
+      },
+    });
+  }
+
+  publish(): void {
+    if (this.submitting) return;
     this.submitting = true;
-    this.electionService.approveCandidate(this.electionId, candidate.electionCandidateId).subscribe({
+    this.electionService.publish(this.electionId).subscribe({
       next: (response) => {
         this.submitting = false;
         if (!response.hasError) {
-          this.toastService.success({ detail: 'Candidate approved.' });
+          this.toastService.success({ detail: 'Election published - eligible voters have been notified.' });
           this.load();
         } else {
-          this.toastService.error({ detail: response.decentMessage || 'Could not approve this candidate.' });
+          this.toastService.error({ detail: response.decentMessage || 'Could not publish this election.' });
         }
       },
       error: () => {
         this.submitting = false;
-        this.toastService.error({ detail: 'Could not approve this candidate.' });
+        this.toastService.error({ detail: 'Could not publish this election.' });
       },
     });
   }

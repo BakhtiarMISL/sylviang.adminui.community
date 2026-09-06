@@ -47,6 +47,10 @@ export class MessengerHubService {
   private readonly _messageDeletedSubject = new Subject<{ conversationId: number; chatMessageId: number }>();
   public readonly messageDeleted$ = this._messageDeletedSubject.asObservable();
 
+  /** Pushed when a message is pinned/unpinned, to whoever currently has that thread (or its Pinned Messages panel) open. */
+  private readonly _messagePinnedSubject = new Subject<{ conversationId: number; chatMessageId: number; isPinned: boolean; pinnedByEmployeeId: number | null }>();
+  public readonly messagePinned$ = this._messagePinnedSubject.asObservable();
+
   /** Sum of unreadCount across every conversation seen via conversationUpdated$ so far - drives the header's Messenger badge. */
   private readonly _unreadCountSubject = new BehaviorSubject<number>(0);
   public readonly unreadCount$ = this._unreadCountSubject.asObservable();
@@ -97,6 +101,13 @@ export class MessengerHubService {
       this.connection.on('MessageDeleted', (conversationId: number, chatMessageId: number) => {
         this._messageDeletedSubject.next({ conversationId, chatMessageId });
       });
+
+      this.connection.on(
+        'MessagePinned',
+        (conversationId: number, chatMessageId: number, isPinned: boolean, pinnedByEmployeeId: number | null) => {
+          this._messagePinnedSubject.next({ conversationId, chatMessageId, isPinned, pinnedByEmployeeId });
+        },
+      );
 
       this.connection.onclose((error) => {
         if (error) {

@@ -26,9 +26,22 @@
     </aside>
 
     <div class="feed-main">
-      <div *ngIf="highlightedPost" class="highlighted-post-banner">
+      <div *ngIf="highlightedPost as post" class="highlighted-post-banner">
         <p>Viewing a reported post &mdash; <a [routerLink]="[]" (click)="clearHighlightedPost()">back to Feed</a></p>
-        <app-post-card [post]="highlightedPost" [autoOpenModal]="true" (deleted)="clearHighlightedPost()"></app-post-card>
+
+        <div class="not-found" *ngIf="!post.canView">
+          <div>
+            <i class="fa-solid fa-lock"></i>
+            <p>You're not a member of {{ post.groupName || 'this group' }}.</p>
+            <a *ngIf="post.groupId" [routerLink]="['/community/groups', post.groupId]">Join the group to see this post</a>
+          </div>
+        </div>
+
+        <app-post-card *ngIf="post.canView" [post]="post" [autoOpenModal]="true" (deleted)="clearHighlightedPost()"></app-post-card>
+      </div>
+
+      <div *ngIf="authorFilterEmployeeId" class="highlighted-post-banner">
+        <p>Viewing posts by <strong>{{ authorFilterEmployeeName || 'this employee' }}</strong> &mdash; <a [routerLink]="[]" (click)="clearAuthorFilter()">Show all posts</a></p>
       </div>
 
       <app-post-composer (posted)="onPostCreated()"></app-post-composer>
@@ -45,7 +58,8 @@
         <div class="not-found" *ngIf="posts.length === 0">
           <div>
             <i class="fa fa-stream"></i>
-            <p>No posts yet. Be the first to share something with the company!</p>
+            <p *ngIf="!authorFilterEmployeeId">No posts yet. Be the first to share something with the company!</p>
+            <p *ngIf="authorFilterEmployeeId">{{ authorFilterEmployeeName || 'This employee' }} hasn't posted anything yet.</p>
           </div>
         </div>
 

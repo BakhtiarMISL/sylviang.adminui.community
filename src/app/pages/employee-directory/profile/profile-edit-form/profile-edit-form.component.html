@@ -2,10 +2,8 @@
   <h3 class="form-section-header">Edit Profile</h3>
 
   <div class="sm:col-span-2 lg:col-span-3 xl:col-span-4">
-    <p-floatlabel variant="in">
-      <textarea pTextarea inputId="bio" formControlName="bio" rows="3" class="w-full" [class.ng-invalid]="hasError('bio')"></textarea>
-      <label for="bio">Bio</label>
-    </p-floatlabel>
+    <label for="bio" class="block mb-1">Bio</label>
+    <textarea pTextarea inputId="bio" formControlName="bio" rows="3" class="w-full" [class.ng-invalid]="hasError('bio')"></textarea>
     <div *ngIf="hasError('bio')" class="invalid">Bio must not exceed 2000 characters.</div>
   </div>
 
@@ -133,7 +131,7 @@
   </div>
 
   <div class="sm:col-span-2 lg:col-span-3 xl:col-span-4 flex justify-end gap-3 mt-2">
-    <button type="button" pButton severity="secondary" (click)="onCancel()">Cancel</button>
+    <button type="button" pButton severity="danger" (click)="onCancel()">Cancel</button>
     <button type="submit" pButton [disabled]="saving">{{ saving ? 'Saving...' : 'Save Changes' }}</button>
   </div>
 </form>

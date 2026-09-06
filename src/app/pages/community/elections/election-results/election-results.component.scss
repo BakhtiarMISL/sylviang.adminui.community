@@ -73,22 +73,68 @@
   }
 }
 
-.candidate-result {
-  background: var(--surface-elevated);
-  border-radius: 0.75rem;
-  padding: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  margin-bottom: 0.6rem;
-  max-width: 40rem;
-}
-
 .option-row {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  gap: 0.4rem;
   font-size: 0.9rem;
-  margin-bottom: 0.3rem;
   color: var(--text-primary);
   font-weight: 600;
+
+  i {
+    opacity: 0.5;
+    font-size: 0.8rem;
+  }
+}
+
+.option-count {
+  display: block;
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+  color: var(--text-primary);
+}
+
+.tally-row {
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      background: var(--surface-elevated);
+    }
+  }
+}
+
+.table-caption {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.voter-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--surface-elevated);
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .voter-name {
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .voter-date {
+    font-size: 0.8rem;
+    opacity: 0.7;
+  }
 }
 
 .voters-section {

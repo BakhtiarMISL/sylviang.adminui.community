@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { AttachmentUploadComponent } from '@shared/attachment-upload/attachment-upload.component';
 import { IVisibilityOption, VISIBILITY_OPTIONS } from '@core/constants/community/visibility-options';
 import { IPostCreateRequest, PostVisibility } from '@core/interfaces/community/post.interface';
 import { IMentionTag } from '@core/interfaces/community/mention.interface';
@@ -30,6 +31,8 @@ export class PostComposerComponent {
 
   @Output() posted = new EventEmitter<void>();
 
+  @ViewChild('attachmentUpload') attachmentUploadRef?: AttachmentUploadComponent;
+
   content = '';
   visibility: PostVisibility = 'Everyone';
   postKind: PostKind = 'Text';
@@ -52,11 +55,13 @@ export class PostComposerComponent {
   ) {}
 
   get canSubmit(): boolean {
-    if (!this.content.trim() || this.submitting) return false;
+    if (this.submitting) return false;
     if (this.postKind === 'Poll') {
       return this.pollOptions.filter((o) => o.trim()).length >= 2;
     }
-    return true;
+    // Content is optional as long as at least one attachment is attached - an image/video/
+    // file post needs no caption, matching Facebook/Instagram-style attachment-only posts.
+    return !!this.content.trim() || this.pendingAttachments.length > 0;
   }
 
   trackByIndex(index: number): number {
@@ -89,7 +94,7 @@ export class PostComposerComponent {
       employeeId,
       type: this.postKind,
       visibility: this.visibility,
-      content: this.content.trim(),
+      content: this.content.trim() || null,
       isAnnouncement: this.postKind === 'Announcement',
       isPoll: this.postKind === 'Poll',
       mentionedEmployeeIds: this.mentionedTags.map((t) => t.employeeId),
@@ -147,5 +152,6 @@ export class PostComposerComponent {
     this.pollOptions = ['', ''];
     this.allowVoteChange = true;
     this.pendingAttachments = [];
+    this.attachmentUploadRef?.clear();
   }
 }
