@@ -1,16 +1,4 @@
-import {
-  AfterViewInit,
-  ChangeDetectorRef,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  OnDestroy,
-  OnInit,
-  Output,
-  QueryList,
-  ViewChildren,
-} from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { IVisibilityOption, VISIBILITY_OPTIONS } from '@core/constants/community/visibility-options';
@@ -37,9 +25,7 @@ import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
   templateUrl: './post-card.component.html',
   styleUrl: './post-card.component.scss',
 })
-export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChildren('videoEl') videoEls!: QueryList<ElementRef<HTMLVideoElement>>;
-
+export class PostCardComponent implements OnInit {
   @Input({ required: true }) post!: IPostResponse;
   /** True only for the nested instance rendered inside the detail modal - prevents it from opening another modal on click. */
   @Input() isModalView = false;
@@ -47,6 +33,8 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() groupModerator = false;
   /** When true, opens the detail modal as soon as this card loads - used for deep-linking straight to a specific post (e.g. from the Moderation Queue). */
   @Input() autoOpenModal = false;
+  /** Shows the "posted in {group}" badge for group posts - on in the main Feed, suppressed inside a group's own post list where it would be redundant. */
+  @Input() showGroupContext = true;
   @Output() deleted = new EventEmitter<number>();
 
   authorName = 'Loading...';
@@ -64,7 +52,6 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
   lightboxVisible = false;
   lightboxAttachment: IPostAttachmentResponse | null = null;
   private mentionLinks: IMentionTag[] = [];
-  private videoObservers: IntersectionObserver[] = [];
 
   visibilityOptions: IVisibilityOption[] = VISIBILITY_OPTIONS;
 
@@ -144,40 +131,6 @@ export class PostCardComponent implements OnInit, AfterViewInit, OnDestroy {
           this.cdr.detectChanges();
         }
       });
-  }
-
-  ngAfterViewInit(): void {
-    this.setupVideoObservers();
-    this.videoEls.changes.pipe(untilDestroyed(this)).subscribe(() => this.setupVideoObservers());
-  }
-
-  ngOnDestroy(): void {
-    this.videoObservers.forEach((observer) => observer.disconnect());
-  }
-
-  /** Reels-style autoplay: play a video once it's substantially visible, pause it otherwise.
-   * Re-run whenever videoEls changes (attachments arrive async, edit mode toggles the gallery). */
-  private setupVideoObservers(): void {
-    this.videoObservers.forEach((observer) => observer.disconnect());
-    this.videoObservers = [];
-
-    this.videoEls.forEach((ref) => {
-      const video = ref.nativeElement;
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              video.play().catch(() => {});
-            } else {
-              video.pause();
-            }
-          });
-        },
-        { threshold: 0.5 },
-      );
-      observer.observe(video);
-      this.videoObservers.push(observer);
-    });
   }
 
   toggleComments(): void {

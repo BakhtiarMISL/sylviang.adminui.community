@@ -45,7 +45,17 @@
       <div class="comment-actions" *ngIf="editingCommentId !== comment.commentId">
         <app-reaction-bar targetType="Comment" [targetId]="comment.commentId"></app-reaction-bar>
 
-        <button type="button" class="link-action" *ngIf="!postLocked" (click)="startReply(comment)">Reply</button>
+        <button
+          type="button"
+          class="link-action"
+          *ngIf="!postLocked"
+          [disabled]="employeeId === null"
+          [pTooltip]="employeeId === null ? 'Not available for system accounts' : null"
+          tooltipPosition="top"
+          (click)="startReply(comment)"
+        >
+          Reply
+        </button>
         <button type="button" class="link-action" *ngIf="canEdit(comment)" (click)="startEdit(comment)">Edit</button>
         <button type="button" class="link-action danger" *ngIf="canEdit(comment)" (click)="deleteComment(comment.commentId)">Delete</button>
       </div>
@@ -60,7 +70,16 @@
           (mentionsChange)="replyTags = $event"
         ></app-mention-textarea>
         <div class="edit-actions">
-          <button pButton size="small" [disabled]="!replyContent.trim()" (click)="submitReply(comment.commentId)">Reply</button>
+          <button
+            pButton
+            size="small"
+            [disabled]="!replyContent.trim() || employeeId === null"
+            [pTooltip]="employeeId === null ? 'Not available for system accounts' : null"
+            tooltipPosition="top"
+            (click)="submitReply(comment.commentId)"
+          >
+            Reply
+          </button>
           <button pButton size="small" severity="danger" (click)="cancelReply()">Cancel</button>
         </div>
       </div>
@@ -80,7 +99,17 @@
       [mentions]="newCommentTags"
       (mentionsChange)="newCommentTags = $event"
     ></app-mention-textarea>
-    <button pButton size="small" class="mt-2" [disabled]="!newCommentContent.trim() || submitting" (click)="submitTopLevelComment()">Comment</button>
+    <button
+      pButton
+      size="small"
+      class="mt-2"
+      [disabled]="!newCommentContent.trim() || submitting || employeeId === null"
+      [pTooltip]="employeeId === null ? 'Not available for system accounts' : null"
+      tooltipPosition="top"
+      (click)="submitTopLevelComment()"
+    >
+      Comment
+    </button>
   </div>
 
   <ng-template #lockedTpl>

@@ -70,32 +70,46 @@
   }
 }
 
-.candidate-row {
-  background: var(--surface-elevated);
-  border-radius: 0.75rem;
-  padding: 1rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  margin-bottom: 0.75rem;
-  max-width: 32rem;
+.table-container {
+  margin-top: 0.5rem;
 }
 
-.candidate-info {
+.table-caption {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
+}
+
+.option-row {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.candidate-name {
-  font-weight: 600;
+  gap: 0.4rem;
+  font-size: 0.9rem;
   color: var(--text-primary);
+  font-weight: 600;
 }
 
-.manifesto {
-  margin-top: 0.4rem;
+.manifesto-cell {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   font-size: 0.85rem;
   color: var(--text-primary);
   opacity: 0.85;
+  max-width: 22rem;
+}
+
+.manifesto-empty {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  opacity: 0.4;
+}
+
+.candidate-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
 }
 
 :host-context(.dark) {

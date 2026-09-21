@@ -46,7 +46,7 @@
       >
         <i class="fa-solid fa-chart-column"></i> Results
       </button>
-      <button *ngIf="survey.status !== 'Closed'" pButton size="small" severity="danger" [disabled]="submitting" (click)="deleteSurvey()">
+      <button *ngIf="survey.status !== 'Closed' && isHr" pButton size="small" severity="danger" [disabled]="submitting" (click)="deleteSurvey()">
         <i class="fa-solid fa-trash"></i> Delete
       </button>
     </ng-container>

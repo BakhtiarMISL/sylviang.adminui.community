@@ -15,7 +15,13 @@
     </div>
 
     <div *ngIf="!loading">
-      <app-post-card *ngFor="let post of posts" [post]="post" [groupModerator]="canModerate" (deleted)="onPostDeleted($event)"></app-post-card>
+      <app-post-card
+        *ngFor="let post of posts"
+        [post]="post"
+        [groupModerator]="canModerate"
+        [showGroupContext]="false"
+        (deleted)="onPostDeleted($event)"
+      ></app-post-card>
 
       <div class="not-found" *ngIf="posts.length === 0">
         <div>

@@ -24,7 +24,9 @@
           *ngIf="!isMember && group.visibility === 'Public'"
           pButton
           size="small"
-          [disabled]="joinLeaveSubmitting"
+          [disabled]="joinLeaveSubmitting || currentEmployeeId === null"
+          [pTooltip]="currentEmployeeId === null ? 'Not available for system accounts' : null"
+          tooltipPosition="top"
           (click)="join()"
         >
           Join Group
@@ -34,7 +36,9 @@
           pButton
           size="small"
           severity="secondary"
-          [disabled]="joinLeaveSubmitting"
+          [disabled]="joinLeaveSubmitting || currentEmployeeId === null"
+          [pTooltip]="currentEmployeeId === null ? 'Not available for system accounts' : null"
+          tooltipPosition="top"
           (click)="requestToJoin()"
         >
           Request to Join

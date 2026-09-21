@@ -238,11 +238,8 @@ export class ModerationQueueComponent implements OnInit {
   }
 
   resolveChatReport(report: IChatReportQueueItem, status: 'Resolved' | 'Dismissed'): void {
-    const employeeId = this.currentUserService.currentUser.employeeId;
-    if (employeeId === null) return;
-
     this.pendingActionChatReportId = report.reportId;
-    this.chatReportService.resolve(report.reportId, { reviewedBy: employeeId, status }).subscribe({
+    this.chatReportService.resolve(report.reportId, { status }).subscribe({
       next: (response) => {
         this.pendingActionChatReportId = null;
         if (!response.hasError) {
@@ -401,10 +398,7 @@ export class ModerationQueueComponent implements OnInit {
   }
 
   resolveReport(report: IContentReportQueueItem, status: 'Resolved' | 'Dismissed'): void {
-    const employeeId = this.currentUserService.currentUser.employeeId;
-    if (employeeId === null) return;
-
-    this.contentReportService.resolve(report.reportId, { reviewedBy: employeeId, status }).subscribe({
+    this.contentReportService.resolve(report.reportId, { status }).subscribe({
       next: (response) => {
         if (!response.hasError) {
           this.load();

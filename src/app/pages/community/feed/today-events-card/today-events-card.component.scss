@@ -37,11 +37,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: inherit;
+  color: var(--p-primary-color, #6366f1);
+  font-weight: 600;
   text-decoration: none;
 
   &:hover {
-    color: var(--p-primary-color, #6366f1);
     text-decoration: underline;
   }
 }

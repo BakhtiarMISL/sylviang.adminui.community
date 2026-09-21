@@ -8,8 +8,8 @@ import { ToastService } from '@core/services/misc/toast.service';
 /**
  * HR/Admin "Edit Employee" dialog (User Management) - scoped to the locally-owned fields
  * Email, Date of Birth, Date of Joining. Department/Designation/Site/Name are deliberately
- * excluded here: they're synced from the upstream Core/Employee service via Kafka, so a local
- * edit would be overwritten by the next sync event. Distinct from the self-service "Edit my
+ * excluded here: they're owned by the upstream Core/Employee service, so a local edit
+ * would be overwritten by the next sync. Distinct from the self-service "Edit my
  * profile" flow (Bio/Skills/contact links), which stays on the Profile page.
  */
 @Component({

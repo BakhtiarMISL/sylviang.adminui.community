@@ -85,13 +85,15 @@ export class NotificationHubService {
       });
     }
 
-    this.connection
-      .start()
-      .then(() => this.resyncUnreadCount())
-      .catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error('Failed to start notification hub connection', error);
-      });
+    if (this.connection.state === HubConnectionState.Disconnected) {
+      this.connection
+        .start()
+        .then(() => this.resyncUnreadCount())
+        .catch((error) => {
+          // eslint-disable-next-line no-console
+          console.error('Failed to start notification hub connection', error);
+        });
+    }
   }
 
   stop(): void {

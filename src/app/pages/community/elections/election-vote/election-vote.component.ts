@@ -26,6 +26,10 @@ export class ElectionVoteComponent implements OnInit {
   election: IElectionResponse | null = null;
   candidates: IElectionCandidateResponse[] = [];
   candidateNames = new Map<number, string>();
+  /** Table-friendly view of candidates - PrimeNG sort/filter need real field values, not template function calls. */
+  candidatesView: (IElectionCandidateResponse & { candidateName: string })[] = [];
+  /** electionCandidateId -> comma-joined team names (empty string once resolved with no teams). Only populated for Employee-type elections. */
+  candidateTeamNames = new Map<number, string>();
   loading = true;
   loadError = false;
   submitting = false;
@@ -45,6 +49,10 @@ export class ElectionVoteComponent implements OnInit {
 
   get currentEmployeeId(): number | null {
     return this.currentUserService.currentUser.employeeId;
+  }
+
+  get isEmployeeCandidateType(): boolean {
+    return this.election?.candidateType === 'Employee';
   }
 
   /**
@@ -84,6 +92,18 @@ export class ElectionVoteComponent implements OnInit {
 
   displayName(candidate: IElectionCandidateResponse): string {
     return this.candidateNames.get(candidate.electionCandidateId) ?? 'Loading...';
+  }
+
+  teamNames(candidate: IElectionCandidateResponse): string {
+    if (!this.candidateTeamNames.has(candidate.electionCandidateId)) return 'Loading...';
+    return this.candidateTeamNames.get(candidate.electionCandidateId) || '—';
+  }
+
+  private buildCandidatesView(): void {
+    this.candidatesView = this.candidates.map((candidate) => ({
+      ...candidate,
+      candidateName: this.displayName(candidate),
+    }));
   }
 
   isSelected(candidateId: number): boolean {
@@ -155,6 +175,7 @@ export class ElectionVoteComponent implements OnInit {
       next: (response) => {
         this.candidates = !response.hasError && response.content ? response.content : [];
         this.loading = false;
+        this.buildCandidatesView();
         this.resolveCandidateNames();
       },
       error: () => {
@@ -172,11 +193,20 @@ export class ElectionVoteComponent implements OnInit {
       if (candidate.employeeId !== null) {
         this.employeeLookupService.getById(candidate.employeeId).subscribe((employee) => {
           this.candidateNames.set(candidate.electionCandidateId, employee?.employeeName ?? `Employee #${candidate.employeeId}`);
+          this.buildCandidatesView();
+        });
+
+        // employeeId is only ever set on Employee-type candidates, so this needs no separate
+        // isEmployeeCandidateType gate - and gating on it here would race election's own load().
+        this.teamService.getByEmployeeId(candidate.employeeId).subscribe((response) => {
+          const teams = !response.hasError && response.content ? response.content : [];
+          this.candidateTeamNames.set(candidate.electionCandidateId, teams.map((t) => t.name).join(', '));
         });
       } else if (candidate.teamId !== null) {
         this.teamService.getById(candidate.teamId).subscribe((response) => {
           const name = !response.hasError && response.content ? response.content.name : `Team #${candidate.teamId}`;
           this.candidateNames.set(candidate.electionCandidateId, name);
+          this.buildCandidatesView();
         });
       }
     }

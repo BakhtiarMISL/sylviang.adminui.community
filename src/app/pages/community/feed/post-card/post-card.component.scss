@@ -65,6 +65,17 @@
   color: #b45309;
 }
 
+.group-badge {
+  background: rgba(59, 130, 246, 0.15);
+  color: #1d4ed8;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .dot {
   opacity: 0.5;
 }

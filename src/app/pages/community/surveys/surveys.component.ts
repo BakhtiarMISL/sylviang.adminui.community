@@ -48,6 +48,11 @@ export class SurveysComponent implements OnInit {
     return this.currentUserService.isHrOrAdmin();
   }
 
+  /** Survey authoring (Create Survey button) is HR-only, not HR/Admin - see hr-only.guard.ts. */
+  get isHr(): boolean {
+    return this.currentUserService.isHr();
+  }
+
   get currentEmployeeId(): number | null {
     return this.currentUserService.currentUser.employeeId;
   }

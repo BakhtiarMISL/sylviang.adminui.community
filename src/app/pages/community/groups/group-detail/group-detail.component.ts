@@ -133,6 +133,7 @@ export class GroupDetailComponent implements OnInit {
   }
 
   join(): void {
+    if (this.currentEmployeeId === null) return;
     this.joinLeaveSubmitting = true;
     this.groupService.join(this.groupId).subscribe({
       next: (response) => {
@@ -155,6 +156,7 @@ export class GroupDetailComponent implements OnInit {
   }
 
   requestToJoin(): void {
+    if (this.currentEmployeeId === null) return;
     this.joinLeaveSubmitting = true;
     this.groupService.requestToJoin(this.groupId).subscribe({
       next: (response) => {
