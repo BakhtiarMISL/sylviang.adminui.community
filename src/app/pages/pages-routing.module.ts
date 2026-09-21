@@ -16,14 +16,6 @@ const routes: Routes = [
       component: ChangePasswordComponent,
     },
     {
-      path: 'attendance',
-      loadChildren: () => import('./attendance-management/attendance-management.module').then((m) => m.AttendanceManagementModule),
-    },
-    {
-      path: 'payroll',
-      loadChildren: () => import('./payroll-management/payroll-management.module').then((m) => m.PayrollManagementModule),
-    },
-    {
       path: 'employee-directory',
       loadChildren: () => import('./employee-directory/employee-directory.module').then((m) => m.EmployeeDirectoryModule),
     },
