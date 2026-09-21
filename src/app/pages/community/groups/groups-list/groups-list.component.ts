@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { UI_CONFIG } from '@core/constants';
 import { IGroupFilterParams, IGroupResponse } from '@core/interfaces/community/group.interface';
 import { GroupService } from '@core/services/community/group.service';
+import { CurrentUserService } from '@core/services/current-user.service';
 import { ToastService } from '@core/services/misc/toast.service';
 import { Subject, forkJoin, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged } from 'rxjs/operators';
@@ -41,9 +42,15 @@ export class GroupsListComponent implements OnInit {
   constructor(
     private groupService: GroupService,
     private router: Router,
+    private currentUserService: CurrentUserService,
     private toastService: ToastService,
     private cdr: ChangeDetectorRef,
   ) {}
+
+  /** Admin is a system account with no Employee record - creating/joining a group always attributes to the acting employee, so disable those controls for Admin. */
+  get employeeId(): number | null {
+    return this.currentUserService.currentUser.employeeId;
+  }
 
   ngOnInit(): void {
     this.searchTermChanged$.pipe(debounceTime(UI_CONFIG.searchDebounceTime), distinctUntilChanged()).subscribe(() => {
@@ -70,6 +77,7 @@ export class GroupsListComponent implements OnInit {
   }
 
   openCreateDialog(): void {
+    if (this.employeeId === null) return;
     this.showCreateDialog = true;
   }
 
@@ -79,6 +87,7 @@ export class GroupsListComponent implements OnInit {
   }
 
   join(group: IGroupResponse): void {
+    if (this.employeeId === null) return;
     this.pendingActionGroupId = group.groupId;
     this.groupService.join(group.groupId).subscribe({
       next: (response) => {
@@ -100,6 +109,7 @@ export class GroupsListComponent implements OnInit {
   }
 
   requestToJoin(group: IGroupResponse): void {
+    if (this.employeeId === null) return;
     this.pendingActionGroupId = group.groupId;
     this.groupService.requestToJoin(group.groupId).subscribe({
       next: (response) => {

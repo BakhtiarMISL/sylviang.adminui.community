@@ -35,6 +35,11 @@ export class SurveyCardComponent {
     return this.currentUserService.isHrOrAdmin();
   }
 
+  /** Deleting a survey is HR-only, not HR/Admin - see hr-only.guard.ts and the backend's HROnly policy. */
+  get isHr(): boolean {
+    return this.currentUserService.isHr();
+  }
+
   /** Admin is a system account with no Employee record (employeeId is null) - HR/Supervisor/Employee all have one and can take surveys like anyone else. */
   get currentEmployeeId(): number | null {
     return this.currentUserService.currentUser.employeeId;

@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { authGuard } from '@core/guards/auth.guard';
 import { hrAdminGuard } from '@core/guards/hr-admin.guard';
+import { hrOnlyGuard } from '@core/guards/hr-only.guard';
 import { FeedComponent } from './feed/feed.component';
 import { GroupsListComponent } from './groups/groups-list/groups-list.component';
 import { GroupDetailComponent } from './groups/group-detail/group-detail.component';
@@ -54,7 +55,7 @@ const routes: Routes = [
   {
     path: 'surveys/create',
     component: SurveyBuilderComponent,
-    canActivate: [authGuard, hrAdminGuard],
+    canActivate: [authGuard, hrOnlyGuard],
   },
   {
     path: 'surveys/:id/edit',

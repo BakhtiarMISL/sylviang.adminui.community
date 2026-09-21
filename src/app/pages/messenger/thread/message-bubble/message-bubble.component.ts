@@ -39,7 +39,8 @@ export class MessageBubbleComponent implements OnInit {
   sharedPost: IPostResponse | null = null;
   sharedPostLoading = false;
 
-  private get employeeId(): number | null {
+  /** Public (not private) so the template can disable the react control for Admin, a system account with no employeeId. */
+  get employeeId(): number | null {
     return this.currentUserService.currentUser.employeeId;
   }
 
@@ -148,6 +149,7 @@ export class MessageBubbleComponent implements OnInit {
   /** Reacting again with the same type toggles it off; the live update comes back through the hub's MessageReacted event, not this response, so every viewer (including me) updates the same way. */
   react(reactionType: ReactionType): void {
     this.pickerOpen = false;
+    if (this.employeeId === null) return;
     this.messengerService.reactToMessage(this.message.chatMessageId, { reactionType }).subscribe();
   }
 

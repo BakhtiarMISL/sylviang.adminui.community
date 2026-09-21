@@ -71,7 +71,15 @@
           <i class="fa-solid fa-comment"></i> Message Seller
         </button>
 
-        <button pButton severity="secondary" [class.active]="isFavorited" (click)="toggleFavorite()">
+        <button
+          pButton
+          severity="secondary"
+          [class.active]="isFavorited"
+          [disabled]="employeeId === null"
+          [pTooltip]="employeeId === null ? 'Not available for system accounts' : null"
+          tooltipPosition="top"
+          (click)="toggleFavorite()"
+        >
           <i class="fa-solid fa-heart"></i> {{ isFavorited ? 'Favorited' : 'Favorite' }}
         </button>
 

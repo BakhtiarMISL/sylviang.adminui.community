@@ -29,6 +29,26 @@
     background: #ffffff;
     color: #000000;
   }
+
+  // .p-paginator-page/-first/-prev/-next/-last each set their own `color` (mapped from
+  // Aura's `paginator.nav.button.color` -> text.muted.color) directly on the element, so
+  // they don't inherit the `.p-paginator` color fix above - and that token has a separate
+  // dark-color-scheme value, picked up by prefers-color-scheme rather than this app's own
+  // toggle, so the numbers can end up on the wrong shade (or the selected page barely
+  // visible) independent of whether the app itself is in light or dark mode. Pin both the
+  // default and selected states explicitly per app theme instead.
+  ::ng-deep .p-paginator-page,
+  ::ng-deep .p-paginator-first,
+  ::ng-deep .p-paginator-prev,
+  ::ng-deep .p-paginator-next,
+  ::ng-deep .p-paginator-last {
+    color: #000000;
+  }
+
+  ::ng-deep .p-paginator-page.p-paginator-page-selected {
+    background: #4ade80;
+    color: #052e16;
+  }
 }
 
 :host-context(.dark) {
@@ -47,6 +67,19 @@
   ::ng-deep .p-paginator {
     background: #1f2937;
     color: #e5e7eb;
+  }
+
+  ::ng-deep .p-paginator-page,
+  ::ng-deep .p-paginator-first,
+  ::ng-deep .p-paginator-prev,
+  ::ng-deep .p-paginator-next,
+  ::ng-deep .p-paginator-last {
+    color: #e5e7eb;
+  }
+
+  ::ng-deep .p-paginator-page.p-paginator-page-selected {
+    background: #4ade80;
+    color: #052e16;
   }
 }
 

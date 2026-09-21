@@ -7,6 +7,13 @@
     <div class="header-text">
       <div class="author-line">
         <a class="author-name" [routerLink]="['/community/profile', post.employeeId]">{{ authorName }}</a>
+        <a
+          class="badge group-badge"
+          *ngIf="post.groupName && showGroupContext"
+          [routerLink]="['/community/groups', post.groupId]"
+        >
+          <i class="fa-solid fa-people-group"></i> {{ post.groupName }}
+        </a>
         <span class="dot">&middot;</span>
         <span class="time" [title]="post.createdAt | date: 'medium'">{{ post.createdAt | relativeTime : (timeTicker.now$ | async) }}</span>
         <span class="badge announcement-badge" *ngIf="post.isAnnouncement">
@@ -52,10 +59,8 @@
       />
       <video
         *ngIf="isVideoAttachment(attachment)"
-        #videoEl
         [src]="servedUrl(attachment.filePath)"
-        muted
-        loop
+        preload="metadata"
         playsinline
         (click)="openLightbox(attachment, $event)"
       ></video>
@@ -149,6 +154,12 @@
     [style]="{ width: '42rem' }"
     [contentStyle]="{ 'max-height': '80vh', 'overflow-y': 'auto' }"
   >
-    <app-post-card *ngIf="showDetailModal" [post]="post" [isModalView]="true" (deleted)="onModalPostDeleted($event)"></app-post-card>
+    <app-post-card
+      *ngIf="showDetailModal"
+      [post]="post"
+      [isModalView]="true"
+      [showGroupContext]="showGroupContext"
+      (deleted)="onModalPostDeleted($event)"
+    ></app-post-card>
   </p-dialog>
 </div>

@@ -54,7 +54,14 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadEmployeeSummary();
+    const employeeId = this.currentUserService.currentUser.employeeId;
+    if (employeeId === null) {
+      // Admin is a system account with no personal employee record - the employee-summary
+      // endpoint requires one, so skip it gracefully instead of erroring on every login.
+      this.employeeLoading = false;
+    } else {
+      this.loadEmployeeSummary();
+    }
 
     if (this.isHrOrAdmin) {
       this.loadAdminSummary();

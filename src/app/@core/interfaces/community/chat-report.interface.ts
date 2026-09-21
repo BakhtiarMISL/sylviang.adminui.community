@@ -1,5 +1,4 @@
 export interface IChatReportResolveRequest {
-  reviewedBy: number;
   status: string;
 }
 

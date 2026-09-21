@@ -14,6 +14,7 @@ import { EmployeeLookupService } from '@core/services/community/employee-lookup.
 import { EmployeeService } from '@core/services/employee-directory/employee/employee.service';
 import { CurrentUserService } from '@core/services/current-user.service';
 import { ToastService } from '@core/services/misc/toast.service';
+import { ConfirmationService } from 'primeng/api';
 
 /**
  * US-9.5: candidate nomination. Nominating stays open to any authenticated employee (self or
@@ -32,6 +33,8 @@ export class ElectionCandidatesComponent implements OnInit {
   election: IElectionResponse | null = null;
   candidates: IElectionCandidateResponse[] = [];
   candidateNames = new Map<number, string>();
+  /** Table-friendly view of candidates - PrimeNG sort/filter need real field values, not template function calls. */
+  candidatesView: (IElectionCandidateResponse & { candidateName: string })[] = [];
   loading = true;
   loadError = false;
   submitting = false;
@@ -50,6 +53,11 @@ export class ElectionCandidatesComponent implements OnInit {
   bulkTargetIds: number[] = [];
   bulkSubmitting = false;
 
+  /** Per-row remove/edit-manifesto state (HR/Admin only). */
+  pendingActionCandidateId: number | null = null;
+  editingManifestoCandidate: IElectionCandidateResponse | null = null;
+  manifestoDraft = '';
+
   constructor(
     private route: ActivatedRoute,
     private electionService: ElectionService,
@@ -60,6 +68,7 @@ export class ElectionCandidatesComponent implements OnInit {
     private employeeService: EmployeeService,
     private currentUserService: CurrentUserService,
     private toastService: ToastService,
+    private confirmationService: ConfirmationService,
   ) {}
 
   get isHrOrAdmin(): boolean {
@@ -80,6 +89,20 @@ export class ElectionCandidatesComponent implements OnInit {
     return this.bulkScope === 'Organization' || this.bulkTargetIds.length > 0;
   }
 
+  /** Employees/teams already nominated in this election - used to stop the same person/team being nominated twice. */
+  private get nominatedEmployeeIds(): Set<number> {
+    return new Set(this.candidates.filter((c) => c.employeeId !== null).map((c) => c.employeeId as number));
+  }
+
+  private get nominatedTeamIds(): Set<number> {
+    return new Set(this.candidates.filter((c) => c.teamId !== null).map((c) => c.teamId as number));
+  }
+
+  get availableTeams(): ITeamResponse[] {
+    const nominated = this.nominatedTeamIds;
+    return this.teams.filter((t) => !nominated.has(t.teamId));
+  }
+
   ngOnInit(): void {
     this.electionId = Number(this.route.snapshot.paramMap.get('id'));
     this.teamService.getPaged({ page: 1, pageSize: 100 }).subscribe((response) => {
@@ -97,7 +120,9 @@ export class ElectionCandidatesComponent implements OnInit {
   searchEmployees(event: { query: string }): void {
     this.employeeService.getDirectoryPaginated({ searchTerm: event.query, page: 1, pageSize: 8 }).subscribe({
       next: (response) => {
-        this.employeeSearchResults = !response.hasError && response.content ? response.content.data || [] : [];
+        const results = !response.hasError && response.content ? response.content.data || [] : [];
+        const nominated = this.nominatedEmployeeIds;
+        this.employeeSearchResults = results.filter((e) => !nominated.has(e.employeeId));
       },
       error: () => {
         this.employeeSearchResults = [];
@@ -185,8 +210,75 @@ export class ElectionCandidatesComponent implements OnInit {
     });
   }
 
+  removeCandidate(candidate: IElectionCandidateResponse, event: Event): void {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: `Remove ${this.displayName(candidate)} from this election's candidates?`,
+      header: 'Remove Candidate',
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.pendingActionCandidateId = candidate.electionCandidateId;
+        this.electionService.removeCandidate(this.electionId, candidate.electionCandidateId).subscribe({
+          next: (response) => {
+            this.pendingActionCandidateId = null;
+            if (!response.hasError) {
+              this.toastService.success({ detail: 'Candidate removed.' });
+              this.load();
+            } else {
+              this.toastService.error({ detail: response.decentMessage || 'Could not remove this candidate.' });
+            }
+          },
+          error: () => {
+            this.pendingActionCandidateId = null;
+            this.toastService.error({ detail: 'Could not remove this candidate.' });
+          },
+        });
+      },
+    });
+  }
+
+  openManifestoEdit(candidate: IElectionCandidateResponse): void {
+    this.editingManifestoCandidate = candidate;
+    this.manifestoDraft = candidate.manifesto ?? '';
+  }
+
+  cancelManifestoEdit(): void {
+    this.editingManifestoCandidate = null;
+    this.manifestoDraft = '';
+  }
+
+  saveManifesto(): void {
+    const candidate = this.editingManifestoCandidate;
+    if (!candidate) return;
+
+    this.pendingActionCandidateId = candidate.electionCandidateId;
+    this.electionService.updateCandidateManifesto(this.electionId, candidate.electionCandidateId, { manifesto: this.manifestoDraft.trim() || null }).subscribe({
+      next: (response) => {
+        this.pendingActionCandidateId = null;
+        if (!response.hasError) {
+          this.toastService.success({ detail: 'Manifesto updated.' });
+          this.cancelManifestoEdit();
+          this.load();
+        } else {
+          this.toastService.error({ detail: response.decentMessage || 'Could not update the manifesto.' });
+        }
+      },
+      error: () => {
+        this.pendingActionCandidateId = null;
+        this.toastService.error({ detail: 'Could not update the manifesto.' });
+      },
+    });
+  }
+
   displayName(candidate: IElectionCandidateResponse): string {
     return this.candidateNames.get(candidate.electionCandidateId) ?? 'Loading...';
+  }
+
+  private buildCandidatesView(): void {
+    this.candidatesView = this.candidates.map((candidate) => ({
+      ...candidate,
+      candidateName: this.displayName(candidate),
+    }));
   }
 
   private load(): void {
@@ -208,6 +300,7 @@ export class ElectionCandidatesComponent implements OnInit {
       next: (response) => {
         this.candidates = !response.hasError && response.content ? response.content : [];
         this.loading = false;
+        this.buildCandidatesView();
         this.resolveCandidateNames();
       },
       error: () => {
@@ -225,11 +318,13 @@ export class ElectionCandidatesComponent implements OnInit {
       if (candidate.employeeId !== null) {
         this.employeeLookupService.getById(candidate.employeeId).subscribe((employee) => {
           this.candidateNames.set(candidate.electionCandidateId, employee?.employeeName ?? `Employee #${candidate.employeeId}`);
+          this.buildCandidatesView();
         });
       } else if (candidate.teamId !== null) {
         this.teamService.getById(candidate.teamId).subscribe((response) => {
           const name = !response.hasError && response.content ? response.content.name : `Team #${candidate.teamId}`;
           this.candidateNames.set(candidate.electionCandidateId, name);
+          this.buildCandidatesView();
         });
       }
     }

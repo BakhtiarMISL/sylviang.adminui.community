@@ -5,6 +5,9 @@
       class="reaction-trigger"
       [class.active]="!!myReaction()"
       [style.color]="myReaction() ? colorFor(myReaction()?.reactionType) : null"
+      [disabled]="employeeId === null"
+      [pTooltip]="employeeId === null ? 'Not available for system accounts' : null"
+      tooltipPosition="top"
       (click)="togglePicker()"
     >
       <i [class]="iconFor(myReaction()?.reactionType)"></i>

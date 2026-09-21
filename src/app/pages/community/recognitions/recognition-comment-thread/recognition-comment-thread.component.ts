@@ -40,6 +40,11 @@ export class RecognitionCommentThreadComponent implements OnInit {
     private cdr: ChangeDetectorRef,
   ) {}
 
+  /** Admin is a system account with no Employee record - used to disable the compose/reply controls (comments always attribute to the acting employee). */
+  get employeeId(): number | null {
+    return this.currentUserService.currentUser.employeeId;
+  }
+
   ngOnInit(): void {
     this.loadComments();
   }
@@ -74,7 +79,7 @@ export class RecognitionCommentThreadComponent implements OnInit {
   }
 
   private addComment(comment: string, parentCommentId: number | null, onSuccess: () => void): void {
-    if (this.currentUserService.currentUser.employeeId === null) return;
+    if (this.employeeId === null) return;
 
     this.submitting = true;
     const request: IRecognitionCommentAddRequest = { comment, parentCommentId };

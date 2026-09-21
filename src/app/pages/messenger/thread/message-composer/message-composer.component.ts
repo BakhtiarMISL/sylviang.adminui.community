@@ -9,6 +9,7 @@ import {
   IChatMessageSendRequest,
 } from '@core/interfaces/messenger/messenger.interface';
 import { AttachmentService } from '@core/services/community/attachment.service';
+import { CurrentUserService } from '@core/services/current-user.service';
 
 const MESSENGER_UPLOAD_MODULE = 'Messenger';
 
@@ -35,7 +36,15 @@ export class MessageComposerComponent {
   private recordedChunks: BlobPart[] = [];
   private recordingStartedAt = 0;
 
-  constructor(private attachmentService: AttachmentService) {}
+  constructor(
+    private attachmentService: AttachmentService,
+    private currentUserService: CurrentUserService,
+  ) {}
+
+  /** Admin is a system account with no Employee record - sending always attributes to the acting employee, so disable the composer for Admin. */
+  get employeeId(): number | null {
+    return this.currentUserService.currentUser.employeeId;
+  }
 
   onInput(): void {
     this.typing.emit();
@@ -43,7 +52,7 @@ export class MessageComposerComponent {
 
   onSend(): void {
     const trimmed = this.text.trim();
-    if (!trimmed) return;
+    if (!trimmed || this.employeeId === null) return;
 
     this.send.emit({
       body: trimmed,
@@ -68,6 +77,7 @@ export class MessageComposerComponent {
   }
 
   openFilePicker(): void {
+    if (this.employeeId === null) return;
     this.fileInput?.nativeElement.click();
   }
 
@@ -109,6 +119,7 @@ export class MessageComposerComponent {
   }
 
   async toggleRecording(): Promise<void> {
+    if (this.employeeId === null) return;
     if (this.recording) {
       this.mediaRecorder?.stop();
       return;

@@ -192,8 +192,11 @@
           <div class="relative shrink-0">
             <button
               type="button"
+              [disabled]="employeeId === null"
               (click)="togglePicker()"
-              class="h-6 w-6 flex items-center justify-center rounded-full text-neutral opacity-0 group-hover/bubble:opacity-100 hover:bg-gray-100 dark:hover:bg-white/10 duration-150"
+              class="h-6 w-6 flex items-center justify-center rounded-full text-neutral opacity-0 group-hover/bubble:opacity-100 hover:bg-gray-100 dark:hover:bg-white/10 duration-150 disabled:cursor-not-allowed disabled:group-hover/bubble:opacity-50"
+              [pTooltip]="employeeId === null ? 'Not available for system accounts' : null"
+              tooltipPosition="top"
               [attr.aria-label]="'React'"
             >
               <i class="fa-regular fa-face-smile text-xs"></i>

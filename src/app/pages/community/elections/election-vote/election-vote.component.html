@@ -10,12 +10,25 @@
 
   <ng-container *ngIf="!loading && election">
     <div class="vote-header">
-      <h1>{{ election.title }}</h1>
-      <p class="description" *ngIf="election.description">{{ election.description }}</p>
-      <span class="badge anon-badge" *ngIf="election.isAnonymous"><i class="fa-solid fa-user-secret"></i> Anonymous - your identity won't be shown with your selections</span>
-      <p class="selection-hint" *ngIf="election.allowMultipleChoice">
-        Select between {{ election.minSelection }} and {{ election.maxSelection }} candidates.
-      </p>
+      <div class="vote-header-text">
+        <h1>{{ election.title }}</h1>
+        <p class="description" *ngIf="election.description">{{ election.description }}</p>
+        <span class="badge anon-badge" *ngIf="election.isAnonymous"><i class="fa-solid fa-user-secret"></i> Anonymous - your identity won't be shown with your selections</span>
+        <p class="selection-hint" *ngIf="election.allowMultipleChoice">
+          Select between {{ election.minSelection }} and {{ election.maxSelection }} candidates.
+        </p>
+      </div>
+
+      <button
+        type="button"
+        pButton
+        class="submit-vote-btn"
+        *ngIf="isVotable && currentEmployeeId !== null && candidates.length > 0"
+        [disabled]="!canSubmit"
+        (click)="submit()"
+      >
+        Submit Vote
+      </button>
     </div>
 
     <div class="not-found" *ngIf="isExpired">
@@ -31,41 +44,66 @@
     </div>
 
     <form *ngIf="isVotable && currentEmployeeId !== null" class="vote-form">
-      <div class="candidate-row" *ngFor="let candidate of candidates">
-        <ng-container *ngIf="!election.allowMultipleChoice">
-          <p-radioButton
-            name="candidate"
-            [value]="candidate.electionCandidateId"
-            [ngModel]="selectedCandidateId"
-            [ngModelOptions]="{ standalone: true }"
-            (ngModelChange)="selectedCandidateId = $event"
-            [inputId]="'candidate-' + candidate.electionCandidateId"
-          ></p-radioButton>
-        </ng-container>
+      <div class="table-container" *ngIf="candidatesView.length > 0">
+        <p-table #dtVote [value]="candidatesView" dataKey="electionCandidateId" [globalFilterFields]="['candidateName']" [responsiveLayout]="'scroll'">
+          <ng-template pTemplate="caption">
+            <div class="table-caption">
+              <input
+                pInputText
+                type="text"
+                placeholder="Filter candidates..."
+                (input)="dtVote.filterGlobal($any($event.target).value, 'contains')"
+              />
+            </div>
+          </ng-template>
 
-        <ng-container *ngIf="election.allowMultipleChoice">
-          <p-checkbox
-            [binary]="true"
-            [ngModel]="isSelected(candidate.electionCandidateId)"
-            [ngModelOptions]="{ standalone: true }"
-            (ngModelChange)="toggleSelection(candidate.electionCandidateId, $event)"
-            [disabled]="isSelectionCapped(candidate.electionCandidateId)"
-            [inputId]="'candidate-' + candidate.electionCandidateId"
-          ></p-checkbox>
-        </ng-container>
+          <ng-template pTemplate="header">
+            <tr>
+              <th class="select-col"></th>
+              <th pSortableColumn="candidateName">Candidate <p-sortIcon field="candidateName"></p-sortIcon></th>
+              <th *ngIf="isEmployeeCandidateType">Team(s)</th>
+              <th>Manifesto</th>
+            </tr>
+          </ng-template>
 
-        <label [for]="'candidate-' + candidate.electionCandidateId" class="candidate-label">
-          <span class="candidate-name">{{ displayName(candidate) }}</span>
-          <span class="manifesto" *ngIf="candidate.manifesto">{{ candidate.manifesto }}</span>
-        </label>
+          <ng-template pTemplate="body" let-candidate>
+            <tr>
+              <td class="select-col">
+                <p-radioButton
+                  *ngIf="!election.allowMultipleChoice"
+                  name="candidate"
+                  [value]="candidate.electionCandidateId"
+                  [ngModel]="selectedCandidateId"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="selectedCandidateId = $event"
+                  [inputId]="'candidate-' + candidate.electionCandidateId"
+                ></p-radioButton>
+
+                <p-checkbox
+                  *ngIf="election.allowMultipleChoice"
+                  [binary]="true"
+                  [ngModel]="isSelected(candidate.electionCandidateId)"
+                  [ngModelOptions]="{ standalone: true }"
+                  (ngModelChange)="toggleSelection(candidate.electionCandidateId, $event)"
+                  [disabled]="isSelectionCapped(candidate.electionCandidateId)"
+                  [inputId]="'candidate-' + candidate.electionCandidateId"
+                ></p-checkbox>
+              </td>
+              <td>
+                <label [for]="'candidate-' + candidate.electionCandidateId" class="option-row candidate-label">{{ candidate.candidateName }}</label>
+              </td>
+              <td *ngIf="isEmployeeCandidateType">{{ teamNames(candidate) }}</td>
+              <td>
+                <span class="manifesto-cell" *ngIf="candidate.manifesto; else noManifesto">{{ candidate.manifesto }}</span>
+                <ng-template #noManifesto><span class="manifesto-empty">-</span></ng-template>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
       </div>
 
       <div class="not-found" *ngIf="candidates.length === 0">
         <div><i class="fa-solid fa-user-group"></i><p>No candidates nominated yet.</p></div>
-      </div>
-
-      <div class="vote-actions" *ngIf="candidates.length > 0">
-        <button type="button" pButton [disabled]="!canSubmit" (click)="submit()">Submit Vote</button>
       </div>
     </form>
   </ng-container>

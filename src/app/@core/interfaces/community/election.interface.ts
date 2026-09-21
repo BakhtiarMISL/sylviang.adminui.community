@@ -18,6 +18,8 @@ export interface IElectionResponse {
   startDate: string;
   endDate: string | null;
   status: ElectionStatus | string;
+  /** UTC instant the election was published; null while still a Draft. */
+  publishedAt: string | null;
   createdBy: number | null;
 }
 
@@ -96,6 +98,10 @@ export interface IElectionCandidateNominateRequest {
   employeeId?: number | null;
   teamId?: number | null;
   candidateType: ElectionCandidateType | string;
+  manifesto?: string | null;
+}
+
+export interface IElectionCandidateUpdateManifestoRequest {
   manifesto?: string | null;
 }
 

@@ -83,7 +83,7 @@ export class ElectionsComponent implements OnInit {
     if (this.isHrOrAdmin) {
       this.electionService.getPaged({ page: 1, pageSize: 100, sortBy: 'CreatedAt', sortDirection: 'desc' }).subscribe({
         next: (response) => {
-          this.allElections = !response.hasError && response.content ? response.content.data || [] : [];
+          this.allElections = this.publishedFirst(!response.hasError && response.content ? response.content.data || [] : []);
           this.finishLoadingIfDone();
         },
         error: () => {
@@ -111,6 +111,25 @@ export class ElectionsComponent implements OnInit {
     if (!this.isHrOrAdmin && this.currentEmployeeId === null) {
       this.loading = false;
     }
+  }
+
+  /**
+   * Most recently published first, then Drafts (no publish date yet) below, newest-created first.
+   * Done client-side over the already-fetched page (server sort is by CreatedAt): a server-side
+   * sort on the nullable PublishedAt would put Drafts first on Postgres (NULLs sort first in DESC).
+   * Array.sort is stable, so drafts keep the server's CreatedAt-desc order.
+   */
+  private publishedFirst(elections: IElectionResponse[]): IElectionResponse[] {
+    const time = (e: IElectionResponse) => (e.publishedAt ? new Date(e.publishedAt).getTime() : null);
+
+    return [...elections].sort((a, b) => {
+      const ta = time(a);
+      const tb = time(b);
+      if (ta === null && tb === null) return 0;
+      if (ta === null) return 1;
+      if (tb === null) return -1;
+      return tb - ta;
+    });
   }
 
   private finishLoadingIfDone(): void {

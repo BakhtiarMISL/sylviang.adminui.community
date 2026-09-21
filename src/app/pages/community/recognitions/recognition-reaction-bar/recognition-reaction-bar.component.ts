@@ -31,7 +31,8 @@ export class RecognitionReactionBarComponent implements OnInit {
     private eRef: ElementRef,
   ) {}
 
-  private get employeeId(): number | null {
+  /** Public (not private) so the template can disable the react control for Admin, a system account with no employeeId. */
+  get employeeId(): number | null {
     return this.currentUserService.currentUser.employeeId;
   }
 

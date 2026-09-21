@@ -58,8 +58,24 @@
       </div>
 
       <div class="mb-6 text-right">
-        <a href="javascript:void(0)" class="text-sm font-medium text-success-600 hover:text-success-700 hover:underline">Forgot password?</a>
+        <button
+          type="button"
+          (click)="toggleForgotPasswordHelp()"
+          [attr.aria-expanded]="showForgotPasswordHelp"
+          class="text-sm font-medium text-success-600 hover:text-success-700 hover:underline"
+        >
+          Forgot password?
+        </button>
       </div>
+
+      <p
+        *ngIf="showForgotPasswordHelp"
+        class="mb-4 rounded-lg bg-success-50 dark:bg-dark px-4 py-2.5 text-sm text-dark dark:text-borderLight flex items-start gap-2"
+        role="status"
+      >
+        <i class="fas fa-circle-info mt-0.5 text-success-600"></i>
+        Passwords are reset by your HR administrator. Please contact HR to have your password reset.
+      </p>
 
       <p *ngIf="loginError" class="mb-4 rounded-lg bg-danger-50 px-4 py-2.5 text-sm text-danger-700 flex items-center gap-2">
         <i class="fas fa-circle-exclamation"></i>
@@ -81,6 +97,17 @@
         </ng-template>
       </button>
     </form>
+
+    <p class="mt-4 text-center text-xs text-neutral">
+      By signing in you agree to the
+      <a
+        href="legal/terms-privacy-policy.html"
+        target="_blank"
+        rel="noopener"
+        class="font-medium text-success-600 hover:text-success-700 hover:underline"
+        >Terms of Use &amp; Privacy Policy</a
+      >.
+    </p>
 
     <!-- Demo accounts -->
     <div class="mt-6 border-t border-borderLight dark:border-borderDark pt-4">

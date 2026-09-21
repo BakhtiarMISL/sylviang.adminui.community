@@ -15,9 +15,9 @@
       <!-- Dynamic Breadcrumbs -->
       <nav class="flex items-center space-x-2" aria-label="Breadcrumb">
         <ng-container *ngFor="let breadcrumb of breadcrumbs; let i = index; let last = last; let first = first">
-          <!-- Non-clickable non-active items (first item or explicitly non-clickable) -->
+          <!-- Non-clickable non-active items (explicitly non-clickable) -->
           <div
-            *ngIf="!breadcrumb.active && (first || breadcrumb.isClickable === false)"
+            *ngIf="!breadcrumb.active && breadcrumb.isClickable === false"
             class="text-borderDark dark:text-borderLight"
             [attr.aria-label]="breadcrumb.title"
             [pTooltip]="breadcrumb.tooltip || breadcrumb.title"
@@ -28,7 +28,7 @@
 
           <!-- Clickable non-active items — icon only -->
           <button
-            *ngIf="!breadcrumb.active && !first && breadcrumb.isClickable !== false"
+            *ngIf="!breadcrumb.active && breadcrumb.isClickable !== false"
             [routerLink]="breadcrumb.href"
             class="cursor-pointer transition-all duration-300 ease-in-out hover:text-primary dark:hover:text-primary text-borderDark dark:text-borderLight"
             [attr.aria-label]="'Navigate to ' + breadcrumb.title"

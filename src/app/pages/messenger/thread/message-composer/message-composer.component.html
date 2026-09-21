@@ -21,21 +21,21 @@
 
   <button
     type="button"
-    [disabled]="uploading"
+    [disabled]="uploading || employeeId === null"
     (click)="toggleRecording()"
-    class="h-8 w-8 flex items-center justify-center duration-150"
+    class="h-8 w-8 flex items-center justify-center duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
     [ngClass]="recording ? 'text-danger animate-pulse' : 'text-neutral hover:text-primary'"
-    [pTooltip]="recording ? 'Stop recording' : 'Record a voice note'"
+    [pTooltip]="employeeId === null ? 'Not available for system accounts' : recording ? 'Stop recording' : 'Record a voice note'"
     tooltipPosition="top"
   >
     <i class="fas fa-microphone"></i>
   </button>
   <button
     type="button"
-    [disabled]="uploading || recording"
+    [disabled]="uploading || recording || employeeId === null"
     (click)="openFilePicker()"
     class="h-8 w-8 flex items-center justify-center text-neutral hover:text-primary duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
-    [pTooltip]="'Attach an image or file'"
+    [pTooltip]="employeeId === null ? 'Not available for system accounts' : 'Attach an image or file'"
     tooltipPosition="top"
   >
     <i class="fas fa-image"></i>
@@ -46,16 +46,20 @@
     [(ngModel)]="text"
     (ngModelChange)="onInput()"
     (keydown)="onKeydown($event)"
-    [disabled]="recording"
-    placeholder="Aa"
+    [disabled]="recording || employeeId === null"
+    [placeholder]="employeeId === null ? 'Not available for system accounts' : 'Aa'"
+    [pTooltip]="employeeId === null ? 'Not available for system accounts' : null"
+    tooltipPosition="top"
     class="flex-1 rounded-full border border-borderLight dark:border-borderDark bg-gray-50 dark:bg-white/5 text-dark dark:text-borderLight px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
   />
 
   <button
     type="button"
-    [disabled]="!text.trim()"
+    [disabled]="!text.trim() || employeeId === null"
     (click)="onSend()"
     class="h-8 w-8 flex items-center justify-center rounded-full text-primary disabled:text-neutral disabled:opacity-50 hover:bg-primary/10 duration-150"
+    [pTooltip]="employeeId === null ? 'Not available for system accounts' : null"
+    tooltipPosition="top"
     [attr.aria-label]="'Send'"
   >
     <i class="fas fa-paper-plane"></i>

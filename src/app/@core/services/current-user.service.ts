@@ -28,6 +28,16 @@ export class CurrentUserService {
   constructor() {
     this.currentUserSubject = new BehaviorSubject<IMockUser>(this.loadInitialUser());
     this.currentUser$ = this.currentUserSubject.asObservable();
+
+    // This service is a per-tab singleton. If a DIFFERENT tab logs in/out (rewriting
+    // STORAGE_KEY), this tab's BehaviorSubject would otherwise never notice and would keep
+    // serving a stale user. The `storage` event only fires in OTHER tabs when localStorage
+    // changes (never in the tab that made the change), so this can't loop back on itself.
+    window.addEventListener('storage', (event) => {
+      if (event.key === STORAGE_KEY) {
+        this.currentUserSubject.next(this.loadInitialUser());
+      }
+    });
   }
 
   get currentUser(): IMockUser {
@@ -56,6 +66,11 @@ export class CurrentUserService {
   isHrOrAdmin(): boolean {
     const role = this.currentUser.role;
     return role === UserRoleEnum.HR || role === UserRoleEnum.Admin;
+  }
+
+  /** HR only, excluding Admin - e.g. survey authoring (create/delete), which the backend's HROnly policy restricts to HR since Admin is a system account, not a survey content owner. */
+  isHr(): boolean {
+    return this.currentUser.role === UserRoleEnum.HR;
   }
 
   private loadInitialUser(): IMockUser {

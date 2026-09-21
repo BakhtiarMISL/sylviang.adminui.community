@@ -25,6 +25,7 @@ export class LoginComponent {
   submitted = false;
   loading = false;
   loginError = '';
+  showForgotPasswordHelp = false;
 
   readonly demoAccounts: IDemoAccount[] = [
     { role: 'Employee', username: 'ayesha.rahman', password: 'Employee@123' },
@@ -50,6 +51,10 @@ export class LoginComponent {
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
+  }
+
+  toggleForgotPasswordHelp(): void {
+    this.showForgotPasswordHelp = !this.showForgotPasswordHelp;
   }
 
   fillDemoAccount(account: IDemoAccount): void {

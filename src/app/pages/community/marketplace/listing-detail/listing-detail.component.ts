@@ -54,6 +54,11 @@ export class ListingDetailComponent implements OnInit {
     return !!this.listing && this.listing.sellerId === this.currentUserService.currentUser.employeeId;
   }
 
+  /** Admin is a system account with no Employee record - favoriting always attributes to the acting employee, so disable the control for Admin. */
+  get employeeId(): number | null {
+    return this.currentUserService.currentUser.employeeId;
+  }
+
   get isHrOrAdmin(): boolean {
     return this.currentUserService.isHrOrAdmin();
   }
@@ -79,8 +84,7 @@ export class ListingDetailComponent implements OnInit {
 
   toggleFavorite(): void {
     if (!this.listing) return;
-    const employeeId = this.currentUserService.currentUser.employeeId;
-    if (employeeId === null) return;
+    if (this.employeeId === null) return;
 
     if (this.isFavorited) {
       this.favoriteService.remove(this.listing.listingId).subscribe({

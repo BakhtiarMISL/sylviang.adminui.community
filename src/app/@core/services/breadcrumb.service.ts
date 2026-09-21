@@ -32,6 +32,48 @@ export class BreadcrumbService {
 
   private customBreadcrumbs: Map<string, BreadcrumbConfig[]> = new Map();
 
+  private readonly sectionIcons: Record<string, string> = {
+    // top-level
+    dashboard: 'fas fa-chart-line',
+    'change-password': 'fas fa-key',
+    'employee-directory': 'fas fa-id-badge',
+    notifications: 'fas fa-bell',
+    messenger: 'fas fa-comment-dots',
+    community: 'fas fa-users',
+
+    // employee-directory
+    directory: 'fas fa-address-book',
+    profile: 'fas fa-user',
+    me: 'fas fa-user',
+    'manage-employee': 'fas fa-user-pen',
+    'user-management': 'fas fa-users-gear',
+
+    // notifications
+    preferences: 'fas fa-gear',
+
+    // community sections
+    feed: 'fas fa-newspaper',
+    groups: 'fas fa-people-group',
+    recognitions: 'fas fa-award',
+    surveys: 'fas fa-clipboard-list',
+    elections: 'fas fa-landmark',
+    moderation: 'fas fa-shield',
+    marketplace: 'fas fa-store',
+    teams: 'fas fa-sitemap',
+    tasks: 'fas fa-list-check',
+
+    // shared action/sub-page words
+    create: 'fas fa-plus',
+    new: 'fas fa-plus',
+    edit: 'fas fa-pen',
+    take: 'fas fa-pen-to-square',
+    candidates: 'fas fa-user-tie',
+    vote: 'fas fa-check-to-slot',
+    results: 'fas fa-chart-bar',
+    listing: 'fas fa-tag',
+    messages: 'fas fa-envelope',
+  };
+
   constructor(private router: Router) {
     this.router.events.pipe(filter((event) => event instanceof NavigationEnd)).subscribe(() => {
       this.updateBreadcrumbs();
@@ -82,23 +124,20 @@ export class BreadcrumbService {
       return [{ title: 'Dashboard', icon: 'fas fa-chart-line', href: '/dashboard', active: true, isClickable: true }];
     }
 
-    const sectionIcons: Record<string, string> = {
-      dashboard: 'fas fa-chart-line',
-      attendance: 'fas fa-clock',
-      payroll: 'fas fa-money-bill-wave',
-      'employee-directory': 'fas fa-id-badge',
-    };
-
     const crumbs: BreadcrumbItem[] = [];
     let pathAccumulator = '';
+    let lastIcon = 'fas fa-circle'; // only used if the very first segment is somehow unmapped
 
     for (let i = 0; i < urlSegments.length; i++) {
       const segment = urlSegments[i];
       pathAccumulator += `/${segment}`;
       const isLast = i === urlSegments.length - 1;
+      const matchedIcon = this.sectionIcons[segment];
+      if (matchedIcon) lastIcon = matchedIcon;
+
       crumbs.push({
         title: this.formatSegmentName(segment),
-        icon: sectionIcons[segment] || 'fas fa-folder',
+        icon: matchedIcon || lastIcon,
         href: pathAccumulator,
         active: isLast,
         isClickable: !isLast,

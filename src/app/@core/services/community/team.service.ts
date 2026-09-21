@@ -46,6 +46,10 @@ export class TeamService {
     return this.httpClient.get<ApiResponse<ITeamMemberResponse[]>>(`${this.API_URL}/${teamId}/members`);
   }
 
+  getByEmployeeId(employeeId: number) {
+    return this.httpClient.get<ApiResponse<ITeamResponse[]>>(`${this.API_URL}/by-employee/${employeeId}`);
+  }
+
   addMember(teamId: number, request: ITeamMemberAddRequest) {
     return this.httpClient.post<ApiResponse<number>>(`${this.API_URL}/${teamId}/members`, request);
   }

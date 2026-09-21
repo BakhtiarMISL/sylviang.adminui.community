@@ -7,6 +7,7 @@ import {
   IElectionCandidateNominateBulkRequest,
   IElectionCandidateNominateRequest,
   IElectionCandidateResponse,
+  IElectionCandidateUpdateManifestoRequest,
   IElectionCreateRequest,
   IElectionEligibleResponse,
   IElectionFilterParams,
@@ -85,6 +86,16 @@ export class ElectionService {
   /** Bulk-nominates every active employee matching request.scope; returns the count newly nominated. */
   nominateBulk(electionId: number, request: IElectionCandidateNominateBulkRequest) {
     return this.httpClient.post<ApiResponse<number>>(`${this.API_URL}/${electionId}/candidates/bulk`, request);
+  }
+
+  /** HR/Admin only - removes a nomination. Rejected once the election has received any votes. */
+  removeCandidate(electionId: number, candidateId: number) {
+    return this.httpClient.delete<ApiResponse<void>>(`${this.API_URL}/${electionId}/candidates/${candidateId}`);
+  }
+
+  /** HR/Admin only - adds or edits a candidate's manifesto after nomination. */
+  updateCandidateManifesto(electionId: number, candidateId: number, request: IElectionCandidateUpdateManifestoRequest) {
+    return this.httpClient.put<ApiResponse<void>>(`${this.API_URL}/${electionId}/candidates/${candidateId}/manifesto`, request);
   }
 
   /** Casts one ballot - request.candidateIds holds every candidate selected in this submission. */

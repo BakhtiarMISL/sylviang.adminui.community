@@ -5,7 +5,6 @@ export interface IContentReportCreateRequest {
 }
 
 export interface IContentReportResolveRequest {
-  reviewedBy: number;
   status: string;
 }
 
